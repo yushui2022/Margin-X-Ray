@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Margin X-Ray — Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="hero-brand">
+          <div class="logo">X</div>
+          <div>
+            <div class="brand-name">MARGIN X-RAY</div>
+            <div class="brand-sub">Factory cost lens · settings</div>
+          </div>
+        </div>
+        <span id="modeBadge" class="badge demo">DEMO</span>
+      </header>
+
+      <p class="lede">
+        The extension only reads a page after you click <strong>Scan</strong>.
+        Everything below is stored locally in this browser. No account, no
+        tracking, no remote code.
+      </p>
+
+      <form id="settingsForm" class="card">
+        <div class="section-head">
+          <h2>API connection</h2>
+          <span class="section-note">Used only when demo mode is off</span>
+        </div>
+
+        <div class="field">
+          <label for="apiBaseUrl">API base URL</label>
+          <input
+            id="apiBaseUrl"
+            name="apiBaseUrl"
+            type="url"
+            placeholder="http://localhost:8787"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="field-hint">
+            Start the local mock server with <code>npm run mock</code>, or point
+            this at the real Margin X-Ray API.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="apiToken">API token</label>
+          <input
+            id="apiToken"
+            name="apiToken"
+            type="password"
+            placeholder="Optional bearer token"
+            autocomplete="off"
+          />
+          <div class="field-hint">
+            Stored in <code>chrome.storage.local</code>. Sent only to the API
+            base URL above.
+          </div>
+        </div>
+
+        <label class="switch-row" for="demoMode">
+          <span>
+            <span class="switch-title">Demo mode</span>
+            <span class="switch-sub">Use a clearly labeled sample dataset. No API calls.</span>
+          </span>
+          <input id="demoMode" name="demoMode" type="checkbox" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+
+        <label class="switch-row" for="autoOpen">
+          <span>
+            <span class="switch-title">Auto-open on supported pages</span>
+            <span class="switch-sub">Open the panel after the page loads on TikTok, Amazon, Instagram and YouTube.</span>
+          </span>
+          <input id="autoOpen" name="autoOpen" type="checkbox" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+
+        <div class="field compact">
+          <label for="maxScanHistory">Local scan history limit</label>
+          <input
+            id="maxScanHistory"
+            name="maxScanHistory"
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+          />
+        </div>
+
+        <div class="actions">
+          <button id="saveBtn" class="btn primary" type="submit">
+            Save settings
+          </button>
+          <button id="testBtn" class="btn secondary" type="button">
+            Test connection
+          </button>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite">
+          Ready.
+        </div>
+      </form>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Local data</h2>
+          <span class="section-note">You can delete it at any time</span>
+        </div>
+        <p id="dataSummary" class="muted">Loading local data…</p>
+        <button id="clearBtn" class="btn danger" type="button">
+          Delete local scans and leads
+        </button>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Integrity rules</h2>
+          <span class="section-note">Why this is not another price-guessing toy</span>
+        </div>
+        <ul class="rules">
+          <li>
+            <strong>No fallback factory price.</strong> If the API cannot verify
+            a range, the panel says “insufficient data” instead of inventing a
+            number.
+          </li>
+          <li>
+            <strong>No fake precision.</strong> Factory cards show the signals,
+            sources and dates behind the confidence label.
+          </li>
+          <li>
+            <strong>No “100% middleman” claims.</strong> The funnel counts
+            exclusion reasons separately instead of subtracting everything from
+            the scanned total.
+          </li>
+          <li>
+            <strong>No hidden margin math.</strong> The landed-cost waterfall is
+            editable and always visible.
+          </li>
+          <li>
+            <strong>Demo is labeled.</strong> Sample data never pretends to be a
+            live supplier quote.
+          </li>
+        </ul>
+      </section>
+
+      <footer class="footer">
+        <span>Margin X-Ray <span id="version">v0.1.0</span></span>
+        <span>Estimates, not a quote.</span>
+      </footer>
+    </main>
+    <script src="options.js" defer></script>
+  </body>
+</html>

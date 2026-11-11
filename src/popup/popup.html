@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Margin X-Ray</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="brand">
+          <div class="logo">X</div>
+          <div class="brand-text">
+            <div class="brand-name">MARGIN X-RAY</div>
+            <div class="brand-sub">Factory cost lens</div>
+          </div>
+        </div>
+        <span id="modeBadge" class="badge demo">DEMO</span>
+      </header>
+
+      <main class="main">
+        <button id="scanBtn" class="btn primary" type="button">
+          ⚡ Scan this page
+        </button>
+        <div id="status" class="status" role="status" aria-live="polite">
+          Ready. Open a product page and scan it.
+        </div>
+
+        <label class="switch-row" for="demoToggle">
+          <span>
+            <span class="switch-title">Demo mode</span>
+            <span class="switch-sub">No API key or server needed.</span>
+          </span>
+          <input id="demoToggle" type="checkbox" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+
+        <div id="demoHint" class="hint">
+          Demo mode uses a clearly labeled sample dataset. It never invents a
+          fallback factory price.
+        </div>
+
+        <section id="lastScan" class="last-scan" hidden>
+          <div class="section-title">Last scan</div>
+          <div id="lastScanTitle" class="last-scan-title"></div>
+          <div id="lastScanMeta" class="last-scan-meta"></div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <button id="optionsBtn" class="link" type="button">Settings</button>
+        <span id="version">v0.1.0</span>
+      </footer>
+    </div>
+    <script src="popup.js" defer></script>
+  </body>
+</html>

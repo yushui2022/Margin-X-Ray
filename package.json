@@ -1,0 +1,23 @@
+{
+  "name": "margin-xray-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome MV3 extension for Margin X-Ray: see the estimated China factory cost behind a product.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "mock": "node server/mock-xray.mjs",
+    "serve:demo": "node scripts/serve-demo.mjs",
+    "package": "npm run build && cd dist && zip -r ../margin-xray-extension.zip ."
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.0",
+    "@types/node": "^26.6.6",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

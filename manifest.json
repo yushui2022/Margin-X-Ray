@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Margin X-Ray — Factory Price Lens",
+  "short_name": "Margin X-Ray",
+  "version": "0.1.0",
+  "description": "See the estimated China factory cost behind TikTok Shop, Shopify and Amazon products — with the assumptions shown.",
+  "minimum_chrome_version": "114",
+  "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
+  "host_permissions": ["http://localhost:8787/*"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "action": {
+    "default_title": "Margin X-Ray",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png",
+      "128": "assets/icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.tiktok.com/*",
+        "https://*.instagram.com/*",
+        "https://*.youtube.com/*",
+        "https://*.amazon.com/*",
+        "https://*.amazon.co.uk/*",
+        "https://*.amazon.ca/*",
+        "https://*.amazon.com.au/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

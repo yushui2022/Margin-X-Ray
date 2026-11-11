@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Margin X-Ray — HUD preview</title>
+    <link rel="stylesheet" href="./demo.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-brand">
+        <span class="tiktok-mark">♪</span>
+        <span>TikTok Shop</span>
+        <span class="demo-pill">LOCAL DEMO PAGE</span>
+      </div>
+      <div class="site-note">This is not a real store. No checkout, no tracking.</div>
+    </header>
+
+    <main class="product-page">
+      <section class="gallery" aria-label="Product image">
+        <div class="product-image">
+          <img
+            src="../assets/demo-neck-fan.svg"
+            alt="Portable neck fan illustration"
+          />
+        </div>
+        <div class="thumb-row">
+          <div class="thumb active">
+            <img src="../assets/demo-neck-fan.svg" alt="" />
+          </div>
+          <div class="thumb">
+            <img src="../assets/demo-neck-fan.svg" alt="" />
+          </div>
+          <div class="thumb">
+            <img src="../assets/demo-neck-fan.svg" alt="" />
+          </div>
+        </div>
+      </section>
+
+      <section class="details">
+        <div class="pill-row">
+          <span class="pill dark">TikTok Shop</span>
+          <span class="pill">Demo listing</span>
+          <span class="pill green">Free shipping</span>
+        </div>
+
+        <h1>Portable Neck Fan — Ultra Cooling</h1>
+        <div class="rating">
+          <span class="stars">★★★★★</span>
+          <span>4.8 · 2,341 reviews</span>
+          <span class="dot">·</span>
+          <span>6.4k sold</span>
+        </div>
+
+        <div class="price-row">
+          <span class="price">$59.90</span>
+          <span class="compare">$89.90</span>
+          <span class="discount">-33%</span>
+        </div>
+        <div class="tax-note">Tax calculated at checkout · Free returns within 30 days</div>
+
+        <p class="description">
+          A bladeless neck fan with a semiconductor cooling plate, three wind
+          speeds and a 4,000 mAh battery. The kind of product that shows up in a
+          viral TikTok video at $59.90 — and in a sourcing report at a very
+          different number.
+        </p>
+
+        <ul class="bullets">
+          <li>Semiconductor cooling plate, not just a fan</li>
+          <li>4,000 mAh battery · 6–18 hours depending on speed</li>
+          <li>CE / FCC documentation claimed by the seller</li>
+        </ul>
+
+        <div class="cta-row">
+          <button id="openHud" class="btn primary" type="button">
+            ⚡ Open X-Ray HUD
+          </button>
+          <button id="replay" class="btn secondary" type="button">
+            Replay scan
+          </button>
+        </div>
+
+        <div class="demo-note">
+          The HUD uses a <strong>sample dataset</strong> and never calls a live
+          API. It is a preview of the extension UI, not a supplier quote.
+        </div>
+
+        <div class="spec-grid">
+          <div>
+            <span class="spec-label">Battery</span>
+            <span class="spec-value">4,000 mAh</span>
+          </div>
+          <div>
+            <span class="spec-label">Weight</span>
+            <span class="spec-value">0.32 kg</span>
+          </div>
+          <div>
+            <span class="spec-label">Speed</span>
+            <span class="spec-value">3 levels</span>
+          </div>
+          <div>
+            <span class="spec-label">Charging</span>
+            <span class="spec-value">USB-C</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Margin X-Ray HUD preview</span>
+      <span>Sample data · estimates, not a quote</span>
+    </footer>
+
+    <script src="./demo.js" defer></script>
+  </body>
+</html>
