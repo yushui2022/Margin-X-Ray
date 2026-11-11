@@ -32,13 +32,13 @@
 .xray-launcher {
   pointer-events: auto;
   position: absolute;
-  top: 84px;
+  top: 76px;
   right: 16px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 38px;
-  padding: 0 12px;
+  min-height: 40px;
+  padding: 0 13px;
   border: 1px solid var(--mx-accent-solid);
   border-radius: var(--mx-radius);
   background: var(--mx-accent-solid);
@@ -46,7 +46,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 18px rgba(19, 55, 38, 0.18);
   transition:
     background 160ms ease,
     border-color 160ms ease,
@@ -91,16 +91,16 @@
 .xray-panel {
   pointer-events: auto;
   position: absolute;
-  top: 72px;
+  top: 20px;
   right: 16px;
-  width: 420px;
-  max-width: calc(100vw - 32px);
-  max-height: calc(100vh - 96px);
+  width: 448px;
+  max-width: calc(100vw - 28px);
+  max-height: calc(100vh - 40px);
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--mx-panel);
   border: 1px solid var(--mx-line-strong);
-  border-radius: var(--mx-radius-lg);
+  border-radius: 12px;
   box-shadow: var(--mx-shadow-panel);
   animation: mx-panel-in 160ms ease-out;
   scrollbar-width: thin;
@@ -139,7 +139,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 14px 16px 12px;
+  padding: 16px 18px 14px;
   border-bottom: 1px solid var(--mx-line);
   background: var(--mx-panel);
 }
@@ -148,8 +148,8 @@
   content: "";
   position: absolute;
   top: 0;
-  left: 16px;
-  width: 36px;
+  left: 18px;
+  width: 44px;
   height: 2px;
   background: var(--mx-accent);
 }
@@ -235,7 +235,7 @@
 }
 
 .xray-content {
-  padding: 14px 16px 16px;
+  padding: 16px 18px 18px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -259,20 +259,20 @@
 }
 
 .xray-badge.demo {
-  border-color: rgba(198, 174, 135, 0.32);
-  background: rgba(198, 174, 135, 0.08);
+  border-color: rgba(138, 107, 50, 0.3);
+  background: rgba(138, 107, 50, 0.08);
   color: var(--mx-gold);
 }
 
 .xray-badge.live {
-  border-color: rgba(175, 203, 182, 0.32);
-  background: rgba(175, 203, 182, 0.08);
+  border-color: rgba(46, 138, 97, 0.3);
+  background: rgba(46, 138, 97, 0.08);
   color: var(--mx-accent);
 }
 
 .xray-badge.mock {
-  border-color: rgba(157, 185, 199, 0.32);
-  background: rgba(157, 185, 199, 0.08);
+  border-color: rgba(53, 109, 125, 0.3);
+  background: rgba(53, 109, 125, 0.08);
   color: var(--mx-blue);
 }
 
@@ -296,8 +296,8 @@
 }
 
 .xray-chip.green {
-  border-color: rgba(175, 203, 182, 0.3);
-  background: rgba(175, 203, 182, 0.07);
+  border-color: rgba(46, 138, 97, 0.3);
+  background: rgba(46, 138, 97, 0.07);
   color: var(--mx-accent);
 }
 
@@ -306,8 +306,8 @@
 }
 
 .xray-chip.red {
-  border-color: rgba(208, 165, 161, 0.3);
-  background: rgba(208, 165, 161, 0.07);
+  border-color: rgba(162, 79, 88, 0.3);
+  background: rgba(162, 79, 88, 0.07);
   color: var(--mx-wine);
 }
 
@@ -338,17 +338,17 @@
 
 .xray-banner.demo {
   border-left-color: var(--mx-gold);
-  color: #d9c6a4;
+  color: var(--mx-gold);
 }
 
 .xray-banner.info {
   border-left-color: var(--mx-blue);
-  color: #b8cbd4;
+  color: var(--mx-blue);
 }
 
 .xray-banner.warn {
   border-left-color: var(--mx-wine);
-  color: #dfb8b3;
+  color: var(--mx-wine);
 }
 
 .xray-banner strong {
@@ -578,11 +578,12 @@
 
 .xray-card {
   position: relative;
-  padding: 14px;
-  margin-bottom: 12px;
+  padding: 15px;
+  margin-bottom: 14px;
   border: 1px solid var(--mx-line);
   border-radius: var(--mx-radius-lg);
-  background: var(--mx-panel-2);
+  background: var(--mx-panel);
+  box-shadow: var(--mx-shadow-card);
 }
 
 .xray-card.flush {
@@ -594,8 +595,8 @@
   content: "";
   position: absolute;
   top: -1px;
-  left: 14px;
-  width: 32px;
+  left: 15px;
+  width: 42px;
   height: 2px;
   background: var(--mx-accent);
 }
@@ -664,7 +665,7 @@
 
 .xray-price-value {
   margin-top: 5px;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   line-height: 1.1;
   color: var(--mx-ink);
@@ -680,7 +681,7 @@
 }
 
 .xray-price-value.range {
-  font-size: 20px;
+  font-size: 21px;
   white-space: nowrap;
 }
 
@@ -752,7 +753,7 @@
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 8px;
   align-items: baseline;
-  padding: 6px 0;
+  padding: 7px 0;
   border-bottom: 1px solid var(--mx-line);
   font-size: 12px;
 }
@@ -817,7 +818,7 @@
 
 .xray-row.total .xray-row-value {
   color: var(--mx-accent);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -1029,7 +1030,7 @@
 }
 
 .xray-factory-price-value {
-  color: var(--mx-accent);
+  color: var(--mx-accent-strong);
   font-size: 13px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -1054,26 +1055,26 @@
 }
 
 .xray-confidence.high {
-  border-color: rgba(175, 203, 182, 0.3);
-  background: rgba(175, 203, 182, 0.07);
+  border-color: rgba(46, 138, 97, 0.3);
+  background: rgba(46, 138, 97, 0.07);
   color: var(--mx-accent);
 }
 
 .xray-confidence.medium {
-  border-color: rgba(198, 174, 135, 0.3);
-  background: rgba(198, 174, 135, 0.07);
+  border-color: rgba(138, 107, 50, 0.3);
+  background: rgba(138, 107, 50, 0.07);
   color: var(--mx-gold);
 }
 
 .xray-confidence.low {
-  border-color: rgba(208, 165, 161, 0.3);
-  background: rgba(208, 165, 161, 0.07);
+  border-color: rgba(162, 79, 88, 0.3);
+  background: rgba(162, 79, 88, 0.07);
   color: var(--mx-wine);
 }
 
 .xray-confidence.demo {
-  border-color: rgba(157, 185, 199, 0.3);
-  background: rgba(157, 185, 199, 0.07);
+  border-color: rgba(53, 109, 125, 0.3);
+  background: rgba(53, 109, 125, 0.07);
   color: var(--mx-blue);
 }
 
@@ -1104,7 +1105,7 @@
 
 .xray-tier.active {
   border-color: var(--mx-accent);
-  background: rgba(175, 203, 182, 0.06);
+  background: rgba(46, 138, 97, 0.06);
 }
 
 .xray-tier-moq {
@@ -1215,7 +1216,7 @@
   border-color: var(--mx-accent-solid);
   background: var(--mx-accent-solid);
   color: var(--mx-on-accent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 10px rgba(29, 101, 73, 0.18);
 }
 
 .xray-btn.primary:hover {
@@ -1245,8 +1246,8 @@
 }
 
 .xray-btn.danger {
-  border-color: rgba(208, 165, 161, 0.3);
-  background: rgba(208, 165, 161, 0.06);
+  border-color: rgba(162, 79, 88, 0.3);
+  background: rgba(162, 79, 88, 0.06);
   color: var(--mx-wine);
 }
 
@@ -1323,7 +1324,7 @@
   border-left: 2px solid var(--mx-wine);
   border-radius: var(--mx-radius);
   background: var(--mx-panel-2);
-  color: #dfb8b3;
+  color: var(--mx-wine);
   font-size: 11px;
   line-height: 1.5;
 }
@@ -1403,7 +1404,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 10px 16px 12px;
+  padding: 11px 18px 14px;
   border-top: 1px solid var(--mx-line);
   color: var(--mx-dim);
   font-size: 9.5px;

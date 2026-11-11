@@ -373,7 +373,7 @@ export class Hud {
     });
     launcher.append(
       el("span", { className: "xray-launcher-mark" }, [createIcon("bolt", 14)]),
-      el("span", { text: "X-Ray Factory Price" }),
+      el("span", { text: "Analyze with X-Ray" }),
       el("span", { className: "xray-launcher-dot" }),
     );
     return launcher;
@@ -556,8 +556,6 @@ export class Hud {
     const pageUrl = safePageUrl(result?.product.sourceUrl ?? context.url);
     const sub = el("div", { className: "xray-sub" });
     sub.append(
-      el("span", { className: "xray-chip", text: platformLabel({ ...context, platform }) }),
-      el("span", { className: "xray-chip", text: pageType }),
       el("span", { className: "xray-price-inline", text: priceValue }),
     );
     if (pageUrl) {

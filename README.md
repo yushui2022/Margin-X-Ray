@@ -4,7 +4,7 @@
 
 This repository contains the first working slice of Margin X-Ray: a Chrome
 Manifest V3 extension that captures the page context you clicked on, streams a
-scan result into a dark HUD, shows an editable landed-cost waterfall, and
+scan result into a focused research HUD, shows an editable landed-cost waterfall, and
 collects sourcing leads.
 
 **The product is the extension.** `dist/` is the loadable extension. `preview/`
@@ -44,13 +44,13 @@ rules real before wiring the supply-chain engine.
 ## Visual system
 
 The extension follows the WenCode-style enterprise visual language, adapted to
-the dark theme because the HUD overlays arbitrary pages:
+a light research-panel treatment because the HUD overlays arbitrary pages:
 
-- ink-green paper and panel surfaces, not pure black
+- warm paper and ink-green panel surfaces, with clear separation from the host page
 - serif headings (`Georgia` / `Songti SC`) with sans-serif body text
 - forest-green actions, mineral-blue links and info, wine warnings, muted gold
   for demo/medium-confidence states
-- 4px badges, 6px controls, 8px cards and panels
+- 5px badges, 7px controls, 10px cards and panels
 - 1px borders, low-intervention shadows, no gradient/glass/neon treatment
 - `tabular-nums` for prices and margins
 - visible mineral-blue focus rings and `prefers-reduced-motion` fallbacks
@@ -155,7 +155,7 @@ src/
       hud.css                 HUD styles
       icons.ts                inline stroke icon set
   styles/
-    tokens.css                shared design tokens (WenCode-inspired dark theme)
+    tokens.css                shared design tokens (WenCode-inspired light theme)
   shared/
     types.ts                  data contract
     pricing.ts                landed-cost waterfall + MOQ helper

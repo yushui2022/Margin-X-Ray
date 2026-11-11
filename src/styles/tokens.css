@@ -2,53 +2,55 @@
  * Margin X-Ray design tokens.
  *
  * Adapted from the WenCode enterprise visual system:
- * ink-green paper, serif headings, forest-green actions, mineral-blue info,
- * wine warnings, thin lines, low-intervention shadows, 4/6/8px radii.
+ * warm paper, serif headings, forest-green actions, mineral-blue info,
+ * wine warnings, thin lines, low-intervention shadows, 5/7/10px radii.
  *
- * The extension uses the dark theme because the HUD is injected over arbitrary
- * pages and must remain readable without washing out the host page.
+ * The HUD uses a light research-panel treatment so it stays legible over
+ * bright storefronts, dark video pages and mixed host themes.
  */
 
 .mx-theme {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* Surfaces */
-  --mx-paper: #171e1b;
-  --mx-panel: #222c26;
-  --mx-panel-2: #1c2520;
-  --mx-panel-3: #2c3931;
-  --mx-soft: #2c3931;
+  --mx-paper: #f3f5f1;
+  --mx-panel: #fbfcfa;
+  --mx-panel-2: #f5f7f4;
+  --mx-panel-3: #e9efea;
+  --mx-soft: #edf2ee;
 
   /* Ink */
-  --mx-ink: #e8eee9;
-  --mx-muted: #b0beb4;
-  --mx-dim: #8c9d92;
+  --mx-ink: #18231f;
+  --mx-muted: #58675f;
+  --mx-dim: #7d8b82;
 
   /* Lines */
-  --mx-line: #3f4d44;
-  --mx-line-strong: #596e5f;
-  --mx-edge: #596e5f;
+  --mx-line: #dce4de;
+  --mx-line-strong: #b8c8bc;
+  --mx-edge: #9fb5a6;
 
   /* Semantic */
-  --mx-accent: #afcbb6;
-  --mx-accent-strong: #355d47;
-  --mx-accent-solid: #294b3a;
-  --mx-accent-hover: #3c5e4a;
-  --mx-on-accent: #f2f7f3;
-  --mx-blue: #9db9c7;
-  --mx-wine: #d0a5a1;
-  --mx-gold: #c6ae87;
+  --mx-accent: #2e8a61;
+  --mx-accent-strong: #246b4e;
+  --mx-accent-solid: #1d6549;
+  --mx-accent-hover: #287957;
+  --mx-on-accent: #ffffff;
+  --mx-blue: #356d7d;
+  --mx-wine: #a24f58;
+  --mx-gold: #8a6b32;
 
   /* Radii */
-  --mx-radius-sm: 4px;
-  --mx-radius: 6px;
-  --mx-radius-lg: 8px;
+  --mx-radius-sm: 5px;
+  --mx-radius: 7px;
+  --mx-radius-lg: 10px;
 
   /* Elevation */
   --mx-shadow-card:
-    0 1px 2px rgba(0, 0, 0, 0.18),
-    0 4px 10px rgba(0, 0, 0, 0.1);
-  --mx-shadow-panel: 0 20px 70px rgba(0, 0, 0, 0.48);
+    0 1px 2px rgba(25, 47, 35, 0.06),
+    0 5px 16px rgba(25, 47, 35, 0.07);
+  --mx-shadow-panel:
+    0 24px 64px rgba(19, 36, 27, 0.2),
+    0 4px 14px rgba(19, 36, 27, 0.08);
 
   /* Type */
   --mx-font-serif:
