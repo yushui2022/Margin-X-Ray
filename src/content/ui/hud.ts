@@ -188,6 +188,15 @@ function pctOf(value: number, retail: number): number {
   return retail > 0 ? (value / retail) * 100 : 0;
 }
 
+function humanizeSourceText(source: string): string {
+  return source
+    .replace(/dom:\[[^\]]+\]/g, "page price element")
+    .replace(/dom:\S+/g, "page price element")
+    .replace(/json-ld/gi, "structured product data")
+    .replace(/microdata/gi, "product microdata")
+    .replace(/\bmeta\b/gi, "page metadata");
+}
+
 export class Hud {
   private host: HTMLDivElement;
   private shadow: ShadowRoot;
@@ -536,9 +545,9 @@ export class Hud {
         : "Not found";
 
     const priceNote = result
-      ? result.product.retailSource
+      ? humanizeSourceText(result.product.retailSource)
       : context.price
-        ? `Source: ${context.price.source}`
+        ? `Source: ${humanizeSourceText(context.price.source)}`
         : "No price found on this page.";
 
     const pageUrl = safePageUrl(result?.product.sourceUrl ?? context.url);
@@ -635,7 +644,7 @@ export class Hud {
           }),
           el("div", {
             className: "xray-price-note",
-            text: result.product.retailSource,
+            text: humanizeSourceText(result.product.retailSource),
           }),
         ]),
         el("div", { className: "xray-price-box green" }, [
@@ -644,7 +653,9 @@ export class Hud {
             text: "Estimated ex-works",
           }),
           el("div", {
-            className: "xray-price-value",
+            className: result.priceRange
+              ? "xray-price-value range"
+              : "xray-price-value",
             text: result.priceRange
               ? range(result.priceRange.fobMinUsd, result.priceRange.fobMaxUsd)
               : "Insufficient data",
