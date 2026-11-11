@@ -5,7 +5,7 @@ import { stat } from "node:fs/promises";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(fileURLToPath(new URL("../dist", import.meta.url)));
+const root = resolve(fileURLToPath(new URL("../preview", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
 
 const MIME = {
@@ -31,12 +31,6 @@ const server = http.createServer((req, res) => {
   void (async () => {
     let filePath = safePath(req.url || "/");
 
-    if (req.url === "/" || req.url === "") {
-      res.writeHead(302, { Location: "/demo/" });
-      res.end();
-      return;
-    }
-
     try {
       let info = await stat(filePath);
       if (info.isDirectory()) {
@@ -59,6 +53,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`\n  Margin X-Ray demo: http://localhost:${port}/demo/\n`);
-  console.log("  Static preview of the HUD. No extension or API required.\n");
+  console.log(`\n  Margin X-Ray HUD preview: http://localhost:${port}/\n`);
+  console.log("  Dev-only static preview of the HUD. No extension or API required.\n");
+  console.log("  The extension itself is built to dist/ and does not include this page.\n");
 });

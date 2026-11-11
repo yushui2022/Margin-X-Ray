@@ -7,6 +7,11 @@ Manifest V3 extension that captures the page context you clicked on, streams a
 scan result into a dark HUD, shows an editable landed-cost waterfall, and
 collects sourcing leads.
 
+**The product is the extension.** `dist/` is the loadable extension. `preview/`
+is a dev-only HUD preview page that is generated outside `dist/`, and
+`server/mock-xray.mjs` is a local mock API for testing. Neither is a web app and
+neither ships inside the extension package.
+
 The current build is an **MVP shell with a clearly labeled demo dataset**. It
 does not call 1688, TikTok Shop, Qichacha or any live supplier API yet. The
 point of this slice is to make the interaction, data contract and integrity
@@ -33,7 +38,8 @@ rules real before wiring the supply-chain engine.
 - Right-click **“Scan with Margin X-Ray”** on any page (uses `activeTab`, not a
   broad all-sites permission).
 - Local mock API (`server/mock-xray.mjs`) for end-to-end testing.
-- Standalone HUD preview page (`npm run serve:demo`) with no extension needed.
+- Dev-only HUD preview page (`npm run preview`), kept outside the extension
+  package.
 
 ## What is still demo / mocked
 
@@ -65,14 +71,27 @@ Load the extension:
 
 The extension starts in **demo mode**, so no server is required.
 
-### Preview the HUD without Chrome
+### Package the extension
 
 ```bash
-npm run serve:demo
+npm run package
 ```
 
-Open <http://localhost:4173/demo/>. This is a static product page that mounts the
+This zips only `dist/` into `margin-xray-extension.zip`. The preview and mock
+server are not included.
+
+### Preview the HUD without installing the extension (dev only)
+
+```bash
+npm run preview
+```
+
+Open <http://localhost:4173/>. This is a static product page that mounts the
 same HUD component with the same sample dataset.
+
+The preview is built to `preview/`, not `dist/`. It is a development harness for
+reviewing the HUD; the extension does not load it and `npm run package` does not
+include it.
 
 ### Run the local mock API
 
@@ -124,15 +143,17 @@ src/
     demo.ts                   sample dataset
     settings.ts               chrome.storage helpers
     steps.ts                  scan step definitions
-  popup/                      quick scan + demo toggle
-  options/                    API settings, permissions, local data
-  demo/                       standalone HUD preview page
+  popup/                      extension popup: quick scan + demo toggle
+  options/                    extension options: API settings, permissions, data
+  demo/                       source for the dev-only HUD preview
 server/
   mock-xray.mjs               zero-dependency local mock API
 tests/                        node:test unit tests
 scripts/
-  build.mjs                   esbuild build
-  serve-demo.mjs              static demo server
+  build.mjs                   esbuild build: dist/ + preview/
+  serve-demo.mjs              static preview server
+dist/                         generated extension output (gitignored)
+preview/                      generated dev-only HUD preview (gitignored)
 ```
 
 ## Integrity rules

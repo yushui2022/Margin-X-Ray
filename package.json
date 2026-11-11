@@ -10,8 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "mock": "node server/mock-xray.mjs",
+    "preview": "node scripts/serve-demo.mjs",
     "serve:demo": "node scripts/serve-demo.mjs",
-    "package": "npm run build && cd dist && zip -r ../margin-xray-extension.zip ."
+    "package": "npm run build && cd dist && zip -r ../margin-xray-extension.zip . -x '*.map'"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.0",

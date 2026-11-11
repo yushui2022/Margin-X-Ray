@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
+const preview = join(root, "preview");
 const isWatch = process.argv.includes("--watch");
 
 const ENTRIES = [
@@ -31,7 +32,7 @@ const ENTRIES = [
   },
   {
     entryPoints: [join(root, "src/demo/demo.ts")],
-    outfile: join(dist, "demo/demo.js"),
+    outfile: join(preview, "demo.js"),
     format: "iife",
   },
 ];
@@ -51,33 +52,46 @@ const buildOptions = {
 
 async function copyStatic() {
   await mkdir(dist, { recursive: true });
+  await mkdir(preview, { recursive: true });
 
   await cp(join(root, "manifest.json"), join(dist, "manifest.json"));
 
-  const staticFiles = [
+  const extensionStaticFiles = [
     ["src/popup/popup.html", "popup.html"],
     ["src/popup/popup.css", "popup.css"],
     ["src/options/options.html", "options.html"],
     ["src/options/options.css", "options.css"],
-    ["src/demo/index.html", "demo/index.html"],
-    ["src/demo/demo.css", "demo/demo.css"],
   ];
 
-  for (const [from, to] of staticFiles) {
+  for (const [from, to] of extensionStaticFiles) {
     await mkdir(dirname(join(dist, to)), { recursive: true });
     await cp(join(root, from), join(dist, to));
   }
 
   try {
-    await cp(join(root, "assets"), join(dist, "assets"), { recursive: true });
+    await cp(join(root, "assets/icons"), join(dist, "assets/icons"), {
+      recursive: true,
+    });
   } catch {
     // Icons are optional during early development.
   }
+
+  // The preview is a dev-only harness. It is deliberately kept outside dist/
+  // so the extension package contains only the extension.
+  await cp(join(root, "src/demo/index.html"), join(preview, "index.html"));
+  await cp(join(root, "src/demo/demo.css"), join(preview, "demo.css"));
+  await mkdir(join(preview, "assets"), { recursive: true });
+  await cp(
+    join(root, "assets/demo-neck-fan.svg"),
+    join(preview, "assets/demo-neck-fan.svg"),
+  );
 }
 
 async function runBuild() {
   await rm(dist, { recursive: true, force: true });
+  await rm(preview, { recursive: true, force: true });
   await mkdir(dist, { recursive: true });
+  await mkdir(preview, { recursive: true });
 
   if (isWatch) {
     const contexts = await Promise.all(

@@ -8,7 +8,7 @@ import type {
 } from "../shared/types";
 
 const productImage = new URL(
-  "../assets/demo-neck-fan.svg",
+  "./assets/demo-neck-fan.svg",
   window.location.href,
 ).toString();
 
