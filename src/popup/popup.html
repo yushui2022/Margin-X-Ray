@@ -4,15 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Margin X-Ray</title>
+    <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="popup.css" />
   </head>
-  <body>
+  <body class="mx-theme">
     <div class="app">
       <header class="header">
         <div class="brand">
           <div class="logo">X</div>
           <div class="brand-text">
-            <div class="brand-name">MARGIN X-RAY</div>
+            <div class="brand-name">Margin X-Ray</div>
             <div class="brand-sub">Factory cost lens</div>
           </div>
         </div>
@@ -21,7 +22,8 @@
 
       <main class="main">
         <button id="scanBtn" class="btn primary" type="button">
-          ⚡ Scan this page
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span>Scan this page</span>
         </button>
         <div id="status" class="status" role="status" aria-live="polite">
           Ready. Open a product page and scan it.

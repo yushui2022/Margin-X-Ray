@@ -1,5 +1,5 @@
 import { build, context } from "esbuild";
-import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, rm } from "node:fs/promises";
 import { watch } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -57,6 +57,7 @@ async function copyStatic() {
   await cp(join(root, "manifest.json"), join(dist, "manifest.json"));
 
   const extensionStaticFiles = [
+    ["src/styles/tokens.css", "tokens.css"],
     ["src/popup/popup.html", "popup.html"],
     ["src/popup/popup.css", "popup.css"],
     ["src/options/options.html", "options.html"],
@@ -78,6 +79,7 @@ async function copyStatic() {
 
   // The preview is a dev-only harness. It is deliberately kept outside dist/
   // so the extension package contains only the extension.
+  await cp(join(root, "src/styles/tokens.css"), join(preview, "tokens.css"));
   await cp(join(root, "src/demo/index.html"), join(preview, "index.html"));
   await cp(join(root, "src/demo/demo.css"), join(preview, "demo.css"));
   await mkdir(join(preview, "assets"), { recursive: true });

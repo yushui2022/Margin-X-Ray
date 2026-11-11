@@ -1,4 +1,6 @@
 import hudCss from "./hud.css";
+import tokensCss from "../../styles/tokens.css";
+import { createIcon } from "./icons";
 import {
   assumptionsForResult,
   computeWaterfall,
@@ -215,11 +217,11 @@ export class Hud {
 
     this.shadow = this.host.attachShadow({ mode: "open" });
     const style = document.createElement("style");
-    style.textContent = hudCss;
+    style.textContent = `${tokensCss}\n${hudCss}`;
     this.shadow.appendChild(style);
 
     this.root = el("div", {
-      className: "xray-root",
+      className: "xray-root mx-theme",
       attrs: { role: "region", "aria-label": "Margin X-Ray" },
     });
     this.shadow.appendChild(this.root);
@@ -370,7 +372,7 @@ export class Hud {
       title: "Scan this page with Margin X-Ray",
     });
     launcher.append(
-      el("span", { className: "xray-launcher-mark", text: "⚡" }),
+      el("span", { className: "xray-launcher-mark" }, [createIcon("bolt", 14)]),
       el("span", { text: "X-Ray Factory Price" }),
       el("span", { className: "xray-launcher-dot" }),
     );
@@ -400,22 +402,27 @@ export class Hud {
     const brand = el("div", { className: "xray-brand" }, [
       el("div", { className: "xray-logo", text: "X" }),
       el("div", { className: "xray-brand-text" }, [
-        el("div", { className: "xray-brand-name", text: "MARGIN X-RAY" }),
+        el("div", { className: "xray-brand-name", text: "Margin X-Ray" }),
         el("div", { className: "xray-brand-sub", text: "Factory cost lens" }),
       ]),
     ]);
 
-    const settings = button("⚙", "xray-icon-btn", () =>
-      this.callbacks.onOpenOptions(),
-    {
-      "aria-label": "Open Margin X-Ray settings",
-      title: "Settings",
-    });
+    const settings = button(
+      "",
+      "xray-icon-btn",
+      () => this.callbacks.onOpenOptions(),
+      {
+        "aria-label": "Open Margin X-Ray settings",
+        title: "Settings",
+      },
+    );
+    settings.append(createIcon("settings", 15));
 
-    const close = button("✕", "xray-icon-btn", () => this.handleClose(), {
+    const close = button("", "xray-icon-btn", () => this.handleClose(), {
       "aria-label": "Close Margin X-Ray",
       title: "Close",
     });
+    close.append(createIcon("x", 15));
 
     return el("div", { className: "xray-header" }, [
       brand,
@@ -464,7 +471,7 @@ export class Hud {
     content.append(progress);
     content.append(
       el("div", { className: "xray-banner info" }, [
-        el("span", { text: "⏳" }),
+        createIcon("clock", 14),
         el("span", {
           text: "You can cancel at any time. Demo mode never calls an external API.",
         }),
@@ -482,16 +489,12 @@ export class Hud {
   private renderSteps(steps: ProgressStep[]): HTMLElement {
     const list = el("div", { className: "xray-steps" });
     for (const step of steps) {
-      const dotText =
-        step.status === "done"
-          ? "✓"
-          : step.status === "active"
-            ? "●"
-            : step.status === "failed"
-              ? "!"
-              : "";
+      const dot = el("span", { className: "xray-step-dot" });
+      if (step.status === "done") dot.append(createIcon("check", 8));
+      if (step.status === "failed") dot.append(createIcon("x", 8));
+
       const row = el("div", { className: `xray-step ${step.status}` }, [
-        el("span", { className: "xray-step-dot", text: dotText }),
+        dot,
         el("span", {}, [
           el("span", { text: step.label }),
           ...(step.detail
@@ -567,6 +570,7 @@ export class Hud {
           rel: "noopener noreferrer",
         },
       });
+      link.append(createIcon("external", 10));
       sub.append(link);
     }
 
@@ -594,7 +598,7 @@ export class Hud {
     if (result.dataSource !== "api") {
       content.append(
         el("div", { className: `xray-banner ${result.dataSource === "demo" ? "demo" : "info"}` }, [
-          el("span", { text: result.dataSource === "demo" ? "🧪" : "🔌" }),
+          createIcon(result.dataSource === "demo" ? "flask" : "plug", 14),
           el("span", {}, [
             el("strong", {
               text: result.dataSource === "demo" ? "DEMO DATA" : "MOCK API",
@@ -615,13 +619,13 @@ export class Hud {
     if (context.warnings?.length) {
       content.append(
         el("div", { className: "xray-banner info" }, [
-          el("span", { text: "ℹ️" }),
+          createIcon("info", 14),
           el("span", { text: truncate(context.warnings[0] ?? "", 180) }),
         ]),
       );
     }
 
-    const priceGrid = el("div", { className: "xray-card" });
+    const priceGrid = el("div", { className: "xray-card accent" });
     priceGrid.append(
       el("div", { className: "xray-section-head" }, [
         el("div", { className: "xray-section-title", text: "Price X-Ray" }),
@@ -697,7 +701,7 @@ export class Hud {
     if (result.qualityWarning) {
       content.append(
         el("div", { className: "xray-banner warn" }, [
-          el("span", { text: "⚠️" }),
+          createIcon("alert", 14),
           el("span", {}, [
             el("strong", { text: "Quality trap: " }),
             el("span", { text: result.qualityWarning }),
@@ -729,7 +733,7 @@ export class Hud {
     assumptions: CostAssumptions | null,
     waterfall: CostWaterfall | null,
   ): HTMLElement {
-    const card = el("div", { className: "xray-card" });
+    const card = el("div", { className: "xray-card accent" });
 
     const head = el("div", { className: "xray-section-head" }, [
       el("div", { className: "xray-section-title", text: "What the seller keeps" }),
@@ -746,7 +750,7 @@ export class Hud {
     if (!assumptions || !waterfall || !result.product.retailUsd) {
       card.append(
         el("div", { className: "xray-banner info" }, [
-          el("span", { text: "ℹ️" }),
+          createIcon("info", 14),
           el("span", {
             text: "Not enough data to model landed cost and margin. Live mode should return the assumptions it used.",
           }),
@@ -820,17 +824,78 @@ export class Hud {
       fragment.append(bar);
     }
 
-    const rows: Array<{
+    type WaterfallRow = {
       label: string;
       value: number;
       pct: number;
       className?: string;
-    }> = [
+    };
+
+    const makeRow = (row: WaterfallRow): HTMLElement =>
+      el("div", { className: `xray-row ${row.className ?? ""}`.trim() }, [
+        el("div", { className: "xray-row-label", text: row.label }),
+        el("div", {
+          className: "xray-row-value",
+          text: formatUsd(row.value),
+        }),
+        el("div", { className: "xray-row-pct", text: formatPct(row.pct) }),
+      ]);
+
+    const fees =
+      waterfall.platformFeeUsd + waterfall.affiliateUsd + waterfall.paymentUsd;
+    const fulfillmentAndReturns =
+      waterfall.fulfillmentUsd + waterfall.returnsUsd;
+
+    const summaryRows: WaterfallRow[] = [
       { label: "Retail price", value: waterfall.retailUsd, pct: 100 },
-      { label: "Ex-works unit price", value: waterfall.fobUsd, pct: pctOf(waterfall.fobUsd, retail) },
-      { label: "Freight", value: waterfall.shippingUsd, pct: pctOf(waterfall.shippingUsd, retail) },
-      { label: "Duty", value: waterfall.dutyUsd, pct: pctOf(waterfall.dutyUsd, retail) },
-      { label: "Landed cost", value: waterfall.landedUsd, pct: pctOf(waterfall.landedUsd, retail) },
+      {
+        label: "Ex-works unit price",
+        value: waterfall.fobUsd,
+        pct: pctOf(waterfall.fobUsd, retail),
+      },
+      {
+        label: "Landed cost (freight + duty)",
+        value: waterfall.landedUsd,
+        pct: pctOf(waterfall.landedUsd, retail),
+      },
+      {
+        label: "Platform, affiliate & payment",
+        value: fees,
+        pct: pctOf(fees, retail),
+      },
+      {
+        label: "Fulfillment & returns",
+        value: fulfillmentAndReturns,
+        pct: pctOf(fulfillmentAndReturns, retail),
+      },
+      {
+        label: "Contribution",
+        value: waterfall.contributionUsd,
+        pct: waterfall.contributionMarginPct,
+        className: "subtotal",
+      },
+      { label: "Ads", value: waterfall.adUsd, pct: pctOf(waterfall.adUsd, retail) },
+      {
+        label: "Net before tax",
+        value: waterfall.netUsd,
+        pct: waterfall.netMarginPct,
+        className: `total ${waterfall.netUsd < 0 ? "negative" : ""}`.trim(),
+      },
+    ];
+
+    for (const row of summaryRows) fragment.append(makeRow(row));
+
+    const detailRows: WaterfallRow[] = [
+      {
+        label: "Freight",
+        value: waterfall.shippingUsd,
+        pct: pctOf(waterfall.shippingUsd, retail),
+      },
+      {
+        label: "Duty",
+        value: waterfall.dutyUsd,
+        pct: pctOf(waterfall.dutyUsd, retail),
+      },
       {
         label: "Platform fee",
         value: waterfall.platformFeeUsd,
@@ -856,38 +921,22 @@ export class Hud {
         value: waterfall.returnsUsd,
         pct: pctOf(waterfall.returnsUsd, retail),
       },
-      {
-        label: "Contribution",
-        value: waterfall.contributionUsd,
-        pct: waterfall.contributionMarginPct,
-        className: "subtotal",
-      },
-      { label: "Ads", value: waterfall.adUsd, pct: pctOf(waterfall.adUsd, retail) },
-      {
-        label: "Net before tax",
-        value: waterfall.netUsd,
-        pct: waterfall.netMarginPct,
-        className: `total ${waterfall.netUsd < 0 ? "negative" : ""}`.trim(),
-      },
     ];
 
-    for (const row of rows) {
-      fragment.append(
-        el("div", { className: `xray-row ${row.className ?? ""}`.trim() }, [
-          el("div", { className: "xray-row-label", text: row.label }),
-          el("div", {
-            className: "xray-row-value",
-            text: formatUsd(row.value),
-          }),
-          el("div", { className: "xray-row-pct", text: formatPct(row.pct) }),
-        ]),
-      );
-    }
+    const details = el("details", {
+      className: "xray-waterfall-details",
+      attrs: { "data-role": "waterfall-details" },
+    });
+    details.append(el("summary", { text: "Show full line items" }));
+    const detailList = el("div", { className: "xray-waterfall-detail-rows" });
+    for (const row of detailRows) detailList.append(makeRow(row));
+    details.append(detailList);
+    fragment.append(details);
 
     if (assumptions.fobUsd <= 0) {
       fragment.append(
         el("div", { className: "xray-banner warn" }, [
-          el("span", { text: "⚠️" }),
+          createIcon("alert", 14),
           el("span", {
             text: "Ex-works price is zero. Enter a real unit cost before trusting this margin.",
           }),
@@ -1043,9 +1092,20 @@ export class Hud {
 
     const body = this.root.querySelector('[data-role="waterfall-body"]');
     if (body) {
+      const previousDetails =
+        this.root.querySelector<HTMLDetailsElement>(
+          '[data-role="waterfall-details"]',
+        );
+      const wasOpen = previousDetails?.open ?? false;
       body.replaceChildren(
         this.renderWaterfallBody(result.product.retailUsd, assumptions, waterfall),
       );
+      if (wasOpen) {
+        const nextDetails = this.root.querySelector<HTMLDetailsElement>(
+          '[data-role="waterfall-details"]',
+        );
+        if (nextDetails) nextDetails.open = true;
+      }
     }
 
     const chip = this.root.querySelector('[data-role="net-chip"]');
@@ -1072,7 +1132,7 @@ export class Hud {
     if (!result.funnel || result.funnel.scanned <= 0) {
       card.append(
         el("div", { className: "xray-banner info" }, [
-          el("span", { text: "ℹ️" }),
+          createIcon("info", 14),
           el("span", { text: "No live funnel data was returned for this scan." }),
         ]),
       );
@@ -1129,7 +1189,7 @@ export class Hud {
     if (!state.result.factories.length) {
       card.append(
         el("div", { className: "xray-empty" }, [
-          el("div", { className: "xray-empty-icon", text: "🏭" }),
+          el("div", { className: "xray-empty-icon" }, [createIcon("factory", 20)]),
           el("strong", { text: "No verified candidates" }),
           el("div", {
             text: "Live mode should return “insufficient data” here instead of a fallback factory or price.",
@@ -1150,7 +1210,10 @@ export class Hud {
     const head = el("div", { className: "xray-factory-head" }, [
       el("div", {}, [
         el("div", { className: "xray-factory-name", text: factory.maskedName }),
-        el("div", { className: "xray-factory-loc", text: factory.location }),
+        el("div", { className: "xray-factory-meta" }, [
+          el("span", { className: "xray-factory-loc", text: factory.location }),
+          confidenceBadge(factory.confidence),
+        ]),
       ]),
       el("div", { className: "xray-factory-price" }, [
         el("div", {
@@ -1163,7 +1226,6 @@ export class Hud {
         }),
       ]),
     ]);
-    head.append(confidenceBadge(factory.confidence));
     card.append(head);
 
     const tiers = el("div", { className: "xray-tiers" });
@@ -1195,7 +1257,7 @@ export class Hud {
     for (const signal of factory.signals) {
       signals.append(
         el("div", { className: "xray-signal" }, [
-          el("span", { className: "xray-signal-dot", text: "●" }),
+          el("span", { className: "xray-signal-dot" }),
           el("span", { className: "xray-signal-value" }, [
             el("strong", { text: `${signal.label}: ` }),
             el("span", { text: signal.value }),
@@ -1217,7 +1279,7 @@ export class Hud {
 
     card.append(
       el("div", { className: "xray-actions" }, [
-        button("Request quote", "xray-btn primary", () =>
+        button("Request quote", "xray-btn secondary", () =>
           this.openQuote(factory.id),
         { "aria-label": `Request a quote from ${factory.maskedName}` }),
       ]),
@@ -1288,7 +1350,7 @@ export class Hud {
     if (state.result.dataSource !== "api") {
       card.append(
         el("div", { className: "xray-banner info" }, [
-          el("span", { text: "🔒" }),
+          createIcon("lock", 14),
           el("span", {
             text: "Demo mode stores this lead locally in your browser. It is not sent to a supplier.",
           }),
@@ -1555,7 +1617,7 @@ export class Hud {
 
     content.append(
       el("div", { className: "xray-banner info" }, [
-        el("span", { text: "🧪" }),
+        createIcon("flask", 14),
         el("span", {
           text: "You can still open a demo report to review the interface without a backend.",
         }),
@@ -1584,7 +1646,7 @@ export class Hud {
     const content = el("div", { className: "xray-content" });
     content.append(
       el("div", { className: "xray-empty" }, [
-        el("div", { className: "xray-empty-icon", text: "🔍" }),
+        el("div", { className: "xray-empty-icon" }, [createIcon("search", 20)]),
         el("strong", {
           text:
             state.kind === "empty" && state.message

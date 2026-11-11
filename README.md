@@ -41,6 +41,24 @@ rules real before wiring the supply-chain engine.
 - Dev-only HUD preview page (`npm run preview`), kept outside the extension
   package.
 
+## Visual system
+
+The extension follows the WenCode-style enterprise visual language, adapted to
+the dark theme because the HUD overlays arbitrary pages:
+
+- ink-green paper and panel surfaces, not pure black
+- serif headings (`Georgia` / `Songti SC`) with sans-serif body text
+- forest-green actions, mineral-blue links and info, wine warnings, muted gold
+  for demo/medium-confidence states
+- 4px badges, 6px controls, 8px cards and panels
+- 1px borders, low-intervention shadows, no gradient/glass/neon treatment
+- `tabular-nums` for prices and margins
+- visible mineral-blue focus rings and `prefers-reduced-motion` fallbacks
+- inline stroke icons instead of emoji in the HUD and popup
+
+Tokens live in `src/styles/tokens.css` and are injected into the HUD shadow root
+so page CSS cannot leak in.
+
 ## What is still demo / mocked
 
 - The factory list, registry signals, funnel counts and prices in demo mode are
@@ -135,6 +153,9 @@ src/
     ui/
       hud.ts                  shadow-DOM HUD
       hud.css                 HUD styles
+      icons.ts                inline stroke icon set
+  styles/
+    tokens.css                shared design tokens (WenCode-inspired dark theme)
   shared/
     types.ts                  data contract
     pricing.ts                landed-cost waterfall + MOQ helper
