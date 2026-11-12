@@ -1,56 +1,50 @@
 /*
  * Margin X-Ray design tokens.
  *
- * Adapted from the WenCode enterprise visual system:
- * warm paper, serif headings, forest-green actions, mineral-blue info,
- * wine warnings, thin lines, low-intervention shadows, 5/7/10px radii.
- *
- * The HUD uses a light research-panel treatment so it stays legible over
- * bright storefronts, dark video pages and mixed host themes.
+ * A compact browser research tool: neutral surfaces, blue actions, dense
+ * metrics, and restrained borders that sit cleanly on marketplace pages.
  */
 
 .mx-theme {
   color-scheme: light;
 
   /* Surfaces */
-  --mx-paper: #f5f6f4;
+  --mx-paper: #f6f7f9;
   --mx-panel: #ffffff;
-  --mx-panel-2: #f7f8f7;
-  --mx-panel-3: #eef1ef;
-  --mx-soft: #f1f4f2;
+  --mx-panel-2: #f8fafc;
+  --mx-panel-3: #eef2f6;
+  --mx-soft: #f1f5f9;
 
   /* Ink */
-  --mx-ink: #1a1f1c;
-  --mx-muted: #5b665f;
-  --mx-dim: #879089;
+  --mx-ink: #17202a;
+  --mx-muted: #5c6875;
+  --mx-dim: #8793a0;
 
   /* Lines */
-  --mx-line: #e3e7e4;
-  --mx-line-strong: #c7d0ca;
-  --mx-edge: #aab8ae;
+  --mx-line: #e4e9ef;
+  --mx-line-strong: #cbd5e1;
+  --mx-edge: #aebdcb;
 
   /* Semantic */
-  --mx-accent: #2e8a61;
-  --mx-accent-strong: #246b4e;
-  --mx-accent-solid: #1d6549;
-  --mx-accent-hover: #287957;
+  --mx-accent: #2563eb;
+  --mx-accent-strong: #1d4ed8;
+  --mx-accent-solid: #2563eb;
+  --mx-accent-hover: #1d4ed8;
   --mx-on-accent: #ffffff;
-  --mx-blue: #356d7d;
-  --mx-wine: #a24f58;
-  --mx-gold: #8a6b32;
+  --mx-blue: #2563eb;
+  --mx-wine: #c2414d;
+  --mx-gold: #b7791f;
 
   /* Radii */
-  --mx-radius-sm: 5px;
-  --mx-radius: 7px;
-  --mx-radius-lg: 10px;
+  --mx-radius-sm: 4px;
+  --mx-radius: 6px;
+  --mx-radius-lg: 8px;
 
   /* Elevation */
-  --mx-shadow-card:
-    0 1px 2px rgba(25, 47, 35, 0.06),
-    0 5px 16px rgba(25, 47, 35, 0.07);
+  --mx-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04);
   --mx-shadow-panel:
-    0 24px 64px rgba(19, 36, 27, 0.2),
-    0 4px 14px rgba(19, 36, 27, 0.08);
+    -10px 0 28px rgba(15, 23, 42, 0.12),
+    0 0 1px rgba(15, 23, 42, 0.08);
 
   /* Type */
   --mx-font-serif: var(--mx-font-sans);

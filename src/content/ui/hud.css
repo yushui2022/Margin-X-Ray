@@ -1771,6 +1771,569 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Product research tool refresh                                      */
+/* ------------------------------------------------------------------ */
+
+.xray-launcher {
+  top: 72px;
+  right: 12px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #1d4ed8;
+  border-radius: 6px;
+  background: #2563eb;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.22);
+  font-size: 11px;
+}
+
+.xray-launcher:hover {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+}
+
+.xray-launcher-mark,
+.xray-launcher-dot {
+  color: #bfdbfe;
+  background: #bfdbfe;
+}
+
+.xray-panel {
+  top: 0;
+  right: 0;
+  width: 408px;
+  max-width: min(408px, 100vw);
+  height: 100vh;
+  max-height: 100vh;
+  border: 0;
+  border-left: 1px solid var(--mx-line-strong);
+  border-radius: 0;
+  background: var(--mx-paper);
+  box-shadow: var(--mx-shadow-panel);
+  animation: mx-panel-in 140ms ease-out;
+}
+
+.xray-header {
+  min-height: 54px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--mx-line);
+  background: var(--mx-panel);
+}
+
+.xray-logo {
+  width: 25px;
+  height: 25px;
+  border: 0;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  font-family: var(--mx-font-sans);
+  font-size: 13px;
+}
+
+.xray-brand {
+  gap: 8px;
+}
+
+.xray-brand-name {
+  font-family: var(--mx-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.xray-brand-sub {
+  margin-top: 1px;
+  color: var(--mx-dim);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+
+.xray-header-actions {
+  gap: 1px;
+}
+
+.xray-icon-btn {
+  width: 27px;
+  height: 27px;
+  border-radius: 5px;
+}
+
+.xray-content {
+  padding: 14px 14px 24px;
+}
+
+.xray-footer {
+  display: none;
+}
+
+.xray-eyebrow,
+.xray-section-note,
+.xray-price-label,
+.xray-factory-price-label {
+  letter-spacing: 0.01em;
+}
+
+.xray-product {
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 11px;
+  margin-bottom: 11px;
+}
+
+.xray-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  background: #eef2f7;
+}
+
+.xray-title {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.xray-sub {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.xray-card,
+.xray-kpi-card {
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--mx-line);
+  border-radius: 7px;
+  background: var(--mx-panel);
+  box-shadow: var(--mx-shadow-card);
+}
+
+.xray-section-head {
+  margin-bottom: 8px;
+}
+
+.xray-section-title {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.xray-banner {
+  padding: 7px 9px;
+  margin-bottom: 9px;
+  border: 1px solid var(--mx-line);
+  border-left-width: 3px;
+  border-radius: 5px;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.xray-kpi-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.xray-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.xray-kpi {
+  min-width: 0;
+  padding: 11px 9px 10px;
+  border-right: 1px solid var(--mx-line);
+}
+
+.xray-kpi:last-child {
+  border-right: 0;
+}
+
+.xray-kpi-label {
+  overflow: hidden;
+  color: var(--mx-muted);
+  font-size: 9px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xray-kpi-value {
+  margin-top: 4px;
+  color: var(--mx-ink);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.xray-kpi-value.positive {
+  color: #16804b;
+}
+
+.xray-kpi-value.negative {
+  color: var(--mx-wine);
+}
+
+.xray-kpi-note {
+  overflow: hidden;
+  margin-top: 4px;
+  color: var(--mx-dim);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xray-kpi-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-top: 1px solid var(--mx-line);
+  color: var(--mx-dim);
+  font-size: 9px;
+}
+
+.xray-kpi-footer span:first-child {
+  color: var(--mx-blue);
+  font-weight: 600;
+}
+
+.xray-next-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin: 0 0 10px;
+}
+
+.xray-next-actions .xray-btn {
+  min-height: 34px;
+  padding: 6px 8px;
+  font-size: 10px;
+}
+
+.xray-btn {
+  min-height: 34px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  box-shadow: none;
+}
+
+.xray-btn.primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  box-shadow: none;
+}
+
+.xray-btn.primary:hover {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+}
+
+.xray-btn.secondary {
+  border-color: var(--mx-line-strong);
+  background: var(--mx-panel);
+}
+
+.xray-btn-small {
+  min-height: 28px;
+  padding: 5px 8px;
+  font-size: 9px;
+}
+
+.xray-capture-intro {
+  margin-bottom: 13px;
+}
+
+.xray-capture-title {
+  margin: 2px 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.xray-capture-lede {
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.xray-capture-page {
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 9px;
+  padding: 9px;
+  margin-bottom: 13px;
+  border: 1px solid var(--mx-line-strong);
+  border-radius: 7px;
+  box-shadow: var(--mx-shadow-card);
+}
+
+.xray-capture-page .xray-thumb {
+  width: 42px;
+  height: 42px;
+}
+
+.xray-capture-page-title {
+  font-size: 11px;
+}
+
+.xray-capture-page-price {
+  font-size: 10px;
+}
+
+.xray-capture-page-btn {
+  min-height: 30px;
+  padding: 5px 8px;
+  font-size: 9px;
+}
+
+.xray-capture-label {
+  margin-bottom: 7px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.xray-capture-options {
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.xray-capture-option {
+  min-height: 72px;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 9px;
+  border-radius: 6px;
+}
+
+.xray-capture-option-icon {
+  width: 27px;
+  height: 27px;
+  border-radius: 5px;
+}
+
+.xray-capture-option-text strong {
+  font-size: 10px;
+}
+
+.xray-capture-option-text span {
+  font-size: 8.5px;
+  line-height: 1.35;
+}
+
+.xray-capture-option-arrow {
+  display: none;
+}
+
+.xray-capture-expand {
+  padding: 9px;
+  margin-top: 7px;
+  border-radius: 6px;
+}
+
+.xray-capture-footnote {
+  margin-top: 12px;
+  padding-top: 9px;
+  font-size: 9px;
+}
+
+.xray-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  gap: 0;
+  margin: -2px -14px 12px;
+  padding: 0 14px;
+  background: var(--mx-paper);
+}
+
+.xray-tab {
+  padding: 8px 9px;
+  font-size: 10px;
+}
+
+.xray-tab-count {
+  min-width: 15px;
+  height: 15px;
+  font-size: 8px;
+}
+
+.xray-funnel {
+  gap: 4px;
+}
+
+.xray-chip {
+  padding: 2px 5px;
+  font-size: 8.5px;
+}
+
+.xray-supplier-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.xray-supplier-card > .xray-section-head {
+  padding: 12px 12px 0;
+}
+
+.xray-supplier-table {
+  margin-top: 8px;
+}
+
+.xray-supplier-table-head,
+.xray-supplier-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(94px, 1fr) 64px;
+  gap: 7px;
+  align-items: center;
+}
+
+.xray-supplier-table-head {
+  padding: 6px 12px;
+  border-top: 1px solid var(--mx-line);
+  border-bottom: 1px solid var(--mx-line);
+  background: var(--mx-panel-2);
+  color: var(--mx-dim);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.xray-supplier-row {
+  position: relative;
+  padding: 10px 12px 9px;
+  border-top: 1px solid var(--mx-line);
+}
+
+.xray-supplier-row:first-of-type {
+  border-top: 0;
+}
+
+.xray-supplier-cell {
+  min-width: 0;
+}
+
+.xray-supplier-name-cell .xray-factory-name {
+  overflow: hidden;
+  font-size: 10.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xray-supplier-name-cell .xray-factory-meta {
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.xray-supplier-name-cell .xray-factory-loc,
+.xray-supplier-name-cell .xray-confidence {
+  font-size: 8px;
+}
+
+.xray-supplier-row .xray-tiers {
+  display: flex;
+  gap: 3px;
+  margin-top: 0;
+}
+
+.xray-supplier-row .xray-tier {
+  padding: 4px 4px;
+  border-radius: 4px;
+}
+
+.xray-supplier-row .xray-tier-moq {
+  font-size: 7px;
+}
+
+.xray-supplier-row .xray-tier-price {
+  font-size: 8px;
+}
+
+.xray-supplier-price-cell {
+  text-align: right;
+}
+
+.xray-supplier-price-cell .xray-factory-price-value {
+  font-size: 10px;
+}
+
+.xray-supplier-price-cell .xray-factory-price-label {
+  font-size: 7px;
+}
+
+.xray-supplier-row .xray-factory-details {
+  grid-column: 1 / -1;
+  margin-top: 1px;
+  padding-top: 6px;
+}
+
+.xray-supplier-row .xray-factory-details summary {
+  font-size: 8.5px;
+}
+
+.xray-supplier-row .xray-signals,
+.xray-supplier-row .xray-confidence-reason {
+  font-size: 9px;
+}
+
+.xray-supplier-actions {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  margin: 2px 0 0;
+}
+
+.xray-supplier-actions .xray-btn {
+  display: inline-flex;
+}
+
+.xray-supplier-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--mx-line);
+  color: var(--mx-dim);
+  font-size: 8.5px;
+}
+
+.xray-supplier-note svg {
+  flex: none;
+}
+
+.xray-waterfall-details summary,
+.xray-assumptions summary,
+.xray-details summary {
+  font-size: 9px;
+}
+
+.xray-row {
+  padding: 6px 0;
+  font-size: 10px;
+}
+
+.xray-row-value {
+  font-size: 10px;
+}
+
+.xray-row-pct {
+  min-width: 36px;
+  font-size: 8px;
+}
+
+.xray-input,
+.xray-select,
+.xray-textarea {
+  min-height: 32px;
+  padding: 6px 7px;
+  border-radius: 5px;
+  font-size: 10px;
+}
+
+@media (max-width: 520px) {
+  .xray-capture-options {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .xray-sr-only {
   position: absolute;
   width: 1px;
@@ -1790,10 +2353,12 @@
   }
 
   .xray-panel {
-    top: 8px;
-    right: 8px;
-    width: calc(100vw - 16px);
-    max-height: calc(100vh - 16px);
-    border-radius: var(--mx-radius);
+    top: 0;
+    right: 0;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
   }
 }

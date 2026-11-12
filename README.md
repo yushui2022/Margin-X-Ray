@@ -48,14 +48,15 @@ rules real before wiring the supply-chain engine.
 
 ## Interface principles
 
-The HUD is a utility panel, not a landing page:
+The HUD is a compact browser research tool:
 
-- white surfaces, neutral borders and one green action color
-- sans-serif type throughout; no decorative gradients or glass effects
-- one decision per screen: choose a source, then scan, then read one report tab
-- Top 3 suppliers only; due-diligence signals stay behind an expandable section
-- `tabular-nums` for prices and margins
-- visible focus rings and `prefers-reduced-motion` fallbacks
+- a full-height right-side panel keeps the product page visible beside the data
+- neutral gray surfaces, blue actions, compact metrics and restrained borders
+- the first result view answers three questions: retail price, landed cost and net margin
+- one primary action moves the user from product judgment to supplier matching
+- Top 3 suppliers appear in a comparison table; due-diligence signals open per row
+- detailed profit line items and assumptions stay behind expandable controls
+- `tabular-nums` for prices and margins, visible focus rings and reduced-motion fallbacks
 - inline stroke icons instead of emoji in the HUD and popup
 
 Tokens live in `src/styles/tokens.css` and are injected into the HUD shadow root
