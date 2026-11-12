@@ -13,21 +13,21 @@
   color-scheme: light;
 
   /* Surfaces */
-  --mx-paper: #f3f5f1;
-  --mx-panel: #fbfcfa;
-  --mx-panel-2: #f5f7f4;
-  --mx-panel-3: #e9efea;
-  --mx-soft: #edf2ee;
+  --mx-paper: #f5f6f4;
+  --mx-panel: #ffffff;
+  --mx-panel-2: #f7f8f7;
+  --mx-panel-3: #eef1ef;
+  --mx-soft: #f1f4f2;
 
   /* Ink */
-  --mx-ink: #18231f;
-  --mx-muted: #58675f;
-  --mx-dim: #7d8b82;
+  --mx-ink: #1a1f1c;
+  --mx-muted: #5b665f;
+  --mx-dim: #879089;
 
   /* Lines */
-  --mx-line: #dce4de;
-  --mx-line-strong: #b8c8bc;
-  --mx-edge: #9fb5a6;
+  --mx-line: #e3e7e4;
+  --mx-line-strong: #c7d0ca;
+  --mx-edge: #aab8ae;
 
   /* Semantic */
   --mx-accent: #2e8a61;
@@ -53,9 +53,7 @@
     0 4px 14px rgba(19, 36, 27, 0.08);
 
   /* Type */
-  --mx-font-serif:
-    Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun,
-    serif;
+  --mx-font-serif: var(--mx-font-sans);
   --mx-font-sans:
     "Segoe UI", "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui,
     -apple-system, sans-serif;

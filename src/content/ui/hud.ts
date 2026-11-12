@@ -13,9 +13,11 @@ import {
   safeImageUrl,
   truncate,
 } from "../../shared/format";
-import { initialSteps, SCAN_STEP_DEFS } from "../../shared/steps";
+import { initialSteps } from "../../shared/steps";
+import { isSupportedImageType } from "../../shared/capture";
 import { EXTENSION_VERSION } from "../../shared/version";
 import type {
+  CaptureInput,
   Confidence,
   CostAssumptions,
   CostWaterfall,
@@ -32,6 +34,9 @@ import type {
 
 export interface HudCallbacks {
   onLauncherClick: () => void;
+  onAnalyzePage: () => void;
+  onAnalyzeInput: (input: CaptureInput) => void;
+  onNewScan: () => void;
   onCancel: () => void;
   onClose: () => void;
   onOpenOptions: () => void;
@@ -40,6 +45,12 @@ export interface HudCallbacks {
 }
 
 type ClosedState = { kind: "closed" };
+
+type CaptureState = {
+  kind: "capture";
+  context: PageContext | null;
+  note?: string;
+};
 
 type ScanningState = {
   kind: "scanning";
@@ -54,6 +65,7 @@ type ResultState = {
   result: ScanResult;
   assumptions: CostAssumptions | null;
   waterfall: CostWaterfall | null;
+  tab: "overview" | "profit" | "suppliers";
   quoteOpen: boolean;
   quoteFactoryId?: string;
 };
@@ -69,7 +81,13 @@ type EmptyState = {
   message?: string;
 };
 
-type HudState = ClosedState | ScanningState | ResultState | ErrorState | EmptyState;
+type HudState =
+  | ClosedState
+  | CaptureState
+  | ScanningState
+  | ResultState
+  | ErrorState
+  | EmptyState;
 
 interface ElOptions {
   className?: string;
@@ -242,6 +260,15 @@ export class Hud {
     return this.state.kind !== "closed";
   }
 
+  showCapture(context: PageContext | null, note?: string): void {
+    this.state = { kind: "capture", context, ...(note ? { note } : {}) };
+    this.render();
+  }
+
+  setHostHidden(hidden: boolean): void {
+    this.host.style.display = hidden ? "none" : "block";
+  }
+
   openScanning(context: PageContext): void {
     this.state = {
       kind: "scanning",
@@ -318,6 +345,7 @@ export class Hud {
       result,
       assumptions,
       waterfall,
+      tab: "overview",
       quoteOpen: false,
     };
     this.render();
@@ -349,6 +377,9 @@ export class Hud {
       case "closed":
         if (this.launcherEnabled) this.root.append(this.renderLauncher());
         break;
+      case "capture":
+        this.root.append(this.renderPanel(this.renderCapture()));
+        break;
       case "scanning":
         this.root.append(this.renderPanel(this.renderScanning()));
         break;
@@ -373,10 +404,275 @@ export class Hud {
     });
     launcher.append(
       el("span", { className: "xray-launcher-mark" }, [createIcon("bolt", 14)]),
-      el("span", { text: "Analyze with X-Ray" }),
+      el("span", { text: "Open X-Ray" }),
       el("span", { className: "xray-launcher-dot" }),
     );
     return launcher;
+  }
+
+  private renderCapture(): HTMLElement {
+    const state = this.state;
+    if (state.kind !== "capture") return el("div");
+
+    const content = el("div", { className: "xray-content xray-capture" });
+    content.append(
+      el("div", { className: "xray-capture-intro" }, [
+        el("div", { className: "xray-eyebrow", text: "New scan" }),
+        el("h2", { className: "xray-capture-title", text: "Start with a product" }),
+        el("p", {
+          className: "xray-capture-lede",
+          text: "Use the page you are on, paste a product link, upload a photo, or capture the current screen. Pick one method, then X-Ray runs the scan.",
+        }),
+      ]),
+    );
+
+    if (state.note) {
+      content.append(
+        el("div", { className: "xray-banner info" }, [
+          createIcon("info", 14),
+          el("span", { text: state.note }),
+        ]),
+      );
+    }
+
+    const context = state.context;
+    if (context) {
+      const price = context.price
+        ? formatMoney(context.price.amount, context.price.currency)
+        : "No price found";
+      const pageCard = el("div", { className: "xray-capture-page" }, [
+        this.renderThumb(context.title, context.imageUrl),
+        el("div", { className: "xray-capture-page-meta" }, [
+          el("div", {
+            className: "xray-eyebrow",
+            text: `${platformLabel(context)} · ${
+              context.pageType === "video" ? "Video" : "Product page"
+            }`,
+          }),
+          el("div", { className: "xray-capture-page-title", text: context.title }),
+          el("div", { className: "xray-capture-page-price", text: price }),
+        ]),
+        button(
+          "Analyze this page",
+          "xray-btn primary xray-capture-page-btn",
+          () => this.callbacks.onAnalyzePage(),
+        ),
+      ]);
+      content.append(pageCard);
+    } else {
+      content.append(
+        el("div", { className: "xray-capture-empty" }, [
+          createIcon("alert", 16),
+          el("span", {
+            text: "This tab is not a recognized product or video page. Use a link, an image, or a screenshot below.",
+          }),
+        ]),
+      );
+    }
+
+    content.append(
+      el("div", { className: "xray-capture-label", text: "Or start from another source" }),
+    );
+
+    const options = el("div", { className: "xray-capture-options" });
+
+    const linkInput = el("input", {
+      className: "xray-input",
+      attrs: {
+        type: "url",
+        placeholder: "https://www.tiktok.com/@brand/video/…",
+        "aria-label": "Product, video or image link",
+      },
+    });
+    const linkError = el("div", {
+      className: "xray-capture-error",
+      attrs: { role: "alert" },
+    });
+    const linkPanel = el("div", { className: "xray-capture-expand" });
+    linkPanel.hidden = true;
+    const submitLink = (): void => {
+      const value = linkInput.value.trim();
+      try {
+        const url = new URL(value);
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+          throw new Error("Only http and https links are supported.");
+        }
+        linkError.textContent = "";
+        if (/\.(png|jpe?g|webp|gif)$/i.test(url.pathname)) {
+          this.callbacks.onAnalyzeInput({
+            kind: "image",
+            dataUrl: url.toString(),
+            fileName: url.pathname.split("/").pop() || "pasted-image",
+          });
+          return;
+        }
+        this.callbacks.onAnalyzeInput({ kind: "link", url: url.toString() });
+      } catch {
+        linkError.textContent = "Enter a valid product or video URL.";
+        linkInput.focus();
+      }
+    };
+    linkInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submitLink();
+      }
+    });
+    linkPanel.append(
+      linkInput,
+      el("div", { className: "xray-capture-expand-row" }, [
+        button("Analyze link", "xray-btn primary", submitLink),
+        linkError,
+      ]),
+    );
+    const linkOption = button("", "xray-capture-option", () => {
+      linkPanel.hidden = !linkPanel.hidden;
+      if (!linkPanel.hidden) linkInput.focus();
+    });
+    linkOption.append(
+      this.renderCaptureOptionContent(
+        "link",
+        "Paste a link",
+        "TikTok, Amazon, Shopify or image URL",
+      ),
+    );
+
+    const imageInput = el("input", {
+      attrs: {
+        type: "file",
+        accept: "image/jpeg,image/png,image/webp,image/gif",
+        "aria-label": "Upload a product image",
+      },
+    });
+    imageInput.style.display = "none";
+    const imagePanel = el("div", { className: "xray-capture-expand" });
+    imagePanel.hidden = true;
+    const imageOption = button("", "xray-capture-option", () => imageInput.click());
+    imageOption.append(
+      this.renderCaptureOptionContent(
+        "image",
+        "Upload an image",
+        "JPG, PNG or WebP, up to 8 MB",
+      ),
+    );
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files?.[0];
+      if (!file) return;
+      imagePanel.replaceChildren();
+      imagePanel.hidden = false;
+      if (!isSupportedImageType(file.type)) {
+        imagePanel.append(
+          el("div", {
+            className: "xray-capture-error",
+            text: "Use a JPG, PNG or WebP image.",
+          }),
+        );
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        imagePanel.append(
+          el("div", {
+            className: "xray-capture-error",
+            text: "The image is larger than 8 MB. Use a smaller file.",
+          }),
+        );
+        return;
+      }
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        const dataUrl = typeof reader.result === "string" ? reader.result : "";
+        if (!dataUrl) return;
+        const preview = el("img", {
+          className: "xray-capture-preview",
+          attrs: { src: dataUrl, alt: "Selected product" },
+        });
+        imagePanel.replaceChildren(
+          el("div", { className: "xray-capture-preview-row" }, [
+            preview,
+            el("div", {}, [
+              el("div", { className: "xray-capture-file", text: file.name }),
+              el("div", {
+                className: "xray-capture-file-note",
+                text: "The server will isolate the product before searching.",
+              }),
+            ]),
+          ]),
+          button("Analyze image", "xray-btn primary", () =>
+            this.callbacks.onAnalyzeInput({
+              kind: "image",
+              dataUrl,
+              fileName: file.name,
+            }),
+          ),
+        );
+      });
+      reader.readAsDataURL(file);
+    });
+
+    const screenshotOption = button(
+      "",
+      "xray-capture-option",
+      () => this.callbacks.onAnalyzeInput({ kind: "screenshot" }),
+    );
+    screenshotOption.append(
+      this.renderCaptureOptionContent(
+        "camera",
+        "Capture screen",
+        "Use the visible page or current video frame",
+      ),
+    );
+
+    options.append(linkOption, imageOption, screenshotOption);
+    content.append(options, linkPanel, imagePanel, imageInput);
+    content.append(
+      el("div", { className: "xray-capture-footnote" }, [
+        createIcon("flask", 12),
+        el("span", {
+          text: "Demo mode is on by default. No supplier API is called until live mode is configured.",
+        }),
+      ]),
+    );
+
+    return content;
+  }
+
+  private renderCaptureOptionContent(
+    icon: "link" | "image" | "camera",
+    title: string,
+    detail: string,
+  ): DocumentFragment {
+    const fragment = document.createDocumentFragment();
+    fragment.append(
+      el("span", { className: "xray-capture-option-icon" }, [createIcon(icon, 18)]),
+      el("span", { className: "xray-capture-option-text" }, [
+        el("strong", { text: title }),
+        el("span", { text: detail }),
+      ]),
+      el("span", { className: "xray-capture-option-arrow" }, [createIcon("chevron", 14)]),
+    );
+    return fragment;
+  }
+
+  private renderThumb(title: string, imageUrl?: string): HTMLElement {
+    const thumb = el("div", { className: "xray-thumb" });
+    const fallback = el("span", {
+      text: (title.trim()[0] ?? "?").toUpperCase(),
+    });
+    thumb.append(fallback);
+    const safe = safeImageUrl(imageUrl);
+    if (!safe) return thumb;
+    const img = el("img", {
+      attrs: {
+        src: safe,
+        alt: "",
+        referrerpolicy: "no-referrer",
+        loading: "lazy",
+      },
+    });
+    img.addEventListener("load", () => fallback.remove());
+    img.addEventListener("error", () => img.remove());
+    thumb.append(img);
+    return thumb;
   }
 
   private renderPanel(content: HTMLElement): HTMLElement {
@@ -424,10 +720,20 @@ export class Hud {
     });
     close.append(createIcon("x", 15));
 
-    return el("div", { className: "xray-header" }, [
-      brand,
-      el("div", { className: "xray-header-actions" }, [settings, close]),
-    ]);
+    const actions = el("div", { className: "xray-header-actions" });
+    if (this.state.kind === "scanning" || this.state.kind === "result") {
+      const newScan = button("", "xray-icon-btn", () =>
+        this.callbacks.onNewScan(),
+      {
+        "aria-label": "Start a new scan",
+        title: "New scan",
+      });
+      newScan.append(createIcon("scan", 15));
+      actions.append(newScan);
+    }
+    actions.append(settings, close);
+
+    return el("div", { className: "xray-header" }, [brand, actions]);
   }
 
   private renderFooter(): HTMLElement {
@@ -516,28 +822,7 @@ export class Hud {
     const pageType = context.pageType === "video" ? "Video" : "Product";
     const imageUrl = safeImageUrl(result?.product.imageUrl ?? context.imageUrl);
 
-    const thumb = el("div", { className: "xray-thumb" });
-    const fallback = el("span", {
-      text: (title.trim()[0] ?? "?").toUpperCase(),
-    });
-    thumb.append(fallback);
-    if (imageUrl) {
-      const img = el("img", {
-        attrs: {
-          src: imageUrl,
-          alt: "",
-          referrerpolicy: "no-referrer",
-          loading: "lazy",
-        },
-      });
-      img.addEventListener("load", () => {
-        fallback.remove();
-      });
-      img.addEventListener("error", () => {
-        img.remove();
-      });
-      thumb.append(img);
-    }
+    const thumb = this.renderThumb(title, imageUrl);
 
     const priceValue = result
       ? result.product.retailUsd !== null
@@ -590,32 +875,95 @@ export class Hud {
     const state = this.state;
     if (state.kind !== "result") return el("div");
 
-    const { result, context, assumptions, waterfall } = state;
-    const content = el("div", { className: "xray-content" });
+    const content = el("div", { className: "xray-content xray-result" });
+    content.append(this.renderResultTabs(state));
+    if (state.tab === "profit") {
+      content.append(this.renderProfit(state));
+    } else if (state.tab === "suppliers") {
+      content.append(this.renderSuppliers(state));
+    } else {
+      content.append(this.renderOverview(state));
+    }
+    return content;
+  }
+
+  private renderResultTabs(state: ResultState): HTMLElement {
+    const tabs = el("div", {
+      className: "xray-tabs",
+      attrs: { role: "tablist", "aria-label": "Report sections" },
+    });
+    const items: Array<{
+      id: ResultState["tab"];
+      label: string;
+      count?: number;
+    }> = [
+      { id: "overview", label: "Overview" },
+      { id: "profit", label: "Profit" },
+      {
+        id: "suppliers",
+        label: "Suppliers",
+        count: state.result.factories.length,
+      },
+    ];
+
+    for (const item of items) {
+      const active = state.tab === item.id;
+      const tab = button("", `xray-tab ${active ? "active" : ""}`.trim(), () =>
+        this.switchTab(item.id),
+      {
+        role: "tab",
+        "aria-selected": active ? "true" : "false",
+      });
+      tab.append(el("span", { text: item.label }));
+      if (item.count !== undefined) {
+        tab.append(el("span", { className: "xray-tab-count", text: String(item.count) }));
+      }
+      tabs.append(tab);
+    }
+    return tabs;
+  }
+
+  private switchTab(tab: ResultState["tab"]): void {
+    if (this.state.kind !== "result") return;
+    this.state.tab = tab;
+    this.render();
+  }
+
+  private renderOverview(state: ResultState): HTMLElement {
+    const { result, context } = state;
+    const body = el("div", { className: "xray-tab-panel" });
 
     if (result.dataSource !== "api") {
-      content.append(
-        el("div", { className: `xray-banner ${result.dataSource === "demo" ? "demo" : "info"}` }, [
-          createIcon(result.dataSource === "demo" ? "flask" : "plug", 14),
-          el("span", {}, [
-            el("strong", {
-              text: result.dataSource === "demo" ? "DEMO DATA" : "MOCK API",
-            }),
-            el("span", {
-              text:
-                result.dataSource === "demo"
-                  ? " — sample dataset for UI review. Not a real supplier quote."
-                  : " — local mock server. Replace it with the real pipeline before launch.",
-            }),
-          ]),
-        ]),
+      body.append(
+        el(
+          "div",
+          {
+            className: `xray-banner ${
+              result.dataSource === "demo" ? "demo" : "info"
+            }`,
+          },
+          [
+            createIcon(result.dataSource === "demo" ? "flask" : "plug", 14),
+            el("span", {}, [
+              el("strong", {
+                text: result.dataSource === "demo" ? "DEMO DATA" : "MOCK API",
+              }),
+              el("span", {
+                text:
+                  result.dataSource === "demo"
+                    ? " — sample dataset for UI review. Not a real supplier quote."
+                    : " — local mock server. Replace it with the real pipeline before launch.",
+              }),
+            ]),
+          ],
+        ),
       );
     }
 
-    content.append(this.renderProductCard(context, result));
+    body.append(this.renderProductCard(context, result));
 
     if (context.warnings?.length) {
-      content.append(
+      body.append(
         el("div", { className: "xray-banner info" }, [
           createIcon("info", 14),
           el("span", { text: truncate(context.warnings[0] ?? "", 180) }),
@@ -623,10 +971,40 @@ export class Hud {
       );
     }
 
-    const priceGrid = el("div", { className: "xray-card accent" });
+    body.append(this.renderPriceCard(result));
+    body.append(this.renderFunnelCard(result));
+
+    if (result.qualityWarning) {
+      body.append(
+        el("div", { className: "xray-banner warn" }, [
+          createIcon("alert", 14),
+          el("span", {}, [
+            el("strong", { text: "Quality trap: " }),
+            el("span", { text: result.qualityWarning }),
+          ]),
+        ]),
+      );
+    }
+
+    body.append(
+      el("div", { className: "xray-next-actions" }, [
+        button("See profit breakdown", "xray-btn primary", () =>
+          this.switchTab("profit"),
+        ),
+        button("View supplier matches", "xray-btn secondary", () =>
+          this.switchTab("suppliers"),
+        ),
+      ]),
+    );
+    body.append(this.renderSources(result, context));
+    return body;
+  }
+
+  private renderPriceCard(result: ScanResult): HTMLElement {
+    const priceGrid = el("div", { className: "xray-card" });
     priceGrid.append(
       el("div", { className: "xray-section-head" }, [
-        el("div", { className: "xray-section-title", text: "Price X-Ray" }),
+        el("div", { className: "xray-section-title", text: "Price comparison" }),
         el("div", {
           className: "xray-section-note",
           text: result.priceRange
@@ -674,56 +1052,85 @@ export class Hud {
 
     if (result.priceRange) {
       priceGrid.append(
-        el("div", { className: "xray-price-note", attrs: { style: "margin-top:9px" } }, [
-          el("strong", {
-            text: `Gross margin on ex-works: ${formatPct(
-              result.product.retailUsd
-                ? ((result.product.retailUsd -
-                    (result.priceRange.fobMinUsd + result.priceRange.fobMaxUsd) / 2) /
-                    result.product.retailUsd) *
-                    100
-                : null,
-            )}. `,
-          }),
-          el("span", {
-            text: "That is not what the seller keeps — see the waterfall below.",
-          }),
-        ]),
+        el(
+          "div",
+          { className: "xray-price-note", attrs: { style: "margin-top:9px" } },
+          [
+            el("strong", {
+              text: `Gross margin on ex-works: ${formatPct(
+                result.product.retailUsd
+                  ? ((result.product.retailUsd -
+                      (result.priceRange.fobMinUsd +
+                        result.priceRange.fobMaxUsd) /
+                        2) /
+                      result.product.retailUsd) *
+                      100
+                  : null,
+              )}. `,
+            }),
+            el("span", {
+              text: "That is not what the seller keeps. Open Profit for the landed-cost model.",
+            }),
+          ],
+        ),
       );
     }
 
-    content.append(priceGrid);
-    content.append(this.renderWaterfallCard(result, assumptions, waterfall));
-    content.append(this.renderFunnelCard(result));
+    return priceGrid;
+  }
 
-    if (result.qualityWarning) {
-      content.append(
-        el("div", { className: "xray-banner warn" }, [
-          createIcon("alert", 14),
-          el("span", {}, [
-            el("strong", { text: "Quality trap: " }),
-            el("span", { text: result.qualityWarning }),
-          ]),
-        ]),
-      );
-    }
+  private renderProfit(state: ResultState): HTMLElement {
+    const { result, assumptions, waterfall } = state;
+    const body = el("div", { className: "xray-tab-panel" });
+    body.append(
+      el("div", { className: "xray-section-head xray-section-head-page" }, [
+        el("div", {
+          className: "xray-section-title",
+          text: "Landed cost & margin",
+        }),
+        el("div", {
+          className: "xray-section-note",
+          text: "Edit assumptions to test the model",
+        }),
+      ]),
+    );
+    body.append(this.renderWaterfallCard(result, assumptions, waterfall));
+    body.append(
+      el("div", { className: "xray-next-actions" }, [
+        button("View supplier matches", "xray-btn primary", () =>
+          this.switchTab("suppliers"),
+        ),
+        button("Back to overview", "xray-btn ghost", () =>
+          this.switchTab("overview"),
+        ),
+      ]),
+    );
+    return body;
+  }
 
-    content.append(this.renderFactories(state));
-
+  private renderSuppliers(state: ResultState): HTMLElement {
+    const body = el("div", { className: "xray-tab-panel" });
+    body.append(this.renderFactories(state));
     if (!state.quoteOpen) {
-      content.append(
-        button(
-          "Request a verified quote",
-          "xray-btn primary wide",
-          () => this.openQuote(),
+      body.append(
+        button("Request a verified quote", "xray-btn primary wide", () =>
+          this.openQuote(),
         ),
       );
     } else {
-      content.append(this.renderQuoteForm(state));
+      body.append(this.renderQuoteForm(state));
     }
-
-    content.append(this.renderSources(result, context));
-    return content;
+    body.append(
+      el("div", { className: "xray-next-actions" }, [
+        button("Back to profit", "xray-btn ghost", () =>
+          this.switchTab("profit"),
+        ),
+        button("Back to overview", "xray-btn ghost", () =>
+          this.switchTab("overview"),
+        ),
+      ]),
+    );
+    return body;
   }
 
   private renderWaterfallCard(
@@ -1179,7 +1586,7 @@ export class Hud {
         }),
         el("div", {
           className: "xray-section-note",
-          text: "Masked · verify before payment",
+          text: "Top 3 · masked · verify before payment",
         }),
       ]),
     );
@@ -1197,7 +1604,7 @@ export class Hud {
       return card;
     }
 
-    for (const factory of state.result.factories) {
+    for (const factory of state.result.factories.slice(0, 3)) {
       card.append(this.renderFactory(factory, state));
     }
     return card;
@@ -1251,6 +1658,13 @@ export class Hud {
     }
     card.append(tiers);
 
+    const details = el("details", { className: "xray-factory-details" });
+    details.append(
+      el("summary", {
+        text: `Due diligence & signals (${factory.signals.length})`,
+      }),
+    );
+    const detailBody = el("div", { className: "xray-factory-details-body" });
     const signals = el("div", { className: "xray-signals" });
     for (const signal of factory.signals) {
       signals.append(
@@ -1267,13 +1681,15 @@ export class Hud {
         ]),
       );
     }
-    card.append(signals);
-    card.append(
+    detailBody.append(signals);
+    detailBody.append(
       el("div", {
         className: "xray-confidence-reason",
         text: factory.confidenceReason,
       }),
     );
+    details.append(detailBody);
+    card.append(details);
 
     card.append(
       el("div", { className: "xray-actions" }, [
@@ -1316,6 +1732,7 @@ export class Hud {
     if (this.state.kind !== "result") return;
     this.state.quoteOpen = true;
     this.state.quoteFactoryId = factoryId;
+    this.state.tab = "suppliers";
     this.render();
     requestAnimationFrame(() => {
       const form = this.root.querySelector<HTMLElement>(
@@ -1556,7 +1973,7 @@ export class Hud {
       for (const warning of context.warnings) {
         notes.append(el("li", { text: warning }));
       }
-      body.append(el("div", { text: "Page extraction notes", attrs: { style: "margin-top:8px;font-weight:700;color:#94a3b8" } }), notes);
+      body.append(el("div", { text: "Page extraction notes", attrs: { style: "margin-top:8px;font-weight:600;color:var(--mx-muted)" } }), notes);
     }
 
     if (result.sources.length) {
@@ -1571,7 +1988,7 @@ export class Hud {
       body.append(
         el("div", {
           text: "Sources",
-          attrs: { style: "margin-top:8px;font-weight:700;color:#94a3b8" },
+          attrs: { style: "margin-top:8px;font-weight:600;color:var(--mx-muted)" },
         }),
         sourceList,
       );
@@ -1585,7 +2002,7 @@ export class Hud {
       body.append(
         el("div", {
           text: "Disclaimers",
-          attrs: { style: "margin-top:8px;font-weight:700;color:#94a3b8" },
+          attrs: { style: "margin-top:8px;font-weight:600;color:var(--mx-muted)" },
         }),
         disclaimers,
       );

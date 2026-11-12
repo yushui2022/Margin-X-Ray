@@ -16,6 +16,8 @@ export type RuntimeMessage =
   | { type: "SCAN_ERROR"; scanId: string; error: ScanError }
   | { type: "SCAN_CANCEL"; scanId: string }
   | { type: "OPEN_HUD" }
+  | { type: "CAPTURE_AND_SCAN" }
+  | { type: "CAPTURE_VISIBLE_TAB" }
   | { type: "OPEN_OPTIONS" }
   | { type: "GET_SETTINGS" }
   | { type: "SAVE_SETTINGS"; settings: Partial<Settings> }
@@ -24,7 +26,13 @@ export type RuntimeMessage =
   | { type: "CLEAR_DATA" };
 
 export type RuntimeResponse =
-  | { ok: true; settings?: Settings; apiTest?: ApiTestResult; lead?: Lead }
+  | {
+      ok: true;
+      settings?: Settings;
+      apiTest?: ApiTestResult;
+      lead?: Lead;
+      captureDataUrl?: string;
+    }
   | { ok: false; error: ScanError };
 
 export function isRuntimeMessage(value: unknown): value is RuntimeMessage {

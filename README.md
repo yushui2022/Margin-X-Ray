@@ -3,9 +3,8 @@
 **Factory cost lens for TikTok Shop, Shopify and Amazon product pages.**
 
 This repository contains the first working slice of Margin X-Ray: a Chrome
-Manifest V3 extension that captures the page context you clicked on, streams a
-scan result into a focused research HUD, shows an editable landed-cost waterfall, and
-collects sourcing leads.
+Manifest V3 extension with a multi-source capture screen, a staged scan, and a
+tabbed report for price, profit and suppliers. It also collects sourcing leads.
 
 **The product is the extension.** `dist/` is the loadable extension. `preview/`
 is a dev-only HUD preview page that is generated outside `dist/`, and
@@ -23,9 +22,15 @@ rules real before wiring the supply-chain engine.
 
 - Chrome MV3 extension, loadable as an unpacked extension.
 - Page adapters for TikTok, Amazon, Shopify and generic product pages.
-- Floating `⚡ X-Ray Factory Price` launcher on supported hosts.
-- Shadow-DOM HUD: product context, scan progress, price range, cost waterfall,
-  factory cards, funnel reasons, quote form and disclaimers.
+- Floating `Open X-Ray` launcher on supported hosts.
+- Start screen with four separate capture paths:
+  - analyze the current product or video page
+  - paste a TikTok, Amazon or Shopify link
+  - upload a JPG, PNG or WebP product image
+  - capture the visible page, or the current video frame when available
+- Staged scan state, then a tabbed report: **Overview / Profit / Suppliers**.
+- Shadow-DOM HUD: product context, price range, cost waterfall, Top 3 factory
+  cards, funnel reasons, quote form and disclaimers.
 - Editable cost assumptions: ex-works price, freight, duty, platform fee,
   affiliate commission, payment fee, fulfillment, returns and ads.
 - MOQ-tier pricing on each factory card; clicking a tier updates the waterfall.
@@ -34,26 +39,23 @@ rules real before wiring the supply-chain engine.
 - Background worker that proxies API calls (avoids page CORS and keeps tokens
   out of the page).
 - Local settings, scan history and lead storage in `chrome.storage.local`.
-- Popup quick scan + full options page.
+- Popup with **Open X-Ray** and **Capture screen** actions + full options page.
 - Right-click **“Scan with Margin X-Ray”** on any page (uses `activeTab`, not a
   broad all-sites permission).
 - Local mock API (`server/mock-xray.mjs`) for end-to-end testing.
 - Dev-only HUD preview page (`npm run preview`), kept outside the extension
   package.
 
-## Visual system
+## Interface principles
 
-The extension follows the WenCode-style enterprise visual language, adapted to
-a light research-panel treatment because the HUD overlays arbitrary pages:
+The HUD is a utility panel, not a landing page:
 
-- warm paper and ink-green panel surfaces, with clear separation from the host page
-- serif headings (`Georgia` / `Songti SC`) with sans-serif body text
-- forest-green actions, mineral-blue links and info, wine warnings, muted gold
-  for demo/medium-confidence states
-- 5px badges, 7px controls, 10px cards and panels
-- 1px borders, low-intervention shadows, no gradient/glass/neon treatment
+- white surfaces, neutral borders and one green action color
+- sans-serif type throughout; no decorative gradients or glass effects
+- one decision per screen: choose a source, then scan, then read one report tab
+- Top 3 suppliers only; due-diligence signals stay behind an expandable section
 - `tabular-nums` for prices and margins
-- visible mineral-blue focus rings and `prefers-reduced-motion` fallbacks
+- visible focus rings and `prefers-reduced-motion` fallbacks
 - inline stroke icons instead of emoji in the HUD and popup
 
 Tokens live in `src/styles/tokens.css` and are injected into the HUD shadow root
@@ -67,10 +69,11 @@ so page CSS cannot leak in.
   real pipeline.
 - No live TikTok Shop, 1688 image search, Qichacha/DueSight, payment or auth
   integration yet.
-- Video frame capture currently uses the page's poster image / `currentSrc`.
-  Canvas capture of cross-origin video is intentionally not attempted because
-  most TikTok/IG/YouTube video elements taint the canvas. The next step is a
-  user-gesture `captureVisibleTab` or `tabCapture` path.
+- The screenshot path first tries a canvas frame from the current video, then
+  `chrome.tabs.captureVisibleTab` through the background worker. Chrome grants
+  `captureVisibleTab` when the scan starts from the popup's **Capture screen**
+  button. A screenshot started from the in-page HUD may be blocked by Chrome;
+  in that case the page's product image is used and the report says so.
 
 ## Quick start
 
@@ -84,8 +87,10 @@ Load the extension:
 1. Open `chrome://extensions`.
 2. Turn on **Developer mode**.
 3. Click **Load unpacked** and select the `dist/` folder.
-4. Open a product page and click the floating `⚡ X-Ray Factory Price` button,
-   or open the extension popup and click **Scan this page**.
+4. Open a product page and click the floating **Open X-Ray** button. Choose
+   **Analyze this page**, paste a link, upload an image, or capture the screen.
+   You can also open the extension popup and use **Open X-Ray** or
+   **Capture screen**.
 
 The extension starts in **demo mode**, so no server is required.
 
@@ -158,6 +163,7 @@ src/
     tokens.css                shared design tokens (WenCode-inspired light theme)
   shared/
     types.ts                  data contract
+    capture.ts                link/image capture context helpers
     pricing.ts                landed-cost waterfall + MOQ helper
     format.ts                 price parsing and safe formatting
     sse.ts                    chunk-safe SSE parser

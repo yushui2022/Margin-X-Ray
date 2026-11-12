@@ -18,6 +18,11 @@ export type PageType = "video" | "product" | "unknown";
 export type DataSource = "demo" | "mock" | "api";
 export type Confidence = "high" | "medium" | "low" | "demo";
 
+export type CaptureInput =
+  | { kind: "link"; url: string }
+  | { kind: "image"; dataUrl: string; fileName: string }
+  | { kind: "screenshot" };
+
 export interface PriceInfo {
   amount: number;
   currency: string;

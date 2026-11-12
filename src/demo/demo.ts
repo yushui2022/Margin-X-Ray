@@ -36,7 +36,16 @@ let runId = 0;
 
 const hud = new Hud({
   onLauncherClick: () => {
+    hud.showCapture(context);
+  },
+  onAnalyzePage: () => {
     void open();
+  },
+  onAnalyzeInput: () => {
+    void open();
+  },
+  onNewScan: () => {
+    hud.showCapture(context);
   },
   onCancel: () => {
     stop();

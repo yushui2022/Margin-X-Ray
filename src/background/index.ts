@@ -123,7 +123,23 @@ async function handleMessage(message: RuntimeMessage): Promise<RuntimeResponse> 
       await chrome.runtime.openOptionsPage();
       return { ok: true };
 
+    case "CAPTURE_VISIBLE_TAB": {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      if (!tab?.windowId) {
+        throw new Error("No active tab to capture.");
+      }
+      const captureDataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
+        format: "jpeg",
+        quality: 82,
+      });
+      return { ok: true, captureDataUrl };
+    }
+
     case "OPEN_HUD":
+    case "CAPTURE_AND_SCAN":
       return { ok: true };
 
     case "SCAN_REQUEST":

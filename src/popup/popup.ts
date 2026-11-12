@@ -4,6 +4,7 @@ import { EXTENSION_VERSION } from "../shared/version";
 import type { Settings } from "../shared/types";
 
 const scanBtn = document.getElementById("scanBtn") as HTMLButtonElement;
+const captureBtn = document.getElementById("captureBtn") as HTMLButtonElement;
 const statusEl = document.getElementById("status") as HTMLDivElement;
 const demoToggle = document.getElementById("demoToggle") as HTMLInputElement;
 const demoHint = document.getElementById("demoHint") as HTMLDivElement;
@@ -59,23 +60,27 @@ async function load(): Promise<void> {
   }
 }
 
+async function openOnActiveTab(message: { type: string }): Promise<void> {
+  const [tab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  if (!tab?.id) throw new Error("No active tab.");
+
+  await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ["content.js"],
+  });
+  await chrome.tabs.sendMessage(tab.id, message);
+}
+
 scanBtn.addEventListener("click", () => {
   void (async () => {
     scanBtn.disabled = true;
     setStatus("Opening the X-Ray panel on this tab…");
     try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-      if (!tab?.id) throw new Error("No active tab.");
-
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ["content.js"],
-      });
-      await chrome.tabs.sendMessage(tab.id, { type: "OPEN_HUD" });
-      setStatus("Panel opened. If this page is not a product page, you will see instructions.", "ok");
+      await openOnActiveTab({ type: "OPEN_HUD" });
+      setStatus("X-Ray opened. Choose how you want to start the scan.", "ok");
       window.setTimeout(() => window.close(), 500);
     } catch {
       setStatus(
@@ -83,6 +88,24 @@ scanBtn.addEventListener("click", () => {
         "error",
       );
       scanBtn.disabled = false;
+    }
+  })();
+});
+
+captureBtn.addEventListener("click", () => {
+  void (async () => {
+    captureBtn.disabled = true;
+    setStatus("Capturing the visible screen and opening the report…");
+    try {
+      await openOnActiveTab({ type: "CAPTURE_AND_SCAN" });
+      setStatus("Capture started. The report will open on this tab.", "ok");
+      window.setTimeout(() => window.close(), 500);
+    } catch {
+      setStatus(
+        "Chrome blocks screenshots on this page. Open a normal http(s) page and try again.",
+        "error",
+      );
+      captureBtn.disabled = false;
     }
   })();
 });

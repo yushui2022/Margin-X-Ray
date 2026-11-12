@@ -18,7 +18,12 @@ export type IconName =
   | "clock"
   | "file"
   | "tag"
-  | "building";
+  | "building"
+  | "link"
+  | "image"
+  | "camera"
+  | "upload"
+  | "scan";
 
 const PATHS: Record<IconName, string[]> = {
   bolt: ["M13 2 3 14h9l-1 8 10-12h-9l1-8z"],
@@ -88,6 +93,31 @@ const PATHS: Record<IconName, string[]> = {
     "M15 9h.01",
     "M15 13h.01",
     "M15 17h.01",
+  ],
+  link: [
+    "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7",
+    "M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7",
+  ],
+  image: [
+    "M3 3h18v18H3z",
+    "m3 16 5-5 4 4 3-3 6 6",
+    "M8 9h.01",
+  ],
+  camera: [
+    "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",
+    "M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+  ],
+  upload: [
+    "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",
+    "m17 8-5-5-5 5",
+    "M12 3v12",
+  ],
+  scan: [
+    "M3 7V5a2 2 0 0 1 2-2h2",
+    "M17 3h2a2 2 0 0 1 2 2v2",
+    "M21 17v2a2 2 0 0 1-2 2h-2",
+    "M7 21H5a2 2 0 0 1-2-2v-2",
+    "M7 12h10",
   ],
 };
 

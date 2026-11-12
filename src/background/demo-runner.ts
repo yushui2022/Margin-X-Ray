@@ -7,11 +7,20 @@ export async function runDemoScan(
   onProgress: (progress: ScanProgress) => void | Promise<void>,
   signal?: AbortSignal,
 ): Promise<ScanResult> {
+  const captureMessage =
+    request.context.extractedBy === "url-input"
+      ? "Loaded the pasted link. Starting the demo scan…"
+      : request.context.extractedBy === "image-upload"
+        ? "Loaded the uploaded image. Starting the demo scan…"
+        : request.context.extractedBy === "screenshot"
+          ? "Captured the current screen. Starting the demo scan…"
+          : "Captured page context. Starting the demo scan…";
+
   await onProgress({
     scanId: request.scanId,
     stepId: "capture",
     percent: 4,
-    message: "Captured page context. Starting the demo scan…",
+    message: captureMessage,
   });
 
   for (const step of SCAN_STEP_DEFS) {
