@@ -2,6 +2,7 @@ import type {
   ApiTestResult,
   Lead,
   LeadInput,
+  SampledFrame,
   ScanError,
   ScanProgress,
   ScanRequest,
@@ -22,6 +23,9 @@ export type RuntimeMessage =
   | { type: "GET_SETTINGS" }
   | { type: "SAVE_SETTINGS"; settings: Partial<Settings> }
   | { type: "TEST_API"; settings?: Partial<Settings> }
+  | { type: "TEST_TIKHUB"; token: string }
+  | { type: "TEST_RECOGNIZER"; apiKey: string; secretKey: string }
+  | { type: "EXTRACT_FRAMES" }
   | { type: "SAVE_LEAD"; lead: LeadInput; result: ScanResult }
   | { type: "CLEAR_DATA" };
 
@@ -32,6 +36,7 @@ export type RuntimeResponse =
       apiTest?: ApiTestResult;
       lead?: Lead;
       captureDataUrl?: string;
+      frames?: SampledFrame[];
     }
   | { ok: false; error: ScanError };
 

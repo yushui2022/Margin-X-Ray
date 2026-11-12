@@ -350,6 +350,14 @@
   font-weight: 600;
 }
 
+.xray-identity-line {
+  display: block;
+}
+
+.xray-identity-line + .xray-identity-line {
+  margin-top: 3px;
+}
+
 /* ------------------------------------------------------------------ */
 /* Product summary                                                    */
 /* ------------------------------------------------------------------ */

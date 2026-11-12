@@ -63,10 +63,107 @@
           </div>
         </div>
 
+        <div class="section-head">
+          <h2>Product identity</h2>
+          <span class="section-note">TikHub, frames, Baidu</span>
+        </div>
+
+        <div class="field">
+          <label for="tikhubToken">TikHub token</label>
+          <input
+            id="tikhubToken"
+            name="tikhubToken"
+            type="password"
+            placeholder="Bearer token from tikhub.io"
+            autocomplete="off"
+          />
+          <div class="field-hint">
+            Used for TikTok and Douyin video metadata. Sent only to
+            <code>api.tikhub.io</code>. A missing token skips the call.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="baiduApiKey">Baidu API key</label>
+          <input
+            id="baiduApiKey"
+            name="baiduApiKey"
+            type="password"
+            placeholder="Product recognition API key"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field">
+          <label for="baiduSecretKey">Baidu secret key</label>
+          <input
+            id="baiduSecretKey"
+            name="baiduSecretKey"
+            type="password"
+            placeholder="Product recognition secret key"
+            autocomplete="off"
+          />
+          <div class="field-hint">
+            Sampled frames, uploads, and covers are sent to Baidu product
+            recognition. Factory prices are not inferred from the label.
+          </div>
+        </div>
+
+        <div class="section-head">
+          <h2>1688 prices</h2>
+          <span class="section-note">Image search, not a registry check</span>
+        </div>
+
+        <div class="field">
+          <label for="oneboundKey">OneBound key</label>
+          <input id="oneboundKey" name="oneboundKey" type="password" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="oneboundSecret">OneBound secret</label>
+          <input id="oneboundSecret" name="oneboundSecret" type="password" autocomplete="off" />
+          <div class="field-hint">
+            Paste the key from the OneBound list, and the secret from that row’s
+            edit button. One scan calls <code>item_search_img</code> once.
+            A 10-call daily quota covers about 10 scans.
+          </div>
+        </div>
+        <label class="switch-row" for="oneboundFetchTiers">
+          <span>
+            <span class="switch-title">Also fetch the cheapest listing’s MOQ tiers</span>
+            <span class="switch-sub">Adds one <code>item_get</code> call per scan. Leave off while the daily cap is 10.</span>
+          </span>
+          <input id="oneboundFetchTiers" name="oneboundFetchTiers" type="checkbox" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+        <div class="field">
+          <label for="alibabaAppKey">1688 app key</label>
+          <input id="alibabaAppKey" name="alibabaAppKey" type="password" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="alibabaAppSecret">1688 app secret</label>
+          <input id="alibabaAppSecret" name="alibabaAppSecret" type="password" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="alibabaAccessToken">1688 access token</label>
+          <input id="alibabaAccessToken" name="alibabaAccessToken" type="password" autocomplete="off" />
+          <div class="field-hint">
+            Leave these blank for now. OneBound is used first. The official
+            search runs only when OneBound is not configured.
+          </div>
+        </div>
+        <div class="field compact">
+          <label for="usdCnyRate">CNY per 1 USD</label>
+          <input id="usdCnyRate" name="usdCnyRate" type="number" min="0" step="0.01" placeholder="7.20" />
+          <div class="field-hint">
+            Leave blank to keep 1688 prices in CNY. A saved rate converts the
+            tiers and labels the rate. It does not add freight or duty.
+          </div>
+        </div>
+
         <label class="switch-row" for="demoMode">
           <span>
             <span class="switch-title">Demo mode</span>
-            <span class="switch-sub">Use a clearly labeled sample dataset. No API calls.</span>
+            <span class="switch-sub">Factory report uses the sample dataset. TikHub and Baidu still run when their keys are saved.</span>
           </span>
           <input id="demoMode" name="demoMode" type="checkbox" />
           <span class="switch" aria-hidden="true"></span>
@@ -99,6 +196,12 @@
           </button>
           <button id="testBtn" class="btn secondary" type="button">
             Test connection
+          </button>
+          <button id="testTikhubBtn" class="btn secondary" type="button">
+            Test TikHub
+          </button>
+          <button id="testRecognizerBtn" class="btn secondary" type="button">
+            Test recognition
           </button>
         </div>
         <div id="status" class="status" role="status" aria-live="polite">

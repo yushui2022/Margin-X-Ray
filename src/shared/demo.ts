@@ -150,9 +150,12 @@ export function createDemoResult(
       sourceUrl: context.url,
       platform: context.platform,
       retailUsd,
-      retailSource: isUsd
-        ? `Listed on the page (${pagePrice?.source ?? "page"})`
-        : "Demo retail price — no USD price was found on the page",
+      retailSource:
+        isUsd && pagePrice
+          ? pagePrice.source === "TikHub"
+            ? "TikHub"
+            : `Listed on the page (${pagePrice.source})`
+          : "Demo retail price — no USD price was found on the page",
     },
     priceRange: {
       fobMinUsd: 2.4,

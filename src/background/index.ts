@@ -1,4 +1,8 @@
 import { runDemoScan } from "./demo-runner";
+import { enrichScan } from "./enrich";
+import { searchSupply } from "./supply-search";
+import { testRecognizer } from "./recognize";
+import { testTikHub } from "./tikhub";
 import {
   ApiError,
   makeLead,
@@ -13,6 +17,8 @@ import {
   getSettings,
   saveSettings,
 } from "../shared/settings";
+import { attachIdentity } from "../shared/identity";
+import { applySupply, parseFxRate } from "../shared/supply";
 import { computeWaterfall } from "../shared/pricing";
 import type { RuntimeMessage, RuntimeResponse } from "../shared/messages";
 import type {
@@ -105,6 +111,15 @@ async function handleMessage(message: RuntimeMessage): Promise<RuntimeResponse> 
       return { ok: true, apiTest: await testApi(settings) };
     }
 
+    case "TEST_TIKHUB":
+      return { ok: true, apiTest: await testTikHub(message.token) };
+
+    case "TEST_RECOGNIZER":
+      return {
+        ok: true,
+        apiTest: await testRecognizer(message.apiKey, message.secretKey),
+      };
+
     case "SAVE_LEAD": {
       const lead = makeLead(message.lead, message.result);
       await addLead(lead);
@@ -181,17 +196,43 @@ async function handleScanRequest(
 
   try {
     const settings = await getSettings();
-    const forceDemo =
-      Boolean(request.forceDemo) || settings.demoMode || !settings.apiBaseUrl;
+    if (!settings.demoMode && !request.forceDemo && !settings.apiBaseUrl) {
+      throw new ApiError(
+        "API_NOT_CONFIGURED",
+        "Live mode needs an API base URL. Set one in Settings or turn Demo mode on.",
+      );
+    }
+    const context = await enrichScan(
+      request,
+      settings,
+      tabId,
+      sendProgress,
+      controller.signal,
+    );
+    if (controller.signal.aborted) return;
+    const supplied = await searchSupply(
+      { ...request, context },
+      settings,
+      sendProgress,
+      controller.signal,
+    );
+    if (controller.signal.aborted) return;
+    const enrichedRequest = { ...request, context: supplied };
+    const forceDemo = Boolean(request.forceDemo) || settings.demoMode;
 
-    const result = forceDemo
-      ? await runDemoScan(request, sendProgress, controller.signal)
+    const scanned = forceDemo
+      ? await runDemoScan(enrichedRequest, sendProgress, controller.signal)
       : await scanWithApi(
-          request,
+          enrichedRequest,
           settings,
           sendProgress,
           controller.signal,
         );
+    const result = applySupply(
+      attachIdentity(scanned, supplied),
+      supplied.supply,
+      parseFxRate(settings.usdCnyRate),
+    );
 
     if (controller.signal.aborted) return;
 

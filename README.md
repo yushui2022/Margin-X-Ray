@@ -11,10 +11,12 @@ is a dev-only HUD preview page that is generated outside `dist/`, and
 `server/mock-xray.mjs` is a local mock API for testing. Neither is a web app and
 neither ships inside the extension package.
 
-The current build is an **MVP shell with a clearly labeled demo dataset**. It
-does not call 1688, TikTok Shop, Qichacha or any live supplier API yet. The
-point of this slice is to make the interaction, data contract and integrity
-rules real before wiring the supply-chain engine.
+The current build is an **MVP shell with a clearly labeled demo dataset** for
+factory verification. The optional live adapters now call TikHub, browser-side
+video frame extraction, Baidu product recognition, and OneBound or the 1688
+open platform when their credentials are saved. The factory report still
+comes from the configured Margin X-Ray API; the extension does not turn a
+marketplace listing into a verified factory quote.
 
 ---
 
@@ -43,6 +45,18 @@ rules real before wiring the supply-chain engine.
 - Right-click **“Scan with Margin X-Ray”** on any page (uses `activeTab`, not a
   broad all-sites permission).
 - Local mock API (`server/mock-xray.mjs`) for end-to-end testing.
+- Optional live capture and sourcing adapters, used only when their keys are
+  saved in Settings:
+  - TikHub (`api.tikhub.io`) resolves a TikTok or Douyin link to title, author,
+    cover and an anchored shop price when the payload states the currency
+  - the content script samples up to three video frames locally
+  - Baidu product recognition labels the frame, upload, cover or page image
+  - OneBound `item_search_img` searches 1688 image listings and can optionally
+    fetch one listing's MOQ tiers with `item_get`
+  - the official 1688 open platform adapter signs and calls the similar-offer
+    image search endpoint when OneBound is not configured
+  - a missing key, a failed call, or a score under 45% is shown as a note and
+    does not replace a real page title or invent a factory quote
 - Dev-only HUD preview page (`npm run preview`), kept outside the extension
   package.
 
@@ -68,8 +82,12 @@ so page CSS cannot leak in.
   **sample data**. They are labeled `DEMO DATA` in the HUD.
 - The local mock server returns `MOCK API` data. It is a test harness, not the
   real pipeline.
-- No live TikTok Shop, 1688 image search, Qichacha/DueSight, payment or auth
-  integration yet.
+- 1688 image search runs only when OneBound or open-platform keys are saved.
+  Returned listing prices stay in CNY unless a CNY-per-USD rate is saved.
+  These are listing prices, not factory verification, freight, duty or a
+  supplier quote.
+  Qichacha/DueSight, payment and auth are not connected. Shop names are not
+  treated as verified factories.
 - The screenshot path first tries a canvas frame from the current video, then
   `chrome.tabs.captureVisibleTab` through the background worker. Chrome grants
   `captureVisibleTab` when the scan starts from the popup's **Capture screen**
@@ -153,8 +171,15 @@ src/
     index.ts                  service worker, context menu, scan orchestration
     api.ts                    SSE client, result normalization, API tests
     demo-runner.ts            staged demo scan
+    enrich.ts                 TikHub + frame sample + Baidu recognition
+    tikhub.ts                 TikHub video client
+    recognize.ts              Baidu product recognition client
+    supply-search.ts          OneBound / 1688 image-search orchestration
+    onebound.ts               OneBound listing adapter
+    alibaba.ts                1688 open-platform adapter
   content/
     index.ts                  page controller, launcher lifecycle, messaging
+    frames.ts                 local video frame sampler
     adapters/                 TikTok, Amazon, Shopify, video, generic
     ui/
       hud.ts                  shadow-DOM HUD
@@ -165,6 +190,7 @@ src/
   shared/
     types.ts                  data contract
     capture.ts                link/image capture context helpers
+    identity.ts               TikHub / Baidu parsers and title rules
     pricing.ts                landed-cost waterfall + MOQ helper
     format.ts                 price parsing and safe formatting
     sse.ts                    chunk-safe SSE parser

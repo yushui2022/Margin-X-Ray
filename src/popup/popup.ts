@@ -25,7 +25,7 @@ function updateMode(settings: Settings): void {
     modeBadge.textContent = "DEMO";
     modeBadge.className = "badge demo";
     demoHint.textContent =
-      "Demo mode uses a clearly labeled sample dataset. It never invents a fallback factory price.";
+      "Demo mode keeps factory cards on the sample dataset. TikHub and Baidu run only when their keys are saved in Settings.";
   } else {
     modeBadge.textContent = "LIVE";
     modeBadge.className = "badge live";

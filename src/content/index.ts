@@ -5,6 +5,7 @@ import { Hud } from "./ui/hud";
 import { getSettings } from "../shared/settings";
 import { EXTENSION_VERSION } from "../shared/version";
 import { buildImageContext, buildLinkContext } from "../shared/capture";
+import { captureCurrentFrame, sampleVideoFrames } from "./frames";
 import type { RuntimeMessage, RuntimeResponse } from "../shared/messages";
 import type {
   CaptureInput,
@@ -62,9 +63,22 @@ class XRayController {
       onSubmitLead: (input) => this.submitLead(input),
     });
 
-    chrome.runtime.onMessage.addListener((message: RuntimeMessage) => {
-      this.handleRuntimeMessage(message);
-    });
+    chrome.runtime.onMessage.addListener(
+      (
+        message: RuntimeMessage,
+        _sender: chrome.runtime.MessageSender,
+        sendResponse: (response: RuntimeResponse) => void,
+      ) => {
+        if (message?.type === "EXTRACT_FRAMES") {
+          void sampleVideoFrames()
+            .then((frames) => sendResponse({ ok: true, frames }))
+            .catch(() => sendResponse({ ok: true, frames: [] }));
+          return true;
+        }
+        this.handleRuntimeMessage(message);
+        return false;
+      },
+    );
 
     window.addEventListener("popstate", () => this.onUrlMaybeChanged());
     this.urlTimer = window.setInterval(
@@ -185,7 +199,7 @@ class XRayController {
     let warning = "Screenshot captured from the current tab.";
 
     if (!preferVisibleTab) {
-      imageUrl = this.captureVideoFrame();
+      imageUrl = captureCurrentFrame()?.dataUrl ?? null;
       if (imageUrl) {
         warning = "Captured the current video frame.";
       }
@@ -225,27 +239,6 @@ class XRayController {
       }
     }
     return genericAdapter.extract(document, url);
-  }
-
-  private captureVideoFrame(): string | null {
-    const videos = Array.from(document.querySelectorAll("video"));
-    const video = videos
-      .filter((entry) => entry.readyState >= 2 && entry.videoWidth > 0)
-      .sort((a, b) => b.videoWidth * b.videoHeight - a.videoWidth * a.videoHeight)[0];
-    if (!video) return null;
-
-    try {
-      const scale = Math.min(1, 1280 / video.videoWidth);
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
-      canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
-      const context = canvas.getContext("2d");
-      if (!context) return null;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL("image/jpeg", 0.85);
-    } catch {
-      return null;
-    }
   }
 
   private async captureVisibleTab(): Promise<string | null> {

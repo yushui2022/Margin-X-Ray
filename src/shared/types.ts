@@ -39,6 +39,40 @@ export interface VideoContext {
   isPlaying?: boolean;
 }
 
+export interface TikHubVideo {
+  awemeId?: string;
+  description?: string;
+  author?: string;
+  coverUrl?: string;
+  playUrl?: string;
+  durationSec?: number;
+  productTitle?: string;
+  price?: PriceInfo;
+}
+
+export type RecognitionImageSource = "video-frame" | "cover" | "upload" | "page";
+
+export interface ProductRecognition {
+  provider: "baidu-product";
+  name: string;
+  score: number;
+  imageSource: RecognitionImageSource;
+  frameTimeSec?: number;
+}
+
+export interface CaptureEnrichment {
+  tikhub?: TikHubVideo;
+  recognition?: ProductRecognition;
+  frameCount: number;
+  notes: string[];
+}
+
+export interface SampledFrame {
+  timeSec: number;
+  dataUrl: string;
+  source: "video-frame";
+}
+
 export interface PageContext {
   platform: Platform;
   pageType: PageType;
@@ -54,6 +88,35 @@ export interface PageContext {
   extractedBy: string;
   extractedAt: string;
   warnings?: string[];
+  enrichment?: CaptureEnrichment;
+  supply?: SupplyReport;
+  supplyNote?: string;
+}
+
+export interface SupplyTier {
+  moq: number;
+  unitCny: number;
+}
+
+export interface SupplyOffer {
+  id: string;
+  title: string;
+  provider: "onebound" | "alibaba-open";
+  tiers: SupplyTier[];
+  location?: string;
+  shopName?: string;
+  detailUrl?: string;
+  sales?: number;
+}
+
+export interface SupplyReport {
+  provider: "onebound" | "alibaba-open";
+  scanned: number;
+  priced: number;
+  offers: SupplyOffer[];
+  fxRate?: number;
+  cnyLabel: string;
+  note: string;
 }
 
 export interface ScanClientInfo {
@@ -93,6 +156,7 @@ export interface ProgressStep {
 export interface FactoryTier {
   moq: number;
   unitUsd: number;
+  currency?: "USD" | "CNY";
   note?: string;
 }
 
@@ -116,6 +180,7 @@ export interface Factory {
   signals: FactorySignal[];
   confidence: Confidence;
   confidenceReason: string;
+  currency?: "USD" | "CNY";
 }
 
 export interface CostAssumptions {
@@ -194,6 +259,7 @@ export interface ScanResult {
   qualityWarning?: string;
   sources: ScanSource[];
   disclaimers: string[];
+  supply?: SupplyReport;
 }
 
 export interface LeadInput {
@@ -222,6 +288,16 @@ export interface Settings {
   demoMode: boolean;
   autoOpen: boolean;
   maxScanHistory: number;
+  tikhubToken: string;
+  baiduApiKey: string;
+  baiduSecretKey: string;
+  oneboundKey: string;
+  oneboundSecret: string;
+  oneboundFetchTiers: boolean;
+  alibabaAppKey: string;
+  alibabaAppSecret: string;
+  alibabaAccessToken: string;
+  usdCnyRate: string;
 }
 
 export interface ScanHistoryItem {

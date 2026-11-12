@@ -10,6 +10,16 @@ export const DEFAULT_SETTINGS: Settings = {
   demoMode: true,
   autoOpen: false,
   maxScanHistory: 20,
+  tikhubToken: "",
+  baiduApiKey: "",
+  baiduSecretKey: "",
+  oneboundKey: "",
+  oneboundSecret: "",
+  oneboundFetchTiers: false,
+  alibabaAppKey: "",
+  alibabaAppSecret: "",
+  alibabaAccessToken: "",
+  usdCnyRate: "",
 };
 
 export const STORAGE_KEYS = {
@@ -29,7 +39,25 @@ function normalizeSettings(input: Partial<Settings> | undefined): Settings {
       100,
       Math.max(1, Number(merged.maxScanHistory) || DEFAULT_SETTINGS.maxScanHistory),
     ),
+    tikhubToken: String(merged.tikhubToken ?? "").trim(),
+    baiduApiKey: String(merged.baiduApiKey ?? "").trim(),
+    baiduSecretKey: String(merged.baiduSecretKey ?? "").trim(),
+    oneboundKey: String(merged.oneboundKey ?? "").trim(),
+    oneboundSecret: String(merged.oneboundSecret ?? "").trim(),
+    oneboundFetchTiers: Boolean(merged.oneboundFetchTiers),
+    alibabaAppKey: String(merged.alibabaAppKey ?? "").trim(),
+    alibabaAppSecret: String(merged.alibabaAppSecret ?? "").trim(),
+    alibabaAccessToken: String(merged.alibabaAccessToken ?? "").trim(),
+    usdCnyRate: normalizeFx(merged.usdCnyRate),
   };
+}
+
+function normalizeFx(value: unknown): string {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  const rate = Number(text);
+  if (!Number.isFinite(rate) || rate <= 0 || rate >= 1000) return "";
+  return String(rate);
 }
 
 export async function getSettings(): Promise<Settings> {

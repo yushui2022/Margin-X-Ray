@@ -10,6 +10,16 @@ import type { Settings } from "../shared/types";
 const form = document.getElementById("settingsForm") as HTMLFormElement;
 const apiBaseUrl = document.getElementById("apiBaseUrl") as HTMLInputElement;
 const apiToken = document.getElementById("apiToken") as HTMLInputElement;
+const tikhubToken = document.getElementById("tikhubToken") as HTMLInputElement;
+const baiduApiKey = document.getElementById("baiduApiKey") as HTMLInputElement;
+const baiduSecretKey = document.getElementById("baiduSecretKey") as HTMLInputElement;
+const oneboundKey = document.getElementById("oneboundKey") as HTMLInputElement;
+const oneboundSecret = document.getElementById("oneboundSecret") as HTMLInputElement;
+const oneboundFetchTiers = document.getElementById("oneboundFetchTiers") as HTMLInputElement;
+const alibabaAppKey = document.getElementById("alibabaAppKey") as HTMLInputElement;
+const alibabaAppSecret = document.getElementById("alibabaAppSecret") as HTMLInputElement;
+const alibabaAccessToken = document.getElementById("alibabaAccessToken") as HTMLInputElement;
+const usdCnyRate = document.getElementById("usdCnyRate") as HTMLInputElement;
 const demoMode = document.getElementById("demoMode") as HTMLInputElement;
 const autoOpen = document.getElementById("autoOpen") as HTMLInputElement;
 const maxScanHistory = document.getElementById(
@@ -17,6 +27,8 @@ const maxScanHistory = document.getElementById(
 ) as HTMLInputElement;
 const saveBtn = document.getElementById("saveBtn") as HTMLButtonElement;
 const testBtn = document.getElementById("testBtn") as HTMLButtonElement;
+const testTikhubBtn = document.getElementById("testTikhubBtn") as HTMLButtonElement;
+const testRecognizerBtn = document.getElementById("testRecognizerBtn") as HTMLButtonElement;
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
 const statusEl = document.getElementById("status") as HTMLDivElement;
 const modeBadge = document.getElementById("modeBadge") as HTMLSpanElement;
@@ -44,6 +56,16 @@ function updateMode(settings: Settings): void {
 function fillForm(settings: Settings): void {
   apiBaseUrl.value = settings.apiBaseUrl;
   apiToken.value = settings.apiToken;
+  tikhubToken.value = settings.tikhubToken;
+  baiduApiKey.value = settings.baiduApiKey;
+  baiduSecretKey.value = settings.baiduSecretKey;
+  oneboundKey.value = settings.oneboundKey;
+  oneboundSecret.value = settings.oneboundSecret;
+  oneboundFetchTiers.checked = settings.oneboundFetchTiers;
+  alibabaAppKey.value = settings.alibabaAppKey;
+  alibabaAppSecret.value = settings.alibabaAppSecret;
+  alibabaAccessToken.value = settings.alibabaAccessToken;
+  usdCnyRate.value = settings.usdCnyRate;
   demoMode.checked = settings.demoMode;
   autoOpen.checked = settings.autoOpen;
   maxScanHistory.value = String(settings.maxScanHistory);
@@ -54,6 +76,16 @@ function readForm(): Partial<Settings> {
   return {
     apiBaseUrl: apiBaseUrl.value.trim(),
     apiToken: apiToken.value.trim(),
+    tikhubToken: tikhubToken.value.trim(),
+    baiduApiKey: baiduApiKey.value.trim(),
+    baiduSecretKey: baiduSecretKey.value.trim(),
+    oneboundKey: oneboundKey.value.trim(),
+    oneboundSecret: oneboundSecret.value.trim(),
+    oneboundFetchTiers: oneboundFetchTiers.checked,
+    alibabaAppKey: alibabaAppKey.value.trim(),
+    alibabaAppSecret: alibabaAppSecret.value.trim(),
+    alibabaAccessToken: alibabaAccessToken.value.trim(),
+    usdCnyRate: usdCnyRate.value.trim(),
     demoMode: demoMode.checked,
     autoOpen: autoOpen.checked,
     maxScanHistory: Number(maxScanHistory.value) || 20,
@@ -203,6 +235,42 @@ testBtn.addEventListener("click", () => {
     }
   })();
 });
+
+testTikhubBtn.addEventListener("click", () => {
+  void runKeyedTest(testTikhubBtn, "Testing TikHub…", {
+    type: "TEST_TIKHUB",
+    token: tikhubToken.value.trim(),
+  });
+});
+
+testRecognizerBtn.addEventListener("click", () => {
+  void runKeyedTest(testRecognizerBtn, "Testing Baidu…", {
+    type: "TEST_RECOGNIZER",
+    apiKey: baiduApiKey.value.trim(),
+    secretKey: baiduSecretKey.value.trim(),
+  });
+});
+
+async function runKeyedTest(
+  button: HTMLButtonElement,
+  pending: string,
+  message: { type: "TEST_TIKHUB"; token: string } | { type: "TEST_RECOGNIZER"; apiKey: string; secretKey: string },
+): Promise<void> {
+  button.disabled = true;
+  setStatus(pending);
+  try {
+    const response = (await chrome.runtime.sendMessage(message)) as RuntimeResponse | undefined;
+    if (response?.ok && response.apiTest) {
+      setStatus(response.apiTest.message, response.apiTest.ok ? "ok" : "error");
+    } else {
+      setStatus(response?.ok === false ? response.error.message : "The connection test failed.", "error");
+    }
+  } catch (error) {
+    setStatus(error instanceof Error ? error.message : "The connection test failed.", "error");
+  } finally {
+    button.disabled = false;
+  }
+}
 
 clearBtn.addEventListener("click", () => {
   void (async () => {

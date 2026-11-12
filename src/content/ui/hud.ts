@@ -138,6 +138,15 @@ function range(min: number, max: number): string {
   return `${formatUsd(min)}–${formatUsd(max)}`;
 }
 
+function quoteText(amount: number, currency?: "USD" | "CNY"): string {
+  return currency === "CNY" ? formatMoney(amount, "CNY") : formatUsd(amount);
+}
+
+function quoteRange(min: number, max: number, currency?: "USD" | "CNY"): string {
+  if (Math.abs(max - min) < 0.005) return quoteText(min, currency);
+  return `${quoteText(min, currency)}–${quoteText(max, currency)}`;
+}
+
 function confidenceLabel(confidence: Confidence): string {
   switch (confidence) {
     case "high":
@@ -779,7 +788,7 @@ export class Hud {
       el("div", { className: "xray-banner info" }, [
         createIcon("clock", 14),
         el("span", {
-          text: "You can cancel at any time. Demo mode never calls an external API.",
+          text: "You can cancel at any time. Factory cards stay on the sample dataset in demo mode. TikHub and Baidu run only when their keys are saved.",
         }),
       ]),
     );
@@ -871,6 +880,46 @@ export class Hud {
     ]);
   }
 
+  private renderIdentity(context: PageContext): HTMLElement | null {
+    const enrichment = context.enrichment;
+    if (!enrichment) return null;
+    const lines: string[] = [];
+    if (enrichment.tikhub) {
+      const label = enrichment.tikhub.productTitle ?? enrichment.tikhub.description;
+      const author = enrichment.tikhub.author ? ` · ${enrichment.tikhub.author}` : "";
+      lines.push(
+        label
+          ? `TikHub: ${truncate(label, 140)}${author}`
+          : `TikHub returned the video${author}.`,
+      );
+    }
+    if (enrichment.recognition) {
+      const where =
+        enrichment.recognition.imageSource === "video-frame"
+          ? `frame${
+              enrichment.recognition.frameTimeSec !== undefined
+                ? ` at ${enrichment.recognition.frameTimeSec.toFixed(1)}s`
+                : ""
+            }`
+          : enrichment.recognition.imageSource;
+      lines.push(
+        `Baidu: ${enrichment.recognition.name} · ${Math.round(
+          enrichment.recognition.score * 100,
+        )}% · ${where}`,
+      );
+    }
+    for (const note of enrichment.notes) lines.push(note);
+    if (!lines.length) return null;
+    return el("div", { className: "xray-banner info" }, [
+      createIcon("info", 14),
+      el(
+        "span",
+        {},
+        lines.map((line) => el("span", { className: "xray-identity-line", text: line })),
+      ),
+    ]);
+  }
+
   private renderResult(): HTMLElement {
     const state = this.state;
     if (state.kind !== "result") return el("div");
@@ -933,7 +982,21 @@ export class Hud {
     const { result, context } = state;
     const body = el("div", { className: "xray-tab-panel" });
 
-    if (result.dataSource !== "api") {
+    if (result.supply) {
+      body.append(
+        el("div", { className: "xray-banner info" }, [
+          createIcon("plug", 14),
+          el("span", {}, [
+            el("strong", { text: "1688 PRICES" }),
+            el("span", {
+              text: ` — ${result.supply.cnyLabel}. ${result.supply.note}`,
+            }),
+          ]),
+        ]),
+      );
+    }
+
+    if (result.dataSource !== "api" && !result.supply) {
       body.append(
         el(
           "div",
@@ -961,6 +1024,8 @@ export class Hud {
     }
 
     body.append(this.renderProductCard(context, result));
+    const identity = this.renderIdentity(context);
+    if (identity) body.append(identity);
 
     if (context.warnings?.length) {
       body.append(
@@ -1079,12 +1144,15 @@ export class Hud {
               : "xray-price-value",
             text: result.priceRange
               ? range(result.priceRange.fobMinUsd, result.priceRange.fobMaxUsd)
-              : "Insufficient data",
+              : result.supply
+                ? result.supply.cnyLabel
+                : "Insufficient data",
           }),
           el("div", {
             className: "xray-price-note",
             text:
               result.priceRange?.basis ??
+              result.supply?.note ??
               "No verified factory range was returned. We do not fill a fallback number.",
           }),
         ]),
@@ -1663,7 +1731,11 @@ export class Hud {
     card.append(
       el("div", { className: "xray-supplier-note" }, [
         createIcon("info", 12),
-        el("span", { text: "Names are masked. Open a row for evidence and request a quote." }),
+        el("span", {
+          text: state.result.supply
+            ? "Prices are 1688 listing prices. Shop names are not a registry check."
+            : "Names are masked. Open a row for evidence and request a quote.",
+        }),
       ]),
     );
     return card;
@@ -1689,7 +1761,7 @@ export class Hud {
         `xray-tier ${active ? "active" : ""}`.trim(),
         () => this.selectTier(tier),
         {
-          "aria-label": `Use ${formatUsd(tier.unitUsd)} per unit at MOQ ${tier.moq}`,
+          "aria-label": `Use ${quoteText(tier.unitUsd, tier.currency)} per unit at MOQ ${tier.moq}`,
           title: tier.note ?? `MOQ ${tier.moq}`,
         },
       );
@@ -1697,7 +1769,7 @@ export class Hud {
         el("div", { className: "xray-tier-moq", text: `MOQ ${tier.moq}` }),
         el("div", {
           className: "xray-tier-price",
-          text: `${formatUsd(tier.unitUsd)}/u`,
+          text: `${quoteText(tier.unitUsd, tier.currency ?? factory.currency)}/u`,
         }),
       );
       tiers.append(tierButton);
@@ -1705,9 +1777,12 @@ export class Hud {
     const price = el("div", { className: "xray-supplier-cell xray-supplier-price-cell", attrs: { role: "cell" } }, [
       el("div", {
         className: "xray-factory-price-value",
-        text: range(factory.fobMinUsd, factory.fobMaxUsd),
+        text: quoteRange(factory.fobMinUsd, factory.fobMaxUsd, factory.currency),
       }),
-      el("div", { className: "xray-factory-price-label", text: "USD / unit" }),
+      el("div", {
+        className: "xray-factory-price-label",
+        text: factory.currency === "CNY" ? "CNY / unit" : "USD / unit",
+      }),
     ]);
     card.append(supplier, tiers, price);
 
@@ -1756,6 +1831,7 @@ export class Hud {
 
   private selectTier(tier: FactoryTier): void {
     if (this.state.kind !== "result") return;
+    if (tier.currency === "CNY") return;
     if (!this.state.assumptions) return;
     this.state.assumptions = {
       ...this.state.assumptions,
@@ -1774,7 +1850,7 @@ export class Hud {
     );
     this.root.querySelectorAll(".xray-tier").forEach((node) => {
       const label = node.querySelector(".xray-tier-price")?.textContent;
-      if (label === `${formatUsd(tier.unitUsd)}/u`) {
+      if (label === `${quoteText(tier.unitUsd, tier.currency)}/u`) {
         node.classList.add("active");
       }
     });
