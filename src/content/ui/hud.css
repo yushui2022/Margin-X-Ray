@@ -3258,8 +3258,8 @@
 
 .xray-logo {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   flex: none;
   padding: 0;
   border: 0;
@@ -4079,4 +4079,17 @@
 
 .xray-kpi-grid {
   border-top: 1px solid var(--mx-line);
+}
+
+.xray-logo,
+.xray-launcher-mascot,
+.xray-capture-mascot {
+  display: block;
+  object-fit: contain;
+  user-select: none;
+}
+
+.xray-capture-mascot {
+  width: 84px;
+  height: 84px;
 }

@@ -11,6 +11,7 @@ import { formatUsd } from "../../shared/format";
 export interface PosterData {
   title: string;
   imageUrl?: string;
+  mascotUrl?: string;
   retailUsd: number | null;
   factoryLowUsd: number | null;
   factoryHighUsd: number | null;
@@ -45,7 +46,7 @@ export async function renderPosterBlob(data: PosterData): Promise<Blob | null> {
   context.lineWidth = 2;
   context.strokeRect(1, 1, WIDTH - 2, HEIGHT - 2);
 
-  drawHeader(context);
+  drawHeader(context, await loadImage(data.mascotUrl));
 
   const image = await loadImage(data.imageUrl);
   drawProduct(context, data.title, image);
@@ -77,8 +78,15 @@ export function downloadPoster(blob: Blob, filename: string): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-function drawHeader(context: CanvasRenderingContext2D): void {
-  drawOnionHead(context, PAD + 22, 80, 21);
+function drawHeader(
+  context: CanvasRenderingContext2D,
+  mascot: HTMLImageElement | null,
+): void {
+  if (mascot) {
+    drawImageContain(context, mascot, PAD, 52, 56, 56);
+  } else {
+    drawOnionHead(context, PAD + 22, 80, 21);
+  }
 
   context.textAlign = "left";
   context.fillStyle = INK;
@@ -326,6 +334,26 @@ function drawImageCover(
   height: number,
 ): void {
   const scale = Math.max(width / image.width, height / image.height);
+  const drawWidth = image.width * scale;
+  const drawHeight = image.height * scale;
+  context.drawImage(
+    image,
+    x + (width - drawWidth) / 2,
+    y + (height - drawHeight) / 2,
+    drawWidth,
+    drawHeight,
+  );
+}
+
+function drawImageContain(
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): void {
+  const scale = Math.min(width / image.width, height / image.height);
   const drawWidth = image.width * scale;
   const drawHeight = image.height * scale;
   context.drawImage(

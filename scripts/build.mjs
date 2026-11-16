@@ -47,6 +47,7 @@ const buildOptions = {
   loader: {
     ".css": "text",
     ".svg": "text",
+    ".webp": "dataurl",
   },
   logLevel: "info",
 };

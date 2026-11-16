@@ -1,0 +1,43 @@
+# Onion Head mascot — Qwen-Image 2.1 generation record
+
+Model: `qwen-image-2.1` (Turbo, 8-step sigma schedule)
+Endpoint: local ComfyUI OpenAI bridge `http://127.0.0.1:8190/v1/images/generations`
+Size: 1024×1024
+Source renders: `design/mascot/onion-kid-v2.png` (chosen), `onion-kid-v1.png`, `onion-head-v1.png`
+
+## Full body (chosen)
+
+Full-body mascot illustration of a cheerful American kid with a giant golden onion for a head,
+small green sprout leaves on top, clean smooth neck with no dark root knot,
+open friendly eyes with small dark pupils, confident smile, rosy cheeks and freckles,
+wearing a vintage rust-red varsity jacket with cream sleeves and a small cream chest patch,
+blue jeans with rolled cuffs and white sneakers, standing with both hands in his pockets,
+flat vector illustration, thick dark espresso-brown outlines, clean simple shapes,
+limited warm palette: cream background, rust red, ochre, denim blue,
+centered full-body composition with margin around the figure,
+no text, no logo, no background scenery, no shadow, no gradient, sticker style, crisp edges.
+
+## Head portrait (alternative)
+
+Mascot logo portrait of a cheerful onion-headed American kid, head and face only,
+large golden onion head with small green sprout leaves on top, clean neck bottom edge,
+open friendly eyes with small dark pupils, confident smile, rosy cheeks and freckles,
+flat vector illustration, thick dark espresso-brown outlines, clean simple shapes,
+limited warm palette: cream background, golden ochre, rust red accents,
+centered symmetrical head composition with generous margin,
+no body, no jacket, no text, no logo, no shadow, no gradient, sticker style, crisp edges.
+
+## Negative prompt
+
+3d render, photorealistic, glossy, gradient, neon colors, text, letters, watermark,
+busy background, drop shadow, blurry, extra limbs, deformed hands, mutated fingers,
+creepy, realistic skin, horror, multiple heads, cropped feet,
+dark knot under the chin, black scribble on the neck, beard, root ball.
+
+## Post-processing
+
+1. Flood-fill the cream paper background to transparency from the border (tolerance 42/765).
+2. Patch two stray green blobs (face and jacket pocket) with sampled neighbouring colours.
+3. Remove green pixels outside the sprout cluster.
+4. Crop the head for the logo and the full figure for the capture panel.
+5. Export transparent WebP (quality 90) into `assets/mascot/`.

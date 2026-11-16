@@ -1,6 +1,7 @@
 import hudCss from "./hud.css";
 import tokensCss from "../../styles/tokens.css";
-import onionHeadSvg from "../../../assets/mascot/onion-head.svg";
+import onionHeadImage from "../../../assets/mascot/onion-head.webp";
+import onionKidImage from "../../../assets/mascot/onion-kid.webp";
 import { createIcon } from "./icons";
 import {
   assumptionsForResult,
@@ -176,10 +177,13 @@ function confidenceBadge(confidence: Confidence): HTMLElement {
   });
 }
 
-function mascot(svg: string, className: string): HTMLElement {
-  const node = el("span", { className });
-  node.innerHTML = svg;
-  return node;
+function mascotImage(src: string, className: string): HTMLImageElement {
+  const image = document.createElement("img");
+  image.src = src;
+  image.alt = "";
+  image.className = className;
+  image.draggable = false;
+  return image;
 }
 
 function posterDate(value: string): string {
@@ -444,7 +448,7 @@ export class Hud {
       title: "See the real cost before you buy",
     });
     launcher.append(
-      mascot(onionHeadSvg, "xray-launcher-mascot"),
+      mascotImage(onionHeadImage, "xray-launcher-mascot"),
       el("span", { text: "Scan product" }),
     );
     return launcher;
@@ -465,7 +469,7 @@ export class Hud {
             text: "Paste a TikTok or product link, upload a photo, or scan this page. You get an estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
           }),
         ]),
-        mascot(onionHeadSvg, "xray-capture-mascot"),
+        mascotImage(onionKidImage, "xray-capture-mascot"),
       ]),
     );
 
@@ -739,7 +743,7 @@ export class Hud {
 
   private renderHeader(): HTMLElement {
     const brand = el("div", { className: "xray-brand" }, [
-      mascot(onionHeadSvg, "xray-logo"),
+      mascotImage(onionHeadImage, "xray-logo"),
       el("div", { className: "xray-brand-text" }, [
         el("div", { className: "xray-brand-name", text: "别做洋葱头" }),
         el("div", {
@@ -1304,6 +1308,7 @@ export class Hud {
     const blob = await renderPosterBlob({
       title: result.product.title,
       ...(result.product.imageUrl ? { imageUrl: result.product.imageUrl } : {}),
+      mascotUrl: onionHeadImage,
       retailUsd: verdict.retailUsd,
       factoryLowUsd: verdict.factoryLowUsd,
       factoryHighUsd: verdict.factoryHighUsd,
