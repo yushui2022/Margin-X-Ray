@@ -9,8 +9,18 @@
 | `ground-truth-50.csv` | 50 个候选爆款，一行一款。已预填类目与产业带假设，其余留空待采。 |
 | `supplier-quotes.csv` | 每个产品最多 3 家供应商的实盘报价与工商核验结果。 |
 | `GROUND-TRUTH-SOP.md` | 采集、图搜、电话套价、工商核验、P25/P50/P75 与质检的完整 SOP。 |
+| `retail-signals.csv` | 已采集的 36 条真实零售信号（公开来源，含价格、币种、来源日期）。 |
+| `COLLECTION-LOG.md` | 2026-11-16 采集记录：抓了什么、被什么挡住、下一步。 |
 
 CSV 使用 UTF-8 BOM，Excel / Google Sheets 可直接打开。
+
+## 两层数据，不要混用
+
+- `retail-signals.csv`：公开可验证的**零售价与商品信号**，已经采集。
+- `ground-truth-50.csv`：需要 **1688 实盘报价 + 工商核验** 才能成为 Ground Truth。
+  目前只有 4 条通过 `retail_signal_id` 关联到零售信号，供应商字段仍为空。
+
+不要把零售价当成出厂价，也不要用文章里的 “from $X” 当实盘报价。
 
 ## 快速开始
 
@@ -42,6 +52,7 @@ TODO → CAPTURED → QUOTED → VERIFIED → DELIVERED
 | `tiktok_url` | 带货视频链接 |
 | `creator_handle` | 达人 handle |
 | `retail_price_usd` | 页面零售价（USD） |
+| `retail_signal_id` | 关联 `retail-signals.csv` 的 RS-xxx |
 | `capture_date` | 采集日期 YYYY-MM-DD |
 | `buyer` | 买手 initials |
 | `image_ref` | 商品图文件名（放 `research/images/`） |
