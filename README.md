@@ -1,8 +1,8 @@
-# Price X-Ray
+# 别做洋葱头 (Don't Be the Onion Head)
 
 **See the real cost before you buy.**
 
-Price X-Ray is a consumer price-transparency tool. Paste a TikTok video or
+别做洋葱头 is a consumer price-transparency tool. Paste a TikTok video or
 product link, upload a photo, or scan the page you are on. It estimates the
 factory cost behind the product, shows a fair retail range, and reports how
 many near-identical 1688 listings exist — then exports a share card.
@@ -20,7 +20,7 @@ range: a missing input is shown as missing.
 
 ## Positioning
 
-Price X-Ray reports what it measured, not what a seller intended.
+别做洋葱头 reports what it measured, not what a seller intended.
 
 - Neutral labels only: **markup**, **fair price range**, **near-identical
   listing**, **generic white-label match**. No “scam”, “fraud” or “rip-off”.
@@ -59,7 +59,7 @@ Price X-Ray reports what it measured, not what a seller intended.
   out of the page).
 - Local settings, scan history and lead storage in `chrome.storage.local`.
 - Popup with **Scan this product** and **Capture screen** actions + full options page.
-- Right-click **“Scan with Price X-Ray”** on any page (uses `activeTab`, not a
+- Right-click **“Scan with 别做洋葱头”** on any page (uses `activeTab`, not a
   broad all-sites permission).
 - Local mock API (`server/mock-xray.mjs`) for end-to-end testing.
 - Optional live capture and sourcing adapters, used only when their keys are
@@ -98,24 +98,22 @@ The HUD is a compact consumer scanner:
 
 ### Visual system
 
-Americana Vintage / Letterpress, not a generic SaaS panel:
+Clean modern Americana, not a costume:
 
-- aged paper surfaces (`#F3EAD8`, `#E6D8BE`) with espresso ink (`#2D241E`); no
-  pure white and no pure black
-- rust-red actions (`#B54935`), faded teal (`#5B8C8A`) and ochre (`#C8963E`)
-- Alfa Slab One for display, Lora for body, Courier Prime for prices and meta,
-  Satisfy reserved for accents — bundled locally in `assets/fonts`, not fetched
-  from a CDN at runtime
-- double-ink borders, hard offset shadows, square corners and a subtle paper
-  grain overlay
-- ticket-style buttons that press down on hover
+- warm paper surfaces (`#FAF6EE`, `#FFFDF8`) with espresso ink (`#1E1A17`)
+- rust-red actions (`#C0492F`), teal (`#2F6F68`) and a single ochre accent
+- Fraunces for display, system sans for UI text — bundled locally in
+  `assets/fonts`, never fetched from a CDN at runtime
+- one-pixel borders, 10–12px radii and soft shadows instead of hard letterpress
+  edges
+- the onion-headed kid mascot (an onion for a head, a varsity jacket for a
+  body) carries the brand instead of decorative borders
 
 Tokens live in `src/styles/tokens.css`; the HUD injects them into its shadow
 root so page CSS cannot leak in. Extension pages link
-`src/styles/fonts.css`, and the HUD injects the same `@font-face` rules with
-extension URLs. Fonts are bundled locally, never fetched from a CDN at runtime.
-If a site blocks extension fonts, the HUD falls back to Georgia and Courier
-without breaking layout.
+`src/styles/fonts.css`, and the HUD injects the same Fraunces `@font-face` rule
+with an extension URL. If a site blocks extension fonts, the HUD falls back to
+the system serif without breaking layout.
 
 ## What is still demo / mocked
 

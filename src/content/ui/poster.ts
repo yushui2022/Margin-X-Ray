@@ -26,11 +26,11 @@ export interface PosterData {
 const WIDTH = 1080;
 const HEIGHT = 1350;
 const PAD = 72;
-const INK = "#2d241e";
-const MUTED = "#5c4d42";
-const LINE = "rgba(45, 36, 30, 0.35)";
-const ACCENT = "#b54935";
-const ALERT = "#8c3a2b";
+const INK = "#1e1a17";
+const MUTED = "#6b6259";
+const LINE = "#e8dfd1";
+const ACCENT = "#c0492f";
+const ALERT = "#a63c25";
 
 export async function renderPosterBlob(data: PosterData): Promise<Blob | null> {
   const canvas = document.createElement("canvas");
@@ -39,7 +39,7 @@ export async function renderPosterBlob(data: PosterData): Promise<Blob | null> {
   const context = canvas.getContext("2d");
   if (!context) return null;
 
-  context.fillStyle = "#f3ead8";
+  context.fillStyle = "#faf6ee";
   context.fillRect(0, 0, WIDTH, HEIGHT);
   context.strokeStyle = LINE;
   context.lineWidth = 2;
@@ -78,29 +78,59 @@ export function downloadPoster(blob: Blob, filename: string): void {
 }
 
 function drawHeader(context: CanvasRenderingContext2D): void {
-  context.fillStyle = ACCENT;
-  roundRect(context, PAD, 56, 44, 44, 10);
-  context.fill();
-  context.fillStyle = "#f3ead8";
-  context.font = "700 26px Georgia, 'Times New Roman', serif";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText("X", PAD + 22, 79);
+  drawOnionHead(context, PAD + 22, 80, 21);
 
   context.textAlign = "left";
   context.fillStyle = INK;
-  context.font = "700 28px Georgia, 'Times New Roman', serif";
-  context.fillText("PRICE X-RAY", PAD + 58, 72);
+  context.font = "700 30px 'PingFang SC', 'Helvetica Neue', Arial, sans-serif";
+  context.fillText("别做洋葱头", PAD + 58, 74);
   context.fillStyle = MUTED;
-  context.font = "500 16px 'Courier New', monospace";
-  context.fillText("Real cost report", PAD + 58, 96);
+  context.font = "600 15px 'Helvetica Neue', Arial, sans-serif";
+  context.fillText("DON'T BE THE ONION HEAD", PAD + 58, 97);
 
   context.textAlign = "right";
   context.fillStyle = MUTED;
-  context.font = "600 14px 'Courier New', monospace";
-  context.fillText("SCAN BEFORE YOU BUY", WIDTH - PAD, 80);
+  context.font = "600 14px 'Helvetica Neue', Arial, sans-serif";
+  context.fillText("SCAN BEFORE YOU BUY", WIDTH - PAD, 82);
   context.textAlign = "left";
   context.textBaseline = "alphabetic";
+}
+
+function drawOnionHead(
+  context: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  r: number,
+): void {
+  context.fillStyle = "#2f6f68";
+  context.beginPath();
+  context.ellipse(cx - 7, cy - r - 6, 5, 12, -0.5, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.ellipse(cx + 7, cy - r - 6, 5, 12, 0.5, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#e8b27f";
+  context.beginPath();
+  context.ellipse(cx, cy + 2, r * 0.92, r * 1.06, 0, 0, Math.PI * 2);
+  context.fill();
+  context.lineWidth = 4;
+  context.strokeStyle = INK;
+  context.stroke();
+
+  context.fillStyle = INK;
+  context.beginPath();
+  context.arc(cx - r * 0.3, cy, r * 0.13, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.arc(cx + r * 0.3, cy, r * 0.13, 0, Math.PI * 2);
+  context.fill();
+
+  context.strokeStyle = INK;
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(cx, cy + r * 0.16, r * 0.28, 0.15 * Math.PI, 0.85 * Math.PI);
+  context.stroke();
 }
 
 function drawProduct(
@@ -125,7 +155,7 @@ function drawProduct(
   const textLeft = image ? PAD + size + 26 : PAD;
   const maxWidth = WIDTH - PAD - textLeft;
   context.fillStyle = MUTED;
-  context.font = "600 14px 'Courier New', monospace";
+  context.font = "600 14px 'Helvetica Neue', Arial, sans-serif";
   context.fillText("PRODUCT", textLeft, top + 16);
 
   context.fillStyle = INK;
@@ -146,7 +176,7 @@ function drawProduct(
 function drawBigNumber(context: CanvasRenderingContext2D, data: PosterData): void {
   const top = 400;
   context.fillStyle = MUTED;
-  context.font = "600 16px 'Courier New', monospace";
+  context.font = "600 15px 'Helvetica Neue', Arial, sans-serif";
   context.fillText("RETAIL PRICE vs EST. FACTORY COST", PAD, top);
 
   if (data.markupX === null) {
@@ -175,12 +205,12 @@ function drawRows(context: CanvasRenderingContext2D, data: PosterData): void {
   let top = 690;
   for (const [label, value] of rows) {
     context.fillStyle = MUTED;
-    context.font = "500 18px 'Courier New', monospace";
+    context.font = "500 18px 'Helvetica Neue', Arial, sans-serif";
     context.fillText(label, PAD, top);
 
     context.textAlign = "right";
     context.fillStyle = INK;
-    context.font = "700 32px 'Courier New', monospace";
+    context.font = "700 30px 'PingFang SC', 'Helvetica Neue', Arial, sans-serif";
     context.fillText(value, WIDTH - PAD, top + 2);
     context.textAlign = "left";
 
@@ -197,15 +227,15 @@ function drawRows(context: CanvasRenderingContext2D, data: PosterData): void {
 
 function drawMatch(context: CanvasRenderingContext2D, label: string): void {
   const top = 950;
-  context.fillStyle = "#ece0c8";
+  context.fillStyle = "#f5eee2";
   roundRect(context, PAD, top, WIDTH - PAD * 2, 62, 10);
   context.fill();
 
   context.fillStyle = MUTED;
-  context.font = "600 13px 'Courier New', monospace";
+  context.font = "600 12px 'Helvetica Neue', Arial, sans-serif";
   context.fillText("1688 IMAGE SEARCH", PAD + 22, top + 24);
   context.fillStyle = INK;
-  context.font = "600 21px Georgia, 'Times New Roman', serif";
+  context.font = "600 20px 'Helvetica Neue', Arial, sans-serif";
   context.fillText(label, PAD + 22, top + 48);
 }
 
@@ -222,7 +252,7 @@ function drawFooter(
   context.stroke();
 
   context.fillStyle = MUTED;
-  context.font = "500 14px 'Courier New', monospace";
+  context.font = "500 14px 'Helvetica Neue', Arial, sans-serif";
   const lines = wrapText(
     context,
     disclaimer,
@@ -233,10 +263,10 @@ function drawFooter(
   lines.forEach((line, index) => context.fillText(line, PAD, 1200 + index * 24));
 
   context.fillStyle = "#9ca3af";
-  context.font = "500 13px 'Courier New', monospace";
+  context.font = "500 13px 'Helvetica Neue', Arial, sans-serif";
   context.fillText(`Generated ${generatedAt}`, PAD, 1310);
   context.textAlign = "right";
-  context.fillText("pricexray · estimates only", WIDTH - PAD, 1310);
+  context.fillText("别做洋葱头 · estimates only", WIDTH - PAD, 1310);
   context.textAlign = "left";
 }
 

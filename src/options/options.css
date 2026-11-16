@@ -411,7 +411,7 @@ code {
 }
 
 /* ------------------------------------------------------------------ */
-/* Americana Vintage / Letterpress                                     */
+/* Warm editorial theme                                               */
 /* ------------------------------------------------------------------ */
 
 body {
@@ -573,4 +573,199 @@ body {
 
 .switch-row input:checked + .switch::after {
   background: var(--mx-paper);
+}
+
+/* ------------------------------------------------------------------ */
+/* Clean Americana — final layer                                       */
+/* ------------------------------------------------------------------ */
+
+body {
+  background-color: var(--mx-paper);
+}
+
+.hero {
+  border-bottom: 1px solid var(--mx-line);
+  background: var(--mx-panel);
+  color: var(--mx-ink);
+  box-shadow: none;
+}
+
+.logo {
+  display: block;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;
+}
+
+.brand-name {
+  color: var(--mx-ink);
+  font-family: var(--mx-font-brand);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.brand-sub {
+  color: var(--mx-dim);
+  font-family: var(--mx-font-sans);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lede {
+  color: var(--mx-muted);
+  font-family: var(--mx-font-sans);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.card {
+  border: 1px solid var(--mx-line);
+  outline: 0;
+  border-radius: 12px;
+  background: var(--mx-panel);
+  box-shadow: var(--mx-shadow-card);
+}
+
+.section-head h2 {
+  color: var(--mx-ink);
+  font-family: var(--mx-font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.section-note {
+  color: var(--mx-dim);
+  font-family: var(--mx-font-sans);
+  font-size: 8.5px;
+  letter-spacing: 0;
+}
+
+.field label {
+  color: var(--mx-muted);
+  font-family: var(--mx-font-sans);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.field input,
+.field select,
+.field textarea {
+  border: 1px solid var(--mx-line-strong);
+  border-radius: 8px;
+  background: var(--mx-panel);
+  color: var(--mx-ink);
+  font-family: var(--mx-font-sans);
+  font-size: 11px;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--mx-accent);
+  outline: 2px solid rgba(192, 73, 47, 0.22);
+  outline-offset: 0;
+}
+
+.field-hint {
+  color: var(--mx-muted);
+  font-family: var(--mx-font-sans);
+  font-size: 9.5px;
+  line-height: 1.55;
+}
+
+.btn {
+  border: 1px solid var(--mx-line-strong);
+  border-radius: 8px;
+  background: var(--mx-panel);
+  color: var(--mx-ink);
+  font-family: var(--mx-font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow: none;
+}
+
+.btn:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--mx-edge);
+  background: var(--mx-soft);
+}
+
+.btn.primary {
+  border-color: var(--mx-accent);
+  background: var(--mx-accent);
+  color: var(--mx-on-accent);
+  outline: 0;
+}
+
+.btn.primary:hover {
+  border-color: var(--mx-accent-hover);
+  background: var(--mx-accent-hover);
+}
+
+.btn.secondary {
+  border-color: var(--mx-line-strong);
+  background: var(--mx-panel);
+  color: var(--mx-ink);
+}
+
+.switch-row,
+.status {
+  border: 1px solid var(--mx-line);
+  border-radius: 10px;
+  background: var(--mx-panel);
+  font-family: var(--mx-font-sans);
+}
+
+.switch-title {
+  color: var(--mx-ink);
+  font-family: var(--mx-font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.badge {
+  border: 1px solid var(--mx-line);
+  border-radius: 999px;
+  background: var(--mx-soft);
+  color: var(--mx-muted);
+  font-family: var(--mx-font-sans);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.rules li {
+  color: var(--mx-muted);
+  font-family: var(--mx-font-sans);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.rules strong {
+  color: var(--mx-ink);
+}
+
+.footer {
+  border-top: 1px solid var(--mx-line);
+  color: var(--mx-dim);
+  font-family: var(--mx-font-sans);
+  font-size: 8.5px;
 }

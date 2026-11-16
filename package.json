@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Chrome MV3 extension for Price X-Ray: see the estimated factory cost and a fair retail range before you buy.",
+  "description": "Chrome MV3 extension for 别做洋葱头 (Don’t Be the Onion Head): see the estimated factory cost and a fair retail range before you buy.",
   "scripts": {
     "build": "node scripts/build.mjs",
     "watch": "node scripts/build.mjs --watch",

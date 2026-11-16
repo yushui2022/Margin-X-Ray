@@ -1,44 +1,12 @@
 /*
- * Americana Vintage / Letterpress type stack.
- * Files live in assets/fonts and are bundled with the extension.
+ * Display type for 别做洋葱头.
+ * Bundled locally so the extension never fetches a font from a CDN.
  */
 
 @font-face {
-  font-family: "Alfa Slab One";
-  src: url("assets/fonts/alfa-slab-one.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Lora";
-  src: url("assets/fonts/lora.woff2") format("woff2");
+  font-family: "Fraunces";
+  src: url("assets/fonts/fraunces.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Courier Prime";
-  src: url("assets/fonts/courier-prime-400.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Courier Prime";
-  src: url("assets/fonts/courier-prime-700.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Satisfy";
-  src: url("assets/fonts/satisfy.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
   font-display: swap;
 }

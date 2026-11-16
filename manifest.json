@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Price X-Ray — Real Cost Scanner",
-  "short_name": "Price X-Ray",
+  "name": "别做洋葱头 — Don't Be the Onion Head",
+  "short_name": "别做洋葱头",
   "version": "0.2.0",
-  "description": "Scan a TikTok video or product page to see the estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
+  "description": "Don't Be the Onion Head: scan a TikTok video or product page to see the estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
   "minimum_chrome_version": "114",
   "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
   "host_permissions": [
@@ -16,7 +16,7 @@
   ],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "action": {
-    "default_title": "Price X-Ray",
+    "default_title": "别做洋葱头",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "assets/icons/icon-16.png",

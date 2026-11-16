@@ -1,5 +1,6 @@
 import hudCss from "./hud.css";
 import tokensCss from "../../styles/tokens.css";
+import onionHeadSvg from "../../../assets/mascot/onion-head.svg";
 import { createIcon } from "./icons";
 import {
   assumptionsForResult,
@@ -175,6 +176,12 @@ function confidenceBadge(confidence: Confidence): HTMLElement {
   });
 }
 
+function mascot(svg: string, className: string): HTMLElement {
+  const node = el("span", { className });
+  node.innerHTML = svg;
+  return node;
+}
+
 function posterDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Unknown date";
@@ -244,14 +251,8 @@ function humanizeSourceText(source: string): string {
 
 function fontFaceCss(): string {
   try {
-    const url = (file: string) => chrome.runtime.getURL(`assets/fonts/${file}`);
-    return [
-      `@font-face{font-family:"Alfa Slab One";src:url("${url("alfa-slab-one.woff2")}") format("woff2");font-style:normal;font-weight:400;font-display:swap;}`,
-      `@font-face{font-family:"Lora";src:url("${url("lora.woff2")}") format("woff2");font-style:normal;font-weight:400 700;font-display:swap;}`,
-      `@font-face{font-family:"Courier Prime";src:url("${url("courier-prime-400.woff2")}") format("woff2");font-style:normal;font-weight:400;font-display:swap;}`,
-      `@font-face{font-family:"Courier Prime";src:url("${url("courier-prime-700.woff2")}") format("woff2");font-style:normal;font-weight:700;font-display:swap;}`,
-      `@font-face{font-family:"Satisfy";src:url("${url("satisfy.woff2")}") format("woff2");font-style:normal;font-weight:400;font-display:swap;}`,
-    ].join("\n");
+    const url = chrome.runtime.getURL("assets/fonts/fraunces.woff2");
+    return `@font-face{font-family:"Fraunces";src:url("${url}") format("woff2");font-style:normal;font-weight:400 700;font-display:swap;}`;
   } catch {
     return "";
   }
@@ -280,7 +281,7 @@ export class Hud {
 
     this.root = el("div", {
       className: "xray-root mx-theme",
-      attrs: { role: "region", "aria-label": "Price X-Ray" },
+      attrs: { role: "region", "aria-label": "别做洋葱头" },
     });
     this.shadow.appendChild(this.root);
     this.render();
@@ -439,13 +440,12 @@ export class Hud {
     const launcher = button("", "xray-launcher", () =>
       this.callbacks.onLauncherClick(),
     {
-      "aria-label": "Scan this product with Price X-Ray",
+      "aria-label": "Scan this product with 别做洋葱头",
       title: "See the real cost before you buy",
     });
     launcher.append(
-      el("span", { className: "xray-launcher-mark" }, [createIcon("bolt", 14)]),
+      mascot(onionHeadSvg, "xray-launcher-mascot"),
       el("span", { text: "Scan product" }),
-      el("span", { className: "xray-launcher-dot" }),
     );
     return launcher;
   }
@@ -457,12 +457,15 @@ export class Hud {
     const content = el("div", { className: "xray-content xray-capture" });
     content.append(
       el("div", { className: "xray-capture-intro" }, [
-        el("div", { className: "xray-eyebrow", text: "Price X-Ray" }),
-        el("h2", { className: "xray-capture-title", text: "See the real cost" }),
-        el("p", {
-          className: "xray-capture-lede",
-          text: "Paste a TikTok or product link, upload a photo, or scan this page. You get an estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
-        }),
+        el("div", { className: "xray-capture-copy" }, [
+          el("div", { className: "xray-eyebrow", text: "Don't be the onion head" }),
+          el("h2", { className: "xray-capture-title", text: "See the real cost" }),
+          el("p", {
+            className: "xray-capture-lede",
+            text: "Paste a TikTok or product link, upload a photo, or scan this page. You get an estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
+          }),
+        ]),
+        mascot(onionHeadSvg, "xray-capture-mascot"),
       ]),
     );
 
@@ -720,7 +723,7 @@ export class Hud {
       className: "xray-panel",
       attrs: {
         role: "dialog",
-        "aria-label": "Price X-Ray report",
+        "aria-label": "别做洋葱头 report",
         "aria-modal": "false",
       },
     });
@@ -736,10 +739,13 @@ export class Hud {
 
   private renderHeader(): HTMLElement {
     const brand = el("div", { className: "xray-brand" }, [
-      el("div", { className: "xray-logo", text: "X" }),
+      mascot(onionHeadSvg, "xray-logo"),
       el("div", { className: "xray-brand-text" }, [
-        el("div", { className: "xray-brand-name", text: "Price X-Ray" }),
-        el("div", { className: "xray-brand-sub", text: "Estd. 2026 · Real cost scanner" }),
+        el("div", { className: "xray-brand-name", text: "别做洋葱头" }),
+        el("div", {
+          className: "xray-brand-sub",
+          text: "Don't be the onion head",
+        }),
       ]),
     ]);
 
@@ -748,14 +754,14 @@ export class Hud {
       "xray-icon-btn",
       () => this.callbacks.onOpenOptions(),
       {
-        "aria-label": "Open Price X-Ray settings",
+        "aria-label": "Open 别做洋葱头 settings",
         title: "Settings",
       },
     );
     settings.append(createIcon("settings", 15));
 
     const close = button("", "xray-icon-btn", () => this.handleClose(), {
-      "aria-label": "Close Price X-Ray",
+      "aria-label": "Close 别做洋葱头",
       title: "Close",
     });
     close.append(createIcon("x", 15));
@@ -1082,7 +1088,7 @@ export class Hud {
         button("See the breakdown", "xray-btn primary", () =>
           this.switchTab("breakdown"),
         ),
-        button("Source listings", "xray-btn secondary", () =>
+        button("See listings", "xray-btn secondary", () =>
           this.switchTab("listings"),
         ),
       ]),
@@ -2288,7 +2294,7 @@ export class Hud {
           text:
             state.kind === "empty" && state.message
               ? state.message
-              : "Open a TikTok video, TikTok Shop product, Shopify product page, or Amazon listing. You can also right-click any page and choose “Scan with Price X-Ray”.",
+              : "Open a TikTok video, TikTok Shop product, Shopify product page, or Amazon listing. You can also right-click any page and choose “Scan with 别做洋葱头”.",
         }),
       ]),
     );

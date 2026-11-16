@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Onion Head kid">
+  <g stroke="#1E1A17" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M100 38c-3-16-12-25-26-28 2 15 11 25 23 31" fill="#2F6F68"/>
+    <path d="M100 38c3-14 12-22 25-24-2 13-10 22-21 27" fill="#3C857D"/>
+    <path d="M100 34c-8 0-13 5-13 13 0 5 2 9 6 12-22 12-38 36-38 64 0 33 20 56 45 56s45-23 45-56c0-28-16-52-38-64 4-3 6-7 6-12 0-8-5-13-13-13z" fill="#E8B27F"/>
+    <path d="M80 72c-7 11-11 25-11 40" fill="none" stroke="#D2955D" stroke-width="4" opacity="0.85"/>
+    <path d="M120 72c7 11 11 25 11 40" fill="none" stroke="#D2955D" stroke-width="4" opacity="0.85"/>
+    <circle cx="86" cy="112" r="7" fill="#1E1A17" stroke="none"/>
+    <circle cx="114" cy="112" r="7" fill="#1E1A17" stroke="none"/>
+    <path d="M75 96c5-4 12-4 17 0" fill="none" stroke-width="5"/>
+    <path d="M108 96c5-4 12-4 17 0" fill="none" stroke-width="5"/>
+    <path d="M90 132c6 6 15 6 21-1" fill="none" stroke-width="5"/>
+    <circle cx="78" cy="124" r="2" fill="#C98E5B" stroke="none"/>
+    <circle cx="122" cy="124" r="2" fill="#C98E5B" stroke="none"/>
+  </g>
+</svg>

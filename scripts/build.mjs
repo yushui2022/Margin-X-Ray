@@ -46,6 +46,7 @@ const buildOptions = {
   charset: "utf8",
   loader: {
     ".css": "text",
+    ".svg": "text",
   },
   logLevel: "info",
 };
@@ -83,7 +84,15 @@ async function copyStatic() {
       recursive: true,
     });
   } catch {
-    // Fonts are optional; the CSS falls back to Georgia and Courier.
+    // Fonts are optional; the CSS falls back to system faces.
+  }
+
+  try {
+    await cp(join(root, "assets/mascot"), join(dist, "assets/mascot"), {
+      recursive: true,
+    });
+  } catch {
+    // Mascot assets are optional; the wordmark still renders.
   }
 
   // The preview is a dev-only harness. It is deliberately kept outside dist/
@@ -103,6 +112,13 @@ async function copyStatic() {
     });
   } catch {
     // Fonts are optional in the dev preview.
+  }
+  try {
+    await cp(join(root, "assets/mascot"), join(preview, "assets/mascot"), {
+      recursive: true,
+    });
+  } catch {
+    // Mascot assets are optional in the dev preview.
   }
 }
 
