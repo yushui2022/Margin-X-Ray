@@ -118,6 +118,16 @@ a {
   background: #2f6f68;
 }
 
+.agent-status.mock {
+  border-color: #e8c98a;
+  background: #fbf2df;
+  color: #8a6a2f;
+}
+
+.agent-status.mock i {
+  background: #c8963e;
+}
+
 .agent-status.offline {
   border-color: #e8c4b8;
   background: #fbeee9;

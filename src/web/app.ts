@@ -142,13 +142,19 @@ function normalizeBase(value: string): string {
 
 async function refreshHealth(): Promise<void> {
   setAgentStatus("checking", "Checking agent");
-  const ok = await ping(apiBase);
-  setAgentStatus(ok ? "online" : "offline", ok ? "Agent connected" : "Agent offline");
-  els.offlineNote.hidden = ok;
+  const health = await ping(apiBase);
+  if (!health.ok) {
+    setAgentStatus("offline", "Agent offline");
+    els.offlineNote.hidden = false;
+    return;
+  }
+  const mock = (health.service ?? "").toLowerCase().includes("mock");
+  setAgentStatus(mock ? "mock" : "online", mock ? "Mock backend" : "Agent connected");
+  els.offlineNote.hidden = true;
 }
 
 function setAgentStatus(
-  state: "checking" | "online" | "offline",
+  state: "checking" | "online" | "offline" | "mock",
   label: string,
 ): void {
   els.agentStatus.className = `agent-status ${state}`;
@@ -156,7 +162,7 @@ function setAgentStatus(
   if (text) text.textContent = label;
 }
 
-async function ping(base: string): Promise<boolean> {
+async function ping(base: string): Promise<{ ok: boolean; service?: string }> {
   const ctrl = new AbortController();
   const timeout = window.setTimeout(() => ctrl.abort(), 4000);
   try {
@@ -164,9 +170,13 @@ async function ping(base: string): Promise<boolean> {
       signal: ctrl.signal,
       cache: "no-store",
     });
-    return response.ok;
+    if (!response.ok) return { ok: false };
+    const body = (await response.json().catch(() => null)) as
+      | { service?: string }
+      | null;
+    return { ok: true, ...(body?.service ? { service: body.service } : {}) };
   } catch {
-    return false;
+    return { ok: false };
   } finally {
     window.clearTimeout(timeout);
   }
@@ -176,9 +186,12 @@ async function testBackend(): Promise<void> {
   const base = normalizeBase(els.apiBaseInput.value || DEFAULT_API);
   els.dialogStatus.textContent = "Testing…";
   els.dialogStatus.className = "dialog-status";
-  const ok = await ping(base);
-  els.dialogStatus.textContent = ok ? `Connected to ${base}` : `No response from ${base}`;
-  els.dialogStatus.className = `dialog-status ${ok ? "ok" : "error"}`;
+  const health = await ping(base);
+  const mock = (health.service ?? "").toLowerCase().includes("mock");
+  els.dialogStatus.textContent = health.ok
+    ? `Connected to ${base}${mock ? " (mock backend)" : ""}`
+    : `No response from ${base}`;
+  els.dialogStatus.className = `dialog-status ${health.ok ? "ok" : "error"}`;
 }
 
 async function loadImage(file: File): Promise<void> {
