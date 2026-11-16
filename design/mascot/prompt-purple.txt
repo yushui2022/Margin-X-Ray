@@ -1,0 +1,35 @@
+# Onion Head mascot — purple chef kid (current)
+
+Model: `qwen-image-2.1` (Turbo, 8-step sigma schedule)
+Endpoint: local ComfyUI OpenAI bridge `http://127.0.0.1:8190/v1/images/generations`
+Size: 1024×1024
+Source renders: `design/mascot/onion-kid-purple-a.png` (chosen),
+`onion-kid-purple-b.png` (varsity-jacket alternative)
+
+## Full body (chosen, variant A)
+
+Full-body mascot illustration of a mischievous little American boy with a giant deep-purple red onion for a head,
+layered violet onion skin with soft magenta highlights, small green sprout leaves on top,
+clean smooth neck with no dark root knot,
+cheeky playful expression: one eyebrow raised, a wink, tongue sticking out at the corner of a grin, rosy cheeks, freckles,
+wearing a cream chef neckerchief and a rust-red apron over a cream-and-rust striped tee,
+blue jeans with rolled cuffs and white sneakers, one hand on his hip, the other giving a thumbs up,
+flat vector illustration, thick dark espresso-brown outlines, clean simple shapes,
+limited warm palette: cream background, deep purple, rust red, cream, denim blue,
+centered full-body composition with margin around the figure,
+no text, no logo, no background scenery, no shadow, no gradient, sticker style, crisp edges.
+
+## Negative prompt
+
+3d render, photorealistic, glossy, gradient, neon colors, text, letters, watermark,
+busy background, drop shadow, blurry, extra limbs, deformed hands, mutated fingers,
+creepy, realistic skin, horror, multiple heads, cropped feet,
+brown onion, yellow onion, white onion, dark knot under the chin, beard, root ball.
+
+## Post-processing
+
+1. Replace stray green specks outside the sprout with the local median colour.
+2. Flood-fill the cream paper background to transparency from the border (tolerance 40/765).
+3. Build the head mark by masking to the purple onion + green sprout components only,
+   so apron straps and the thumbs-up hand never enter the logo.
+4. Export transparent WebP (quality 90) into `assets/mascot/`.
