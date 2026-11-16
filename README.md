@@ -1,22 +1,35 @@
-# Margin X-Ray
+# Price X-Ray
 
-**Factory cost lens for TikTok Shop, Shopify and Amazon product pages.**
+**See the real cost before you buy.**
 
-This repository contains the first working slice of Margin X-Ray: a Chrome
-Manifest V3 extension with a multi-source capture screen, a staged scan, and a
-tabbed report for price, profit and suppliers. It also collects sourcing leads.
+Price X-Ray is a consumer price-transparency tool. Paste a TikTok video or
+product link, upload a photo, or scan the page you are on. It estimates the
+factory cost behind the product, shows a fair retail range, and reports how
+many near-identical 1688 listings exist — then exports a share card.
 
-**The product is the extension.** `dist/` is the loadable extension. `preview/`
-is a dev-only HUD preview page that is generated outside `dist/`, and
-`server/mock-xray.mjs` is a local mock API for testing. Neither is a web app and
-neither ships inside the extension package.
+The product is the extension. `dist/` is the loadable extension. `preview/` is
+a dev-only HUD preview page generated outside `dist/`, and
+`server/mock-xray.mjs` is a local mock API. Neither ships inside the extension
+package.
 
-The current build is an **MVP shell with a clearly labeled demo dataset** for
-factory verification. The optional live adapters now call TikHub, browser-side
-video frame extraction, Baidu product recognition, and JustOneAPI, OneBound or
-the 1688 open platform when their credentials are saved. The factory report
-still comes from the configured Margin X-Ray API; the extension does not turn a
-marketplace listing into a verified factory quote.
+This build still uses a clearly labeled demo dataset for factory verification.
+Live adapters call TikHub, browser-side video frame extraction, Baidu product
+recognition, and JustOneAPI, OneBound or the 1688 open platform when their
+credentials are saved. The report never invents a factory price or a fair
+range: a missing input is shown as missing.
+
+## Positioning
+
+Price X-Ray reports what it measured, not what a seller intended.
+
+- Neutral labels only: **markup**, **fair price range**, **near-identical
+  listing**, **generic white-label match**. No “scam”, “fraud” or “rip-off”.
+- Every number carries its source. 1688 listing prices are listing prices, not
+  factory audits.
+- The fair range is a stated model: landed cost plus fulfillment, platform,
+  payment and returns fees, at a 15–25% net margin with no paid-ads load.
+- Company names and 1688 factory flags come from the listing. They are not a
+  registry, headcount or litigation check.
 
 ---
 
@@ -24,25 +37,29 @@ marketplace listing into a verified factory quote.
 
 - Chrome MV3 extension, loadable as an unpacked extension.
 - Page adapters for TikTok, Amazon, Shopify and generic product pages.
-- Floating `Open X-Ray` launcher on supported hosts.
-- Start screen with four separate capture paths:
-  - analyze the current product or video page
+- Floating `Scan product` launcher on supported hosts.
+- Start screen with four capture paths:
+  - scan the current product or video page
   - paste a TikTok, Amazon or Shopify link
   - upload a JPG, PNG or WebP product image
   - capture the visible page, or the current video frame when available
-- Staged scan state, then a tabbed report: **Overview / Profit / Suppliers**.
-- Shadow-DOM HUD: product context, price range, cost waterfall, Top 3 factory
-  cards, funnel reasons, quote form and disclaimers.
-- Editable cost assumptions: ex-works price, freight, duty, platform fee,
+- Staged scan state, then a tabbed report: **Verdict / Breakdown / Source listings**.
+- Verdict card: retail price, estimated factory cost, fair price range, markup
+  multiple and a 1688 near-identical-listing match signal.
+- Share card export: a 1080×1350 PNG with the verdict, product image, evidence
+  line and disclaimer, built to be posted in a comment thread.
+- Shadow-DOM HUD: product context, price range, cost waterfall, Top 3 source
+  listings, evidence rows and disclaimers.
+- Editable cost assumptions: factory price, freight, duty, platform fee,
   affiliate commission, payment fee, fulfillment, returns and ads.
-- MOQ-tier pricing on each factory card; clicking a tier updates the waterfall.
+- MOQ-tier pricing on each source listing; clicking a tier updates the model.
 - SSE client with correct chunk buffering, so progress events do not break when
   TCP splits a JSON line.
 - Background worker that proxies API calls (avoids page CORS and keeps tokens
   out of the page).
 - Local settings, scan history and lead storage in `chrome.storage.local`.
-- Popup with **Open X-Ray** and **Capture screen** actions + full options page.
-- Right-click **“Scan with Margin X-Ray”** on any page (uses `activeTab`, not a
+- Popup with **Scan this product** and **Capture screen** actions + full options page.
+- Right-click **“Scan with Price X-Ray”** on any page (uses `activeTab`, not a
   broad all-sites permission).
 - Local mock API (`server/mock-xray.mjs`) for end-to-end testing.
 - Optional live capture and sourcing adapters, used only when their keys are
@@ -66,32 +83,58 @@ marketplace listing into a verified factory quote.
 
 ## Interface principles
 
-The HUD is a compact browser research tool:
+The HUD is a compact consumer scanner:
 
 - a full-height right-side panel keeps the product page visible beside the data
 - neutral gray surfaces, blue actions, compact metrics and restrained borders
-- the first result view answers three questions: retail price, landed cost and net margin
-- one primary action moves the user from product judgment to supplier matching
-- Top 3 suppliers appear in a comparison table; due-diligence signals open per row
-- detailed profit line items and assumptions stay behind expandable controls
-- `tabular-nums` for prices and margins, visible focus rings and reduced-motion fallbacks
+- the first result view answers three questions: what you pay, what it costs to
+  make, and what a fair range looks like
+- the markup multiple is the single punchline; supporting evidence stays below it
+- the fair range states its own assumptions instead of implying a market survey
+- Top 3 near-identical listings appear in a comparison table; evidence opens per row
+- detailed cost line items and assumptions stay behind expandable controls
+- `tabular-nums` for prices and multiples, visible focus rings and reduced-motion fallbacks
 - inline stroke icons instead of emoji in the HUD and popup
 
-Tokens live in `src/styles/tokens.css` and are injected into the HUD shadow root
-so page CSS cannot leak in.
+### Visual system
+
+Americana Vintage / Letterpress, not a generic SaaS panel:
+
+- aged paper surfaces (`#F3EAD8`, `#E6D8BE`) with espresso ink (`#2D241E`); no
+  pure white and no pure black
+- rust-red actions (`#B54935`), faded teal (`#5B8C8A`) and ochre (`#C8963E`)
+- Alfa Slab One for display, Lora for body, Courier Prime for prices and meta,
+  Satisfy reserved for accents — bundled locally in `assets/fonts`, not fetched
+  from a CDN at runtime
+- double-ink borders, hard offset shadows, square corners and a subtle paper
+  grain overlay
+- ticket-style buttons that press down on hover
+
+Tokens live in `src/styles/tokens.css`; the HUD injects them into its shadow
+root so page CSS cannot leak in. Extension pages link
+`src/styles/fonts.css`, and the HUD injects the same `@font-face` rules with
+extension URLs. Fonts are bundled locally, never fetched from a CDN at runtime.
+If a site blocks extension fonts, the HUD falls back to Georgia and Courier
+without breaking layout.
 
 ## What is still demo / mocked
 
-- The factory list, registry signals, funnel counts and prices in demo mode are
-  **sample data**. They are labeled `DEMO DATA` in the HUD.
-- The local mock server returns `MOCK API` data. It is a test harness, not the
-  real pipeline.
+- The mobile web / PWA scanner is **not built yet**. The current product is the
+  Chrome extension; a phone-first page and link-paste flow still need a hosted
+  backend.
+- One-click retail alternatives and affiliate links are **not connected**. The
+  Source listings tab links only to 1688 listings and says so; it does not show
+  a retail buy button with a price that cannot be backed up.
+- The share card is drawn locally on a canvas. A cross-origin product image can
+  block the export; the UI reports that instead of downloading a broken card.
+- The sample report in demo mode is **sample data**, labeled `DEMO DATA` in the
+  HUD. The local mock server returns `MOCK API` data; it is a test harness.
 - 1688 image search runs when JustOneAPI, OneBound or open-platform keys are
   saved, in that order. Returned listing prices stay in CNY unless a
-  CNY-per-USD rate is saved. These are listing prices, not factory
-  verification, freight, duty or a supplier quote. Company names and 1688
-  flags come from the listing and are not a registry, headcount or litigation
-  check.
+  CNY-per-USD rate is saved, so the fair range stays empty until a rate exists.
+  These are listing prices, not factory verification, freight, duty or a
+  supplier quote. Company names and 1688 flags come from the listing and are
+  not a registry, headcount or litigation check.
 - Qichacha / Tianyancha / Qixinbao / DueSight data is **not connected**. The
   "manufacturing scope, insured headcount >= 15, paid-in capital, contract
   disputes" sourcing filter still needs a real registry endpoint and field
@@ -196,6 +239,7 @@ src/
       hud.ts                  shadow-DOM HUD
       hud.css                 HUD styles
       icons.ts                inline stroke icon set
+      poster.ts               share-card canvas renderer
   styles/
     tokens.css                shared design tokens (WenCode-inspired light theme)
   shared/
@@ -203,6 +247,7 @@ src/
     capture.ts                link/image capture context helpers
     identity.ts               TikHub / Baidu parsers and title rules
     justoneapi.ts             tolerant JustOneAPI response parser
+    consumer.ts               verdict, fair range and markup model
     supply.ts                 supply reports and 1688 offer mapping
     pricing.ts                landed-cost waterfall + MOQ helper
     format.ts                 price parsing and safe formatting
@@ -229,13 +274,16 @@ These are product requirements, not marketing copy:
 
 1. **No fallback factory price.** If a scan cannot verify a range, the UI shows
    “insufficient data” instead of inventing a number.
-2. **No fake precision.** Each factory card carries its signals, sources and
+2. **No fake precision.** Each source listing carries its signals, sources and
    dates. Demo data is labeled as demo.
-3. **No subtraction theater.** The funnel reports each exclusion reason
-   separately; it never labels every non-top-3 listing as a “middleman”.
-4. **No hidden margin math.** The waterfall shows landed cost, platform and
-   affiliate fees, fulfillment, returns and ads. Assumptions are editable.
-5. **No silent PII collection.** Leads are stored locally in demo mode. In live
+3. **No accusation by implication.** The report shows a markup multiple and a
+   near-identical-listing count. It does not call a seller a scammer or claim a
+   legal finding of white-labeling.
+4. **A fair range states its assumptions.** Landed cost, fees and the 15–25%
+   margin band are visible and editable; there is no hidden multiplier.
+5. **No fake buy button.** A retail alternative is shown only when a real
+   affiliate or supplier feed backs its price.
+6. **No silent PII collection.** Leads are stored locally in demo mode. In live
    mode they are only posted to the configured API after consent.
 
 ## Tests
@@ -245,28 +293,36 @@ npm run typecheck
 npm test
 ```
 
-Current tests cover price parsing, formatting, the landed-cost model and
-chunk-safe SSE parsing.
+Current tests cover price parsing, formatting, the landed-cost model, the
+consumer verdict thresholds, TikHub / Baidu / JustOneAPI parsing and chunk-safe
+SSE parsing.
 
 ## Known limitations
 
+- Mobile web / PWA is not built. C-end acquisition will need a phone-first page
+  and a hosted backend, not only a desktop extension.
+- Affiliate / CPS links and one-click retail alternatives are not connected, so
+  there is no consumer checkout path yet.
 - TikTok/Amazon/Shopify DOM selectors are best-effort and will need maintenance.
 - Instagram and YouTube are limited to page metadata and poster images.
-- Shopify pages are scanned via the popup or right-click menu; auto-injection on
-  every site would require a broad host permission and is intentionally avoided.
+- The fair-range model assumes a 15–25% net margin and no paid-ads load; it is
+  an estimate, not a market survey.
+- DueSight / registry verification is not connected, so no supplier is labeled a
+  verified factory.
 - The service worker may be terminated during very long scans; the UI has a
   timeout path, but production should use a durable job queue.
 - No authentication, billing, rate limiting, observability or legal review yet.
 
 ## Next steps
 
-1. Build a ground-truth set of 50 products with real quotes at 100 / 500 / 2,000
-   pcs before optimizing the engine.
-2. Add a user-gesture `captureVisibleTab` / `tabCapture` frame path and crop to
-   the video element.
-3. Replace the mock API with the real pipeline: image search, listing filters,
-   registry verification and provenance.
-4. Add confidence calibration and “insufficient data” states end to end.
+1. Ship the phone-first scan page: paste a TikTok link, get the same Verdict and
+   share card on mobile.
+2. Calibrate the fair-range model against real retail prices for one category
+   before publishing it as a headline number.
+3. Add affiliate / CPS mappings for AliExpress, Temu and DHgate, with a hard
+   rule: no link without a live price.
+4. Connect the DueSight / registry layer and only then promote “verified
+   factory” language.
 5. Add Chrome Web Store permission copy, privacy policy, terms and a takedown /
    correction workflow.
 

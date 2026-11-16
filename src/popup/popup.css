@@ -316,3 +316,185 @@ body {
 .link:hover {
   text-decoration: underline;
 }
+
+/* ------------------------------------------------------------------ */
+/* Americana Vintage / Letterpress                                     */
+/* ------------------------------------------------------------------ */
+
+.header {
+  padding: 13px 16px 11px;
+  border-bottom: 3px solid var(--mx-accent);
+  background: var(--mx-ink);
+}
+
+.logo {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--mx-paper);
+  border-radius: 2px;
+  background: var(--mx-accent);
+  color: var(--mx-paper);
+  font-family: var(--mx-font-display);
+  font-size: 17px;
+  font-weight: 400;
+  box-shadow: 2px 2px 0 rgba(243, 234, 216, 0.25);
+}
+
+.brand-name {
+  color: var(--mx-paper);
+  font-family: var(--mx-font-display);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.brand-sub {
+  color: #c8b9a4;
+  font-family: var(--mx-font-mono);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+}
+
+.badge {
+  border: 1px solid var(--mx-line-strong);
+  border-radius: 2px;
+  font-family: var(--mx-font-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+
+.badge.demo {
+  border-color: var(--mx-gold);
+  background: transparent;
+  color: #d8b877;
+}
+
+.badge.live {
+  border-color: var(--mx-blue);
+  background: transparent;
+  color: #9dc0bb;
+}
+
+.btn {
+  min-height: 40px;
+  border: 2px solid var(--mx-ink);
+  border-radius: 2px;
+  font-family: var(--mx-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 rgba(45, 36, 30, 0.85);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+
+.btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 rgba(45, 36, 30, 0.85);
+}
+
+.btn.primary {
+  border-color: var(--mx-ink);
+  background: var(--mx-accent);
+  color: var(--mx-paper);
+  outline: 2px solid var(--mx-paper);
+  outline-offset: -5px;
+  box-shadow: 3px 3px 0 rgba(45, 36, 30, 0.85);
+}
+
+.btn.primary:hover {
+  border-color: var(--mx-ink);
+  background: var(--mx-accent-hover);
+}
+
+.btn.secondary {
+  border-color: var(--mx-ink);
+  background: var(--mx-paper);
+  color: var(--mx-ink);
+}
+
+.status {
+  border: 1px dashed var(--mx-line-strong);
+  border-radius: 2px;
+  background: var(--mx-panel);
+  color: var(--mx-muted);
+  font-family: var(--mx-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.01em;
+}
+
+.status.error {
+  border-left: 3px solid var(--mx-wine);
+  color: var(--mx-wine);
+}
+
+.status.ok {
+  border-left: 3px solid #466f55;
+  color: #466f55;
+}
+
+.switch-row {
+  border: 1px solid var(--mx-line-strong);
+  border-radius: 2px;
+  background: var(--mx-panel);
+  box-shadow: 2px 2px 0 rgba(45, 36, 30, 0.14);
+}
+
+.switch-title {
+  font-family: var(--mx-font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.switch-sub {
+  color: var(--mx-muted);
+  font-family: var(--mx-font-sans);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.hint,
+.section-title,
+.last-scan-meta {
+  font-family: var(--mx-font-mono);
+}
+
+.section-title {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.footer {
+  border-top: 1px solid var(--mx-line-strong);
+  font-family: var(--mx-font-mono);
+  font-size: 8.5px;
+}
+
+.link {
+  color: var(--mx-accent);
+  font-family: var(--mx-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Vintage toggle: rust track, cream knob (the knob must not match the track). */
+.switch {
+  border-color: var(--mx-line-strong);
+  border-radius: 999px;
+}
+
+.switch-row input:checked + .switch {
+  border-color: var(--mx-ink);
+  background: var(--mx-accent);
+}
+
+.switch-row input:checked + .switch::after {
+  background: var(--mx-paper);
+}

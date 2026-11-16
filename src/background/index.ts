@@ -36,7 +36,7 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create(
       {
         id: "xray-scan-page",
-        title: "Scan with Margin X-Ray",
+        title: "Scan with Price X-Ray",
         contexts: ["page"],
       },
       () => {

@@ -161,7 +161,7 @@ export function createDemoResult(
       fobMinUsd: 2.4,
       fobMaxUsd: 4.1,
       basis:
-        "Demo range from a sample 1688 dataset at 100–2,000 pc tiers. Not a live quote.",
+        "Demo range from a sample 1688 dataset at 100–2,000 pc tiers. Not a live image-search match.",
       confidence: "demo",
     },
     waterfall,
@@ -180,15 +180,16 @@ export function createDemoResult(
         "Illustrative demo funnel. Live mode must report each exclusion reason separately instead of labeling every non-top-3 listing as a middleman.",
     },
     qualityWarning:
-      "Demo only: confirm the exact SKU, certifications, MOQ and current quote before ordering.",
+      "Demo only: the factory range and fair price come from sample data, not a live 1688 match.",
     sources: [
       { label: "Demo product dataset", asOf: "Sample data, not a live query" },
       { label: "Demo factory signals", asOf: "Sample data, not a live query" },
     ],
     disclaimers: [
-      "This is a demo report generated from a sample dataset. It is not a real supplier quote.",
+      "This is a demo report. The factory range, markup and fair price are sample values, not a real price check.",
       "Factory names and signal values are fictional in demo mode.",
-      "The cost waterfall is a model with editable assumptions, not accounting or tax advice.",
+      "The fair range is a cost model with editable assumptions, not a market survey.",
+      "Listing prices are not a legal finding of white-labeling.",
       "Verify every supplier claim independently before sending payment.",
     ],
   };

@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Margin X-Ray — Settings</title>
+    <title>Price X-Ray — Settings</title>
+    <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="options.css" />
   </head>
@@ -13,17 +14,18 @@
         <div class="hero-brand">
           <div class="logo">X</div>
           <div>
-            <div class="brand-name">Margin X-Ray</div>
-            <div class="brand-sub">Factory cost lens · settings</div>
+            <div class="brand-name">Price X-Ray</div>
+            <div class="brand-sub">Estd. 2026 · Real cost scanner · settings</div>
           </div>
         </div>
         <span id="modeBadge" class="badge demo">DEMO</span>
       </header>
 
       <p class="lede">
-        The extension only reads a page after you start a scan.
-        Everything below is stored locally in this browser. No account, no
-        tracking, no remote code.
+        Price X-Ray scans a product link, image or page and estimates what it
+        costs to make, what a fair retail range looks like, and how many
+        near-identical 1688 listings exist. Everything below is stored locally
+        in this browser. No account, no tracking, no remote code.
       </p>
 
       <form id="settingsForm" class="card">
@@ -44,7 +46,7 @@
           />
           <div class="field-hint">
             Start the local mock server with <code>npm run mock</code>, or point
-            this at the real Margin X-Ray API.
+            this at the real Price X-Ray API.
           </div>
         </div>
 
@@ -247,32 +249,36 @@
         </div>
         <ul class="rules">
           <li>
-            <strong>No fallback factory price.</strong> If the API cannot verify
-            a range, the panel says “insufficient data” instead of inventing a
+            <strong>No fallback factory price.</strong> If the scan cannot match
+            a listing, the panel says “insufficient data” instead of inventing a
             number.
           </li>
           <li>
-            <strong>No fake precision.</strong> Factory cards show the signals,
-            sources and dates behind the confidence label.
+            <strong>No fake precision.</strong> Each source listing shows its
+            price, MOQ, location and 1688 flags, plus the date of the scan.
           </li>
           <li>
-            <strong>No “100% middleman” claims.</strong> The funnel counts
-            exclusion reasons separately instead of subtracting everything from
-            the scanned total.
+            <strong>No accusation by implication.</strong> The report shows a
+            markup multiple and a near-identical-listing count. It does not call
+            a seller a scammer.
           </li>
           <li>
-            <strong>No hidden margin math.</strong> The landed-cost waterfall is
-            editable and always visible.
+            <strong>A fair range states its assumptions.</strong> Landed cost,
+            fees and the 15–25% margin band are visible and editable.
+          </li>
+          <li>
+            <strong>No fake buy button.</strong> A retail alternative appears
+            only when a real affiliate or supplier feed backs its price.
           </li>
           <li>
             <strong>Demo is labeled.</strong> Sample data never pretends to be a
-            live supplier quote.
+            live price check.
           </li>
         </ul>
       </section>
 
       <footer class="footer">
-        <span>Margin X-Ray <span id="version">v0.1.0</span></span>
+        <span>Price X-Ray <span id="version">v0.1.0</span></span>
         <span>Estimates, not a quote.</span>
       </footer>
     </main>

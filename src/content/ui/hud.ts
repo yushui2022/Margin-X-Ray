@@ -6,6 +6,12 @@ import {
   computeWaterfall,
 } from "../../shared/pricing";
 import {
+  consumerVerdict,
+  fairnessLabel,
+  matchLabel,
+} from "../../shared/consumer";
+import { downloadPoster, renderPosterBlob } from "./poster";
+import {
   formatDateTime,
   formatMoney,
   formatPct,
@@ -65,7 +71,7 @@ type ResultState = {
   result: ScanResult;
   assumptions: CostAssumptions | null;
   waterfall: CostWaterfall | null;
-  tab: "overview" | "profit" | "suppliers";
+  tab: "verdict" | "breakdown" | "listings";
   quoteOpen: boolean;
   quoteFactoryId?: string;
 };
@@ -169,6 +175,16 @@ function confidenceBadge(confidence: Confidence): HTMLElement {
   });
 }
 
+function posterDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unknown date";
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function platformLabel(context: PageContext): string {
   switch (context.platform) {
     case "tiktok":
@@ -226,6 +242,21 @@ function humanizeSourceText(source: string): string {
     .replace(/\bmeta\b/gi, "page metadata");
 }
 
+function fontFaceCss(): string {
+  try {
+    const url = (file: string) => chrome.runtime.getURL(`assets/fonts/${file}`);
+    return [
+      `@font-face{font-family:"Alfa Slab One";src:url("${url("alfa-slab-one.woff2")}") format("woff2");font-style:normal;font-weight:400;font-display:swap;}`,
+      `@font-face{font-family:"Lora";src:url("${url("lora.woff2")}") format("woff2");font-style:normal;font-weight:400 700;font-display:swap;}`,
+      `@font-face{font-family:"Courier Prime";src:url("${url("courier-prime-400.woff2")}") format("woff2");font-style:normal;font-weight:400;font-display:swap;}`,
+      `@font-face{font-family:"Courier Prime";src:url("${url("courier-prime-700.woff2")}") format("woff2");font-style:normal;font-weight:700;font-display:swap;}`,
+      `@font-face{font-family:"Satisfy";src:url("${url("satisfy.woff2")}") format("woff2");font-style:normal;font-weight:400;font-display:swap;}`,
+    ].join("\n");
+  } catch {
+    return "";
+  }
+}
+
 export class Hud {
   private host: HTMLDivElement;
   private shadow: ShadowRoot;
@@ -244,12 +275,12 @@ export class Hud {
 
     this.shadow = this.host.attachShadow({ mode: "open" });
     const style = document.createElement("style");
-    style.textContent = `${tokensCss}\n${hudCss}`;
+    style.textContent = `${fontFaceCss()}\n${tokensCss}\n${hudCss}`;
     this.shadow.appendChild(style);
 
     this.root = el("div", {
       className: "xray-root mx-theme",
-      attrs: { role: "region", "aria-label": "Margin X-Ray" },
+      attrs: { role: "region", "aria-label": "Price X-Ray" },
     });
     this.shadow.appendChild(this.root);
     this.render();
@@ -354,7 +385,7 @@ export class Hud {
       result,
       assumptions,
       waterfall,
-      tab: "overview",
+      tab: "verdict",
       quoteOpen: false,
     };
     this.render();
@@ -408,12 +439,12 @@ export class Hud {
     const launcher = button("", "xray-launcher", () =>
       this.callbacks.onLauncherClick(),
     {
-      "aria-label": "Scan this page with Margin X-Ray",
-      title: "Scan this page with Margin X-Ray",
+      "aria-label": "Scan this product with Price X-Ray",
+      title: "See the real cost before you buy",
     });
     launcher.append(
       el("span", { className: "xray-launcher-mark" }, [createIcon("bolt", 14)]),
-      el("span", { text: "Open X-Ray" }),
+      el("span", { text: "Scan product" }),
       el("span", { className: "xray-launcher-dot" }),
     );
     return launcher;
@@ -426,11 +457,11 @@ export class Hud {
     const content = el("div", { className: "xray-content xray-capture" });
     content.append(
       el("div", { className: "xray-capture-intro" }, [
-        el("div", { className: "xray-eyebrow", text: "Product research" }),
-        el("h2", { className: "xray-capture-title", text: "Capture product" }),
+        el("div", { className: "xray-eyebrow", text: "Price X-Ray" }),
+        el("h2", { className: "xray-capture-title", text: "See the real cost" }),
         el("p", {
           className: "xray-capture-lede",
-          text: "Choose a source. X-Ray will identify the product and estimate the opportunity.",
+          text: "Paste a TikTok or product link, upload a photo, or scan this page. You get an estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
         }),
       ]),
     );
@@ -462,7 +493,7 @@ export class Hud {
           el("div", { className: "xray-capture-page-price", text: price }),
         ]),
         button(
-          "Analyze this page",
+          "Scan this page",
           "xray-btn primary xray-capture-page-btn",
           () => this.callbacks.onAnalyzePage(),
         ),
@@ -637,7 +668,7 @@ export class Hud {
       el("div", { className: "xray-capture-footnote" }, [
         createIcon("flask", 12),
         el("span", {
-          text: "Demo mode is on by default. No supplier API is called until live mode is configured.",
+          text: "Demo mode is on by default. Scans use a sample report until live mode and keys are configured.",
         }),
       ]),
     );
@@ -689,7 +720,7 @@ export class Hud {
       className: "xray-panel",
       attrs: {
         role: "dialog",
-        "aria-label": "Margin X-Ray report",
+        "aria-label": "Price X-Ray report",
         "aria-modal": "false",
       },
     });
@@ -707,8 +738,8 @@ export class Hud {
     const brand = el("div", { className: "xray-brand" }, [
       el("div", { className: "xray-logo", text: "X" }),
       el("div", { className: "xray-brand-text" }, [
-        el("div", { className: "xray-brand-name", text: "Margin X-Ray" }),
-        el("div", { className: "xray-brand-sub", text: "Factory cost lens" }),
+        el("div", { className: "xray-brand-name", text: "Price X-Ray" }),
+        el("div", { className: "xray-brand-sub", text: "Estd. 2026 · Real cost scanner" }),
       ]),
     ]);
 
@@ -717,14 +748,14 @@ export class Hud {
       "xray-icon-btn",
       () => this.callbacks.onOpenOptions(),
       {
-        "aria-label": "Open Margin X-Ray settings",
+        "aria-label": "Open Price X-Ray settings",
         title: "Settings",
       },
     );
     settings.append(createIcon("settings", 15));
 
     const close = button("", "xray-icon-btn", () => this.handleClose(), {
-      "aria-label": "Close Margin X-Ray",
+      "aria-label": "Close Price X-Ray",
       title: "Close",
     });
     close.append(createIcon("x", 15));
@@ -749,7 +780,7 @@ export class Hud {
     return el("div", { className: "xray-footer" }, [
       el("span", { text: `v${EXTENSION_VERSION}` }),
       el("span", {
-        text: "Estimates, not a quote · assumptions shown",
+        text: "Estimates from listing prices · assumptions shown",
       }),
     ]);
   }
@@ -926,12 +957,12 @@ export class Hud {
 
     const content = el("div", { className: "xray-content xray-result" });
     content.append(this.renderResultTabs(state));
-    if (state.tab === "profit") {
-      content.append(this.renderProfit(state));
-    } else if (state.tab === "suppliers") {
-      content.append(this.renderSuppliers(state));
+    if (state.tab === "breakdown") {
+      content.append(this.renderBreakdown(state));
+    } else if (state.tab === "listings") {
+      content.append(this.renderListings(state));
     } else {
-      content.append(this.renderOverview(state));
+      content.append(this.renderVerdict(state));
     }
     return content;
   }
@@ -946,13 +977,9 @@ export class Hud {
       label: string;
       count?: number;
     }> = [
-      { id: "overview", label: "Overview" },
-      { id: "profit", label: "Profit" },
-      {
-        id: "suppliers",
-        label: "Suppliers",
-        count: state.result.factories.length,
-      },
+      { id: "verdict", label: "Verdict" },
+      { id: "breakdown", label: "Breakdown" },
+      { id: "listings", label: "Listings", count: state.result.factories.length },
     ];
 
     for (const item of items) {
@@ -978,7 +1005,7 @@ export class Hud {
     this.render();
   }
 
-  private renderOverview(state: ResultState): HTMLElement {
+  private renderVerdict(state: ResultState): HTMLElement {
     const { result, context } = state;
     const body = el("div", { className: "xray-tab-panel" });
 
@@ -987,7 +1014,7 @@ export class Hud {
         el("div", { className: "xray-banner info" }, [
           createIcon("plug", 14),
           el("span", {}, [
-            el("strong", { text: "1688 PRICES" }),
+            el("strong", { text: "1688 IMAGE SEARCH" }),
             el("span", {
               text: ` — ${result.supply.cnyLabel}. ${result.supply.note}`,
             }),
@@ -1014,7 +1041,7 @@ export class Hud {
               el("span", {
                 text:
                   result.dataSource === "demo"
-                    ? " — sample dataset for UI review. Not a real supplier quote."
+                    ? " — sample report for interface review. Not a real price check."
                     : " — local mock server. Replace it with the real pipeline before launch.",
               }),
             ]),
@@ -1036,15 +1063,14 @@ export class Hud {
       );
     }
 
-    body.append(this.renderOverviewMetrics(state));
-    body.append(this.renderFunnelCard(result));
+    body.append(this.renderVerdictCard(state));
 
     if (result.qualityWarning) {
       body.append(
         el("div", { className: "xray-banner warn" }, [
           createIcon("alert", 14),
           el("span", {}, [
-            el("strong", { text: "Quality trap: " }),
+            el("strong", { text: "Worth checking: " }),
             el("span", { text: result.qualityWarning }),
           ]),
         ]),
@@ -1053,44 +1079,252 @@ export class Hud {
 
     body.append(
       el("div", { className: "xray-next-actions" }, [
-        button("See profit breakdown", "xray-btn primary", () =>
-          this.switchTab("profit"),
+        button("See the breakdown", "xray-btn primary", () =>
+          this.switchTab("breakdown"),
         ),
-        button("View supplier matches", "xray-btn secondary", () =>
-          this.switchTab("suppliers"),
+        button("Source listings", "xray-btn secondary", () =>
+          this.switchTab("listings"),
         ),
+      ]),
+    );
+    body.append(
+      el("div", { className: "xray-share-row" }, [
+        button("Download share card", "xray-btn secondary wide", () => {
+          void this.shareCard(state);
+        }),
+        el("span", {
+          className: "xray-share-note",
+          text: "A 1080×1350 image for Reddit, X or TikTok comments.",
+        }),
       ]),
     );
     body.append(this.renderSources(result, context));
     return body;
   }
 
-  private renderOverviewMetrics(state: ResultState): HTMLElement {
-    const { result, waterfall } = state;
-    const retail = result.product.retailUsd;
-    const landed = waterfall?.landedUsd ??
-      (result.priceRange
-        ? (result.priceRange.fobMinUsd + result.priceRange.fobMaxUsd) / 2
-        : null);
-    const margin = waterfall?.netMarginPct ?? null;
-    const metrics = el("div", { className: "xray-kpi-card" });
-    metrics.append(
-      el("div", { className: "xray-kpi-grid" }, [
-        this.renderKpi("Retail price", retail === null ? "—" : formatUsd(retail), "page listing"),
-        this.renderKpi("Est. landed", landed === null ? "—" : formatUsd(landed), "modelled cost"),
-        this.renderKpi(
-          "Net margin",
-          margin === null ? "—" : formatPct(margin),
-          waterfall ? "after fees & returns" : "needs cost inputs",
-          margin !== null && margin < 0 ? "negative" : "positive",
-        ),
-      ]),
-      el("div", { className: "xray-kpi-footer" }, [
-        el("span", { text: result.priceRange ? confidenceLabel(result.priceRange.confidence) : "No cost range" }),
-        el("span", { text: "Estimates update in Profit" }),
+  private renderVerdictCard(state: ResultState): HTMLElement {
+    const { result, waterfall, assumptions } = state;
+    const verdict = consumerVerdict(result, waterfall, assumptions);
+    const card = el("div", { className: "xray-kpi-card xray-verdict-card" });
+
+    const tone =
+      verdict.fairness === "extreme" || verdict.fairness === "well-above"
+        ? "warn"
+        : verdict.fairness === "fair"
+          ? "good"
+          : "";
+    card.append(
+      el("div", { className: "xray-verdict-head" }, [
+        el("div", { className: "xray-verdict-eyebrow", text: fairnessLabel(verdict.fairness) }),
+        el("div", {
+          className: `xray-verdict-markup ${tone}`.trim(),
+          text: verdict.markupX === null ? "—" : `${verdict.markupX.toFixed(1)}×`,
+        }),
+        el("div", {
+          className: "xray-verdict-sub",
+          text: "retail price vs estimated factory cost",
+        }),
       ]),
     );
-    return metrics;
+
+    const factoryValue =
+      verdict.factoryLowUsd !== null
+        ? range(verdict.factoryLowUsd, verdict.factoryHighUsd ?? verdict.factoryLowUsd)
+        : result.supply?.cnyLabel ?? "—";
+    const factoryNote =
+      result.dataSource !== "api" && !result.supply
+        ? "sample range"
+        : verdict.factorySource === "listing"
+          ? "1688 image search"
+          : verdict.factorySource === "assumption"
+            ? "model assumption"
+            : result.supply
+              ? "CNY listing — add a rate"
+              : "no matched listing";
+
+    const fairValue =
+      verdict.fairLowUsd !== null && verdict.fairHighUsd !== null
+        ? range(verdict.fairLowUsd, verdict.fairHighUsd)
+        : result.supply && !result.supply.fxRate
+          ? "Needs FX rate"
+          : "—";
+
+    card.append(
+      el("div", { className: "xray-kpi-grid" }, [
+        this.renderKpi("You pay", verdict.retailUsd === null ? "—" : formatUsd(verdict.retailUsd), "listed price"),
+        this.renderKpi(
+          "Est. factory cost",
+          factoryValue,
+          factoryNote,
+          undefined,
+          true,
+        ),
+        this.renderKpi("Fair range", fairValue, "15–25% margin model", "positive", true),
+      ]),
+    );
+
+    card.append(
+      el("div", { className: "xray-match-row" }, [
+        el("span", {
+          className: `xray-match-badge ${verdict.matchStrength}`,
+          text:
+            verdict.matchStrength === "high"
+              ? "HIGH MATCH"
+              : verdict.matchStrength === "medium"
+                ? "MATCH"
+                : verdict.matchStrength === "low"
+                  ? "FEW MATCHES"
+                  : verdict.matchStrength === "none"
+                    ? "NO MATCH"
+                    : "NOT CHECKED",
+        }),
+        el("span", {
+          className: "xray-match-text",
+          text: matchLabel(verdict.matchStrength, verdict.matchCount),
+        }),
+      ]),
+    );
+
+    card.append(
+      el("div", { className: "xray-kpi-footer" }, [
+        el("span", {
+          text:
+            result.priceRange
+              ? confidenceLabel(result.priceRange.confidence)
+              : "Estimated factory cost",
+        }),
+        el("span", { text: "Open Breakdown to see the math" }),
+      ]),
+    );
+    return card;
+  }
+
+  private renderBreakdown(state: ResultState): HTMLElement {
+    const { result, assumptions, waterfall } = state;
+    const verdict = consumerVerdict(result, waterfall, assumptions);
+    const body = el("div", { className: "xray-tab-panel" });
+    body.append(
+      el("div", { className: "xray-section-head xray-section-head-page" }, [
+        el("div", { className: "xray-section-title", text: "Where your money goes" }),
+        el("div", {
+          className: "xray-section-note",
+          text: "Model with visible assumptions",
+        }),
+      ]),
+    );
+    body.append(this.renderFairCard(state, verdict));
+    body.append(this.renderWaterfallCard(result, assumptions, waterfall));
+    body.append(
+      el("div", { className: "xray-next-actions" }, [
+        button("Back to verdict", "xray-btn primary", () =>
+          this.switchTab("verdict"),
+        ),
+        button("Source listings", "xray-btn ghost", () =>
+          this.switchTab("listings"),
+        ),
+      ]),
+    );
+    return body;
+  }
+
+  private renderFairCard(
+    state: ResultState,
+    verdict: ReturnType<typeof consumerVerdict>,
+  ): HTMLElement {
+    const { result, assumptions } = state;
+    const card = el("div", { className: "xray-card" });
+    card.append(
+      el("div", { className: "xray-section-head" }, [
+        el("div", { className: "xray-section-title", text: "How the fair range is built" }),
+        el("div", {
+          className: "xray-section-note",
+          text: "No paid-ads load in this range",
+        }),
+      ]),
+    );
+
+    const rows: Array<[string, string]> = [
+      [
+        "Landed cost",
+        verdict.landedUsd === null ? "Not enough data" : formatUsd(verdict.landedUsd),
+      ],
+      [
+        "Platform, payment & returns",
+        assumptions
+          ? `${formatPct(assumptions.platformFeePct + assumptions.paymentPct + assumptions.returnRatePct)} of retail`
+          : "Not enough data",
+      ],
+      [
+        "Fair price range",
+        verdict.fairLowUsd !== null && verdict.fairHighUsd !== null
+          ? range(verdict.fairLowUsd, verdict.fairHighUsd)
+          : "Not enough data",
+      ],
+    ];
+    for (const [label, value] of rows) {
+      card.append(
+        el("div", { className: "xray-row" }, [
+          el("div", { className: "xray-row-label", text: label }),
+          el("div", { className: "xray-row-value", text: value }),
+          el("div", { className: "xray-row-pct", text: "" }),
+        ]),
+      );
+    }
+
+    card.append(
+      el("p", {
+        className: "xray-fine-print",
+        text:
+          "The fair range covers landed cost and fulfillment plus platform, payment and returns fees, at a 15–25% net margin. It is a model, not a market survey. Freight, duty and fee assumptions are editable below.",
+      }),
+    );
+
+    if (result.supply && !result.supply.fxRate) {
+      card.append(
+        el("div", { className: "xray-banner info" }, [
+          createIcon("info", 14),
+          el("span", {
+            text: "The 1688 listing is in CNY. Add a CNY per USD rate in Settings to convert it and fill the fair range.",
+          }),
+        ]),
+      );
+    }
+    return card;
+  }
+
+  private async shareCard(state: ResultState): Promise<void> {
+    const { result, waterfall, assumptions } = state;
+    const verdict = consumerVerdict(result, waterfall, assumptions);
+    const blob = await renderPosterBlob({
+      title: result.product.title,
+      ...(result.product.imageUrl ? { imageUrl: result.product.imageUrl } : {}),
+      retailUsd: verdict.retailUsd,
+      factoryLowUsd: verdict.factoryLowUsd,
+      factoryHighUsd: verdict.factoryHighUsd,
+      fairLowUsd: verdict.fairLowUsd,
+      fairHighUsd: verdict.fairHighUsd,
+      markupX: verdict.markupX,
+      fairness: fairnessLabel(verdict.fairness),
+      matchLabel: matchLabel(verdict.matchStrength, verdict.matchCount),
+      disclaimer:
+        result.dataSource !== "api"
+          ? "Sample report for interface review. The factory range, markup and fair price are not a real price check."
+          : "Estimated from 1688 image-search listing prices and a cost model. Not a legal finding of white-labeling.",
+      generatedAt: posterDate(result.generatedAt),
+    });
+    if (!blob) {
+      this.toast("Could not render the share card. A cross-origin product image blocked the canvas.");
+      return;
+    }
+    downloadPoster(blob, `price-xray-${Date.now()}.png`);
+    this.toast("Share card downloaded.");
+  }
+
+  private toast(message: string): void {
+    this.root.querySelector(".xray-toast")?.remove();
+    const node = el("div", { className: "xray-toast", text: message });
+    this.root.append(node);
+    window.setTimeout(() => node.remove(), 3200);
   }
 
   private renderKpi(
@@ -1098,144 +1332,54 @@ export class Hud {
     value: string,
     note: string,
     tone?: "positive" | "negative",
+    compact = false,
   ): HTMLElement {
     return el("div", { className: "xray-kpi" }, [
       el("div", { className: "xray-kpi-label", text: label }),
-      el("div", { className: `xray-kpi-value ${tone ?? ""}`.trim(), text: value }),
+      el("div", {
+        className: `xray-kpi-value ${tone ?? ""} ${compact ? "compact" : ""}`.trim(),
+        text: value,
+      }),
       el("div", { className: "xray-kpi-note", text: note }),
     ]);
   }
 
-  private renderPriceCard(result: ScanResult): HTMLElement {
-    const priceGrid = el("div", { className: "xray-card" });
-    priceGrid.append(
-      el("div", { className: "xray-section-head" }, [
-        el("div", { className: "xray-section-title", text: "Price comparison" }),
-        el("div", {
-          className: "xray-section-note",
-          text: result.priceRange
-            ? confidenceLabel(result.priceRange.confidence)
-            : "No range returned",
-        }),
-      ]),
-      el("div", { className: "xray-price-grid" }, [
-        el("div", { className: "xray-price-box red" }, [
-          el("div", { className: "xray-price-label", text: "Page price" }),
-          el("div", {
-            className: "xray-price-value",
-            text:
-              result.product.retailUsd !== null
-                ? formatUsd(result.product.retailUsd)
-                : "Not found",
-          }),
-          el("div", {
-            className: "xray-price-note",
-            text: humanizeSourceText(result.product.retailSource),
-          }),
-        ]),
-        el("div", { className: "xray-price-box green" }, [
-          el("div", {
-            className: "xray-price-label",
-            text: "Estimated ex-works",
-          }),
-          el("div", {
-            className: result.priceRange
-              ? "xray-price-value range"
-              : "xray-price-value",
-            text: result.priceRange
-              ? range(result.priceRange.fobMinUsd, result.priceRange.fobMaxUsd)
-              : result.supply
-                ? result.supply.cnyLabel
-                : "Insufficient data",
-          }),
-          el("div", {
-            className: "xray-price-note",
-            text:
-              result.priceRange?.basis ??
-              result.supply?.note ??
-              "No verified factory range was returned. We do not fill a fallback number.",
-          }),
-        ]),
-      ]),
-    );
-
-    if (result.priceRange) {
-      priceGrid.append(
-        el(
-          "div",
-          { className: "xray-price-note", attrs: { style: "margin-top:9px" } },
-          [
-            el("strong", {
-              text: `Gross margin on ex-works: ${formatPct(
-                result.product.retailUsd
-                  ? ((result.product.retailUsd -
-                      (result.priceRange.fobMinUsd +
-                        result.priceRange.fobMaxUsd) /
-                        2) /
-                      result.product.retailUsd) *
-                      100
-                  : null,
-              )}. `,
-            }),
-            el("span", {
-              text: "That is not what the seller keeps. Open Profit for the landed-cost model.",
-            }),
-          ],
-        ),
-      );
-    }
-
-    return priceGrid;
-  }
-
-  private renderProfit(state: ResultState): HTMLElement {
-    const { result, assumptions, waterfall } = state;
-    const body = el("div", { className: "xray-tab-panel" });
-    body.append(
-      el("div", { className: "xray-section-head xray-section-head-page" }, [
-        el("div", {
-          className: "xray-section-title",
-          text: "Landed cost & margin",
-        }),
-        el("div", {
-          className: "xray-section-note",
-          text: "Edit assumptions to test the model",
-        }),
-      ]),
-    );
-    body.append(this.renderWaterfallCard(result, assumptions, waterfall));
-    body.append(
-      el("div", { className: "xray-next-actions" }, [
-        button("View supplier matches", "xray-btn primary", () =>
-          this.switchTab("suppliers"),
-        ),
-        button("Back to overview", "xray-btn ghost", () =>
-          this.switchTab("overview"),
-        ),
-      ]),
-    );
-    return body;
-  }
-
-  private renderSuppliers(state: ResultState): HTMLElement {
+  private renderListings(state: ResultState): HTMLElement {
     const body = el("div", { className: "xray-tab-panel" });
     body.append(this.renderFactories(state));
-    if (!state.quoteOpen) {
-      body.append(
-        button("Request a verified quote", "xray-btn primary wide", () =>
-          this.openQuote(),
-        ),
-      );
-    } else {
+    if (state.quoteOpen) {
       body.append(this.renderQuoteForm(state));
+    } else {
+      body.append(
+        el("div", { className: "xray-card" }, [
+          el("div", { className: "xray-section-head" }, [
+            el("div", {
+              className: "xray-section-title",
+              text: "Buying from 1688",
+            }),
+            el("div", {
+              className: "xray-section-note",
+              text: "Not a consumer checkout",
+            }),
+          ]),
+          el("p", {
+            className: "xray-fine-print",
+            text:
+              "1688 needs a Chinese account, a payment method and usually a minimum order. One-click retail alternatives and affiliate links are not connected yet, so this report does not show a buy button with a price we cannot back up.",
+          }),
+          button("Ask for sourcing help", "xray-btn secondary", () =>
+            this.openQuote(),
+          ),
+        ]),
+      );
     }
     body.append(
       el("div", { className: "xray-next-actions" }, [
-        button("Back to profit", "xray-btn ghost", () =>
-          this.switchTab("profit"),
+        button("Back to verdict", "xray-btn primary", () =>
+          this.switchTab("verdict"),
         ),
-        button("Back to overview", "xray-btn ghost", () =>
-          this.switchTab("overview"),
+        button("Breakdown", "xray-btn ghost", () =>
+          this.switchTab("breakdown"),
         ),
       ]),
     );
@@ -1631,71 +1775,17 @@ export class Hud {
     }
   }
 
-  private renderFunnelCard(result: ScanResult): HTMLElement {
-    const card = el("div", { className: "xray-card" });
-    card.append(
-      el("div", { className: "xray-section-head" }, [
-        el("div", { className: "xray-section-title", text: "Supply-chain filter" }),
-        el("div", {
-          className: "xray-section-note",
-          text: "Reasons, not a subtraction trick",
-        }),
-      ]),
-    );
-
-    if (!result.funnel || result.funnel.scanned <= 0) {
-      card.append(
-        el("div", { className: "xray-banner info" }, [
-          createIcon("info", 14),
-          el("span", { text: "No live funnel data was returned for this scan." }),
-        ]),
-      );
-      return card;
-    }
-
-    const chips = el("div", { className: "xray-funnel" });
-    chips.append(
-      el("span", { className: "xray-chip" }, [
-        el("span", { text: "Scanned " }),
-        el("strong", { text: String(result.funnel.scanned) }),
-      ]),
-    );
-    for (const reason of result.funnel.excludedByReason) {
-      chips.append(
-        el("span", { className: "xray-chip red" }, [
-          el("span", { text: `${reason.reason} ` }),
-          el("strong", { text: String(reason.count) }),
-        ]),
-      );
-    }
-    chips.append(
-      el("span", { className: "xray-chip green" }, [
-        el("span", { text: "Verified " }),
-        el("strong", { text: String(result.funnel.verified) }),
-      ]),
-    );
-    card.append(chips);
-    card.append(
-      el("div", {
-        className: "xray-section-note",
-        attrs: { style: "margin-top:9px;line-height:1.5" },
-        text: result.funnel.note,
-      }),
-    );
-    return card;
-  }
-
   private renderFactories(state: ResultState): HTMLElement {
     const card = el("div", { className: "xray-card xray-supplier-card" });
     card.append(
       el("div", { className: "xray-section-head" }, [
         el("div", {
           className: "xray-section-title",
-          text: "Supplier matches",
+          text: "1688 source listings",
         }),
         el("div", {
           className: "xray-section-note",
-          text: `${Math.min(3, state.result.factories.length)} results · compare MOQ`,
+          text: `${Math.min(3, state.result.factories.length)} shown · image-search match`,
         }),
       ]),
     );
@@ -1704,9 +1794,9 @@ export class Hud {
       card.append(
         el("div", { className: "xray-empty" }, [
           el("div", { className: "xray-empty-icon" }, [createIcon("factory", 20)]),
-          el("strong", { text: "No verified candidates" }),
+          el("strong", { text: "No near-identical listing found" }),
           el("div", {
-            text: "Live mode should return “insufficient data” here instead of a fallback factory or price.",
+            text: "Try a sharper product image, or scan the product page instead of a wide video shot. We do not fill a fallback price.",
           }),
         ]),
       );
@@ -1715,12 +1805,11 @@ export class Hud {
 
     const table = el("div", {
       className: "xray-supplier-table",
-      attrs: { role: "table", "aria-label": "Supplier matches" },
+      attrs: { role: "table", "aria-label": "1688 source listings" },
     });
     table.append(
       el("div", { className: "xray-supplier-table-head", attrs: { role: "row" } }, [
-        el("span", { text: "Supplier", attrs: { role: "columnheader" } }),
-        el("span", { text: "MOQ tiers", attrs: { role: "columnheader" } }),
+        el("span", { text: "Listing", attrs: { role: "columnheader" } }),
         el("span", { text: "Price", attrs: { role: "columnheader" } }),
       ]),
     );
@@ -1733,8 +1822,8 @@ export class Hud {
         createIcon("info", 12),
         el("span", {
           text: state.result.supply
-            ? "Prices are 1688 listing prices. Shop names are not a registry check."
-            : "Names are masked. Open a row for evidence and request a quote.",
+            ? "1688 image-search listings, in CNY unless a rate is saved. A shop name is not a factory verification."
+            : "Sample listings. 1688 image search is not connected in this report.",
         }),
       ]),
     );
@@ -1749,31 +1838,17 @@ export class Hud {
         el("span", { className: "xray-factory-loc", text: factory.location }),
         confidenceBadge(factory.confidence),
       ]),
+      el("div", {
+        className: "xray-moq-line",
+        text:
+          factory.tiers.length > 1
+            ? `MOQ ${factory.tiers.map((tier) => tier.moq).join(" · ")}`
+            : factory.tiers.length === 1
+              ? `MOQ ${factory.tiers[0]?.moq ?? 1}`
+              : "MOQ not listed",
+      }),
     ]);
 
-    const tiers = el("div", { className: "xray-tiers xray-supplier-cell", attrs: { role: "cell" } });
-    for (const tier of factory.tiers) {
-      const active =
-        state.assumptions &&
-        Math.abs(state.assumptions.fobUsd - tier.unitUsd) < 0.005;
-      const tierButton = button(
-        "",
-        `xray-tier ${active ? "active" : ""}`.trim(),
-        () => this.selectTier(tier),
-        {
-          "aria-label": `Use ${quoteText(tier.unitUsd, tier.currency)} per unit at MOQ ${tier.moq}`,
-          title: tier.note ?? `MOQ ${tier.moq}`,
-        },
-      );
-      tierButton.append(
-        el("div", { className: "xray-tier-moq", text: `MOQ ${tier.moq}` }),
-        el("div", {
-          className: "xray-tier-price",
-          text: `${quoteText(tier.unitUsd, tier.currency ?? factory.currency)}/u`,
-        }),
-      );
-      tiers.append(tierButton);
-    }
     const price = el("div", { className: "xray-supplier-cell xray-supplier-price-cell", attrs: { role: "cell" } }, [
       el("div", {
         className: "xray-factory-price-value",
@@ -1784,15 +1859,37 @@ export class Hud {
         text: factory.currency === "CNY" ? "CNY / unit" : "USD / unit",
       }),
     ]);
-    card.append(supplier, tiers, price);
+    card.append(supplier, price);
 
     const details = el("details", { className: "xray-factory-details" });
     details.append(
       el("summary", {
-        text: `Due diligence & signals (${factory.signals.length})`,
+        text: `Evidence & price detail (${factory.signals.length})`,
       }),
     );
     const detailBody = el("div", { className: "xray-factory-details-body" });
+
+    if (factory.tiers.length) {
+      const tierRow = el("div", { className: "xray-tier-row" });
+      for (const tier of factory.tiers) {
+        const active =
+          state.assumptions &&
+          Math.abs(state.assumptions.fobUsd - tier.unitUsd) < 0.005;
+        tierRow.append(
+          button(
+            `MOQ ${tier.moq} · ${quoteText(tier.unitUsd, tier.currency ?? factory.currency)}`,
+            `xray-tier-chip ${active ? "active" : ""}`.trim(),
+            () => this.selectTier(tier),
+            {
+              "aria-label": `Use ${quoteText(tier.unitUsd, tier.currency)} per unit at MOQ ${tier.moq}`,
+              title: tier.note ?? `MOQ ${tier.moq}`,
+            },
+          ),
+        );
+      }
+      detailBody.append(tierRow);
+    }
+
     const signals = el("div", { className: "xray-signals" });
     for (const signal of factory.signals) {
       signals.append(
@@ -1818,14 +1915,6 @@ export class Hud {
     );
     details.append(detailBody);
     card.append(details);
-
-    card.append(
-      el("div", { className: "xray-actions xray-supplier-actions" }, [
-        button("Request quote", "xray-btn secondary xray-btn-small", () =>
-          this.openQuote(factory.id),
-        { "aria-label": `Request a quote from ${factory.maskedName}` }),
-      ]),
-    );
     return card;
   }
 
@@ -1845,14 +1934,12 @@ export class Hud {
       'input[data-assumption="fobUsd"]',
     );
     if (fobInput) fobInput.value = String(tier.unitUsd);
-    this.root.querySelectorAll(".xray-tier.active").forEach((node) =>
+    this.root.querySelectorAll(".xray-tier-chip").forEach((node) =>
       node.classList.remove("active"),
     );
-    this.root.querySelectorAll(".xray-tier").forEach((node) => {
-      const label = node.querySelector(".xray-tier-price")?.textContent;
-      if (label === `${quoteText(tier.unitUsd, tier.currency)}/u`) {
-        node.classList.add("active");
-      }
+    this.root.querySelectorAll<HTMLElement>(".xray-tier-chip").forEach((node) => {
+      const label = node.textContent ?? "";
+      if (label.startsWith(`MOQ ${tier.moq} ·`)) node.classList.add("active");
     });
     this.updateWaterfallDom();
   }
@@ -1861,7 +1948,7 @@ export class Hud {
     if (this.state.kind !== "result") return;
     this.state.quoteOpen = true;
     this.state.quoteFactoryId = factoryId;
-    this.state.tab = "suppliers";
+    this.state.tab = "listings";
     this.render();
     requestAnimationFrame(() => {
       const form = this.root.querySelector<HTMLElement>(
@@ -2201,7 +2288,7 @@ export class Hud {
           text:
             state.kind === "empty" && state.message
               ? state.message
-              : "Open a TikTok video, TikTok Shop product, Shopify product page, or Amazon listing. You can also right-click any page and choose “Scan with Margin X-Ray”.",
+              : "Open a TikTok video, TikTok Shop product, Shopify product page, or Amazon listing. You can also right-click any page and choose “Scan with Price X-Ray”.",
         }),
       ]),
     );

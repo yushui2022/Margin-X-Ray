@@ -1,58 +1,59 @@
 /*
- * Margin X-Ray design tokens.
+ * Price X-Ray design tokens.
  *
- * A compact browser research tool: neutral surfaces, blue actions, dense
- * metrics, and restrained borders that sit cleanly on marketplace pages.
+ * Americana Vintage / Letterpress: warm aged paper, espresso ink, rust-red
+ * actions, ochre and faded teal accents, slab display type, typewriter meta.
+ * No pure white and no pure black anywhere in the interface.
  */
 
 .mx-theme {
   color-scheme: light;
 
   /* Surfaces */
-  --mx-paper: #f6f7f9;
-  --mx-panel: #ffffff;
-  --mx-panel-2: #f8fafc;
-  --mx-panel-3: #eef2f6;
-  --mx-soft: #f1f5f9;
+  --mx-paper: #f3ead8;
+  --mx-panel: #f8f0e0;
+  --mx-panel-2: #ece0c8;
+  --mx-panel-3: #e0d2b6;
+  --mx-soft: #efe4cc;
 
   /* Ink */
-  --mx-ink: #17202a;
-  --mx-muted: #5c6875;
-  --mx-dim: #8793a0;
+  --mx-ink: #2d241e;
+  --mx-muted: #5c4d42;
+  --mx-dim: #8a7968;
 
   /* Lines */
-  --mx-line: #e4e9ef;
-  --mx-line-strong: #cbd5e1;
-  --mx-edge: #aebdcb;
+  --mx-line: rgba(45, 36, 30, 0.22);
+  --mx-line-strong: rgba(45, 36, 30, 0.5);
+  --mx-edge: #2d241e;
 
   /* Semantic */
-  --mx-accent: #2563eb;
-  --mx-accent-strong: #1d4ed8;
-  --mx-accent-solid: #2563eb;
-  --mx-accent-hover: #1d4ed8;
-  --mx-on-accent: #ffffff;
-  --mx-blue: #2563eb;
-  --mx-wine: #c2414d;
-  --mx-gold: #b7791f;
+  --mx-accent: #b54935;
+  --mx-accent-strong: #963827;
+  --mx-accent-solid: #b54935;
+  --mx-accent-hover: #963827;
+  --mx-on-accent: #f3ead8;
+  --mx-blue: #5b8c8a;
+  --mx-wine: #8c3a2b;
+  --mx-gold: #c8963e;
 
-  /* Radii */
-  --mx-radius-sm: 4px;
-  --mx-radius: 6px;
-  --mx-radius-lg: 8px;
+  /* Radii — letterpress blocks stay square */
+  --mx-radius-sm: 2px;
+  --mx-radius: 3px;
+  --mx-radius-lg: 5px;
 
   /* Elevation */
-  --mx-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --mx-shadow-panel:
-    -10px 0 28px rgba(15, 23, 42, 0.12),
-    0 0 1px rgba(15, 23, 42, 0.08);
+  --mx-shadow-card: 3px 3px 0 rgba(45, 36, 30, 0.85);
+  --mx-shadow-panel: -6px 0 0 rgba(45, 36, 30, 0.22);
+  --mx-shadow-letterpress:
+    0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 1px 2px rgba(45, 36, 30, 0.18);
 
   /* Type */
-  --mx-font-serif: var(--mx-font-sans);
-  --mx-font-sans:
-    "Segoe UI", "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui,
-    -apple-system, sans-serif;
-  --mx-font-mono:
-    Consolas, Menlo, ui-monospace, SFMono-Regular, "Liberation Mono", monospace;
+  --mx-font-sans: "Lora", Georgia, "Times New Roman", serif;
+  --mx-font-serif: "Alfa Slab One", "Playfair Display", Georgia, serif;
+  --mx-font-display: "Alfa Slab One", "Playfair Display", Georgia, serif;
+  --mx-font-mono: "Courier Prime", "Courier New", ui-monospace, monospace;
+  --mx-font-script: "Satisfy", "Brush Script MT", cursive;
 
   /* Spacing */
   --mx-space-1: 4px;
@@ -74,8 +75,25 @@
 }
 
 .mx-theme :focus-visible {
-  outline: 2px solid var(--mx-blue);
+  outline: 2px solid var(--mx-accent);
   outline-offset: 2px;
+}
+
+/* Paper grain for extension pages. The HUD paints its own grain on the panel. */
+body.mx-theme {
+  position: relative;
+  background-color: var(--mx-paper);
+  color: var(--mx-ink);
+}
+
+body.mx-theme::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 @media (prefers-reduced-motion: reduce) {

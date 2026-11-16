@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Margin X-Ray — Factory Price Lens",
-  "short_name": "Margin X-Ray",
-  "version": "0.1.0",
-  "description": "See the estimated China factory cost behind TikTok Shop, Shopify and Amazon products — with the assumptions shown.",
+  "name": "Price X-Ray — Real Cost Scanner",
+  "short_name": "Price X-Ray",
+  "version": "0.2.0",
+  "description": "Scan a TikTok video or product page to see the estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
   "minimum_chrome_version": "114",
   "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
   "host_permissions": [
@@ -16,7 +16,7 @@
   ],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "action": {
-    "default_title": "Margin X-Ray",
+    "default_title": "Price X-Ray",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "assets/icons/icon-16.png",

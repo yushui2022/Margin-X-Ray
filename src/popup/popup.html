@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Margin X-Ray</title>
+    <title>Price X-Ray</title>
+    <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="popup.css" />
   </head>
@@ -13,8 +14,8 @@
         <div class="brand">
           <div class="logo">X</div>
           <div class="brand-text">
-            <div class="brand-name">Margin X-Ray</div>
-            <div class="brand-sub">Factory cost lens</div>
+            <div class="brand-name">Price X-Ray</div>
+            <div class="brand-sub">Estd. 2026 · Real cost scanner</div>
           </div>
         </div>
         <span id="modeBadge" class="badge demo">DEMO</span>
@@ -23,28 +24,28 @@
       <main class="main">
         <button id="scanBtn" class="btn primary" type="button">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          <span>Open X-Ray</span>
+          <span>Scan this product</span>
         </button>
         <button id="captureBtn" class="btn secondary" type="button">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><path d="M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
           <span>Capture screen</span>
         </button>
         <div id="status" class="status" role="status" aria-live="polite">
-          Open a product page, or capture the current screen.
+          Open a product page, or scan the current screen.
         </div>
 
         <label class="switch-row" for="demoToggle">
           <span>
             <span class="switch-title">Demo mode</span>
-            <span class="switch-sub">Factory data stays local. Identity keys live in Settings.</span>
+            <span class="switch-sub">Sample report stays local. Live keys live in Settings.</span>
           </span>
           <input id="demoToggle" type="checkbox" />
           <span class="switch" aria-hidden="true"></span>
         </label>
 
         <div id="demoHint" class="hint">
-          Demo mode uses a clearly labeled sample dataset. It never invents a
-          fallback factory price.
+          Demo mode uses a clearly labeled sample report. It never invents a
+          factory price or a fair range.
         </div>
 
         <section id="lastScan" class="last-scan" hidden>

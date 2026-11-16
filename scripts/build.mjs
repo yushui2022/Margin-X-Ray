@@ -58,6 +58,7 @@ async function copyStatic() {
 
   const extensionStaticFiles = [
     ["src/styles/tokens.css", "tokens.css"],
+    ["src/styles/fonts.css", "fonts.css"],
     ["src/popup/popup.html", "popup.html"],
     ["src/popup/popup.css", "popup.css"],
     ["src/options/options.html", "options.html"],
@@ -77,9 +78,18 @@ async function copyStatic() {
     // Icons are optional during early development.
   }
 
+  try {
+    await cp(join(root, "assets/fonts"), join(dist, "assets/fonts"), {
+      recursive: true,
+    });
+  } catch {
+    // Fonts are optional; the CSS falls back to Georgia and Courier.
+  }
+
   // The preview is a dev-only harness. It is deliberately kept outside dist/
   // so the extension package contains only the extension.
   await cp(join(root, "src/styles/tokens.css"), join(preview, "tokens.css"));
+  await cp(join(root, "src/styles/fonts.css"), join(preview, "fonts.css"));
   await cp(join(root, "src/demo/index.html"), join(preview, "index.html"));
   await cp(join(root, "src/demo/demo.css"), join(preview, "demo.css"));
   await mkdir(join(preview, "assets"), { recursive: true });
@@ -87,6 +97,13 @@ async function copyStatic() {
     join(root, "assets/demo-neck-fan.svg"),
     join(preview, "assets/demo-neck-fan.svg"),
   );
+  try {
+    await cp(join(root, "assets/fonts"), join(preview, "assets/fonts"), {
+      recursive: true,
+    });
+  } catch {
+    // Fonts are optional in the dev preview.
+  }
 }
 
 async function runBuild() {
