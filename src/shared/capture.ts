@@ -37,6 +37,10 @@ export function guessTitleFromUrl(raw: string): string {
   const url = toUrl(raw);
   if (!url) return "Pasted product link";
   const host = url.hostname.replace(/^www\./, "");
+  if (/(^|\.)tiktok\.com$/.test(host)) {
+    const handle = url.pathname.match(/^\/@([^/]+)\/video\//)?.[1];
+    if (handle) return `TikTok video · @${handle}`;
+  }
   const parts = url.pathname.split("/").filter(Boolean);
   const last = parts[parts.length - 1] ?? "";
   const readable = last

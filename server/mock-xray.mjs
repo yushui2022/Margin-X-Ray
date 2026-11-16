@@ -182,6 +182,15 @@ function makeResult(context, scanId) {
     waterfall: model.waterfall,
     assumptions: model.assumptions,
     factories: FACTORIES,
+    supply: {
+      provider: "onebound",
+      scanned: 58,
+      priced: 3,
+      offers: [],
+      fxRate: 7.2,
+      cnyLabel: "CNY 17.00–29.00",
+      note: "Mock 1688 image search. Sample listings, not a live quote.",
+    },
     funnel: {
       scanned: 58,
       excludedByReason: [

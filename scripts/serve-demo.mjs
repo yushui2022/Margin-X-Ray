@@ -5,7 +5,7 @@ import { stat } from "node:fs/promises";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(fileURLToPath(new URL("../preview", import.meta.url)));
+const root = resolve(fileURLToPath(new URL("../web", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
 
 const MIME = {
@@ -53,7 +53,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`\n  Margin X-Ray HUD preview: http://localhost:${port}/\n`);
-  console.log("  Dev-only static preview of the HUD. No extension or API required.\n");
-  console.log("  The extension itself is built to dist/ and does not include this page.\n");
+  console.log(`\n  别做洋葱头 agent web: http://localhost:${port}/\n`);
+  console.log("  Agent scan frontend. Point it at http://localhost:8787 or your API.\n");
+  console.log("  The extension itself is built to dist/; this page is the web frontend.\n");
 });

@@ -106,7 +106,7 @@ export function fairnessOf(premiumX: number | null): Fairness {
 export function matchStrengthOf(count: number | null): MatchStrength {
   if (count === null) return "unknown";
   if (count >= 20) return "high";
-  if (count >= 5) return "medium";
+  if (count >= 3) return "medium";
   if (count >= 1) return "low";
   return "none";
 }

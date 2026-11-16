@@ -35,6 +35,10 @@ range: a missing input is shown as missing.
 
 ## What works today
 
+- Agent web frontend at `web/`: paste a link or upload an image, watch the
+  agent trace stream (read → identify → 1688 → verify → price), then read the
+  verdict, breakdown, listings and share card. Calls the same
+  `POST /api/v1/xray/stream` contract as the extension.
 - Chrome MV3 extension, loadable as an unpacked extension.
 - Page adapters for TikTok, Amazon, Shopify and generic product pages.
 - Floating `Scan product` launcher on supported hosts.
@@ -150,7 +154,12 @@ the system serif without breaking layout.
 ```bash
 npm install
 npm run build
+npm run mock        # local agent backend on :8787
+npm run serve:demo  # web frontend on :4173
 ```
+
+Open <http://localhost:4173/> and paste a product link. The header shows whether
+the agent backend is reachable; use **Backend** to point it at a real API.
 
 Load the extension:
 
@@ -255,13 +264,14 @@ src/
     steps.ts                  scan step definitions
   popup/                      extension popup: quick scan + demo toggle
   options/                    extension options: API settings, permissions, data
-  demo/                       source for the dev-only HUD preview
+  web/                        agent scan frontend (HTML, CSS, app.ts)
+  demo/                       dev-only HUD harness source
 server/
   mock-xray.mjs               zero-dependency local mock API
 tests/                        node:test unit tests
 scripts/
   build.mjs                   esbuild build: dist/ + preview/
-  serve-demo.mjs              static preview server
+  serve-demo.mjs              static server for the agent web app
 dist/                         generated extension output (gitignored)
 preview/                      generated dev-only HUD preview (gitignored)
 ```

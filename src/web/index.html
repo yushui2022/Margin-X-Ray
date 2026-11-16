@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>别做洋葱头 — Agent scan</title>
+    <link rel="icon" href="assets/mascot/onion-head.webp" />
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body class="mx-theme">
+    <header class="topbar">
+      <a class="brand" href="/">
+        <img class="brand-mark" src="assets/mascot/onion-head.webp" alt="" />
+        <span class="brand-text">
+          <strong>别做洋葱头</strong>
+          <span>Don't be the onion head</span>
+        </span>
+      </a>
+      <div class="topbar-right">
+        <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
+        <button class="btn ghost" id="backendBtn" type="button">Backend</button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero" id="hero">
+        <div class="hero-grid">
+          <div class="hero-copy">
+        <p class="eyebrow">Agent scan</p>
+        <h1>Paste a link.<br /><em>See the real cost.</em></h1>
+        <p class="lede">
+          The agent reads the video or product page, pulls a clean product image,
+          searches 1688 for near-identical listings, and models what a fair price
+          should look like — before you pay.
+        </p>
+
+        <div class="backend-offline" id="offlineNote" hidden>
+          Agent backend is not connected. Start <code>npm run mock</code> or set a
+          backend URL. Scans will fail until then.
+        </div>
+
+        <form class="scan-form" id="scanForm">
+          <label class="scan-field">
+            <span class="scan-field-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg>
+            </span>
+            <input
+              id="urlInput"
+              type="url"
+              placeholder="Paste a TikTok, Amazon or Shopify link"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </label>
+          <button class="btn primary scan-btn" id="scanBtn" type="submit">
+            Run agent
+          </button>
+        </form>
+
+        <div class="scan-secondary">
+          <button class="btn secondary" id="uploadBtn" type="button">Upload image</button>
+          <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
+          <span class="or">or try</span>
+          <button class="chip-link" data-example="https://www.tiktok.com/@demo/video/7350810998023949599" type="button">a TikTok video</button>
+          <button class="chip-link" data-example="https://www.amazon.com/dp/B0EXAMPLE" type="button">an Amazon listing</button>
+          <button class="chip-link" data-example="https://shop.example.com/products/neck-fan" type="button">a Shopify product</button>
+        </div>
+        <div class="image-ready" id="imageReady" hidden>
+          <img id="imageThumb" alt="" />
+          <span id="imageName"></span>
+          <button class="link-btn" id="clearImage" type="button">Remove</button>
+        </div>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <img src="assets/mascot/onion-kid.webp" alt="" />
+          </div>
+        </div>
+
+        <ol class="pipeline" aria-label="Agent pipeline">
+          <li><span>01</span><strong>Source</strong><em>Link, image or page</em></li>
+          <li><span>02</span><strong>Identify</strong><em>Product + retail price</em></li>
+          <li><span>03</span><strong>Match</strong><em>1688 image search</em></li>
+          <li><span>04</span><strong>Verdict</strong><em>Cost + fair range</em></li>
+        </ol>
+      </section>
+
+      <section class="workspace" id="workspace" hidden>
+        <aside class="agent-card" aria-label="Agent trace">
+          <header class="agent-head">
+            <div>
+              <p class="eyebrow">Agent trace</p>
+              <strong id="traceTitle">Working…</strong>
+            </div>
+            <button class="link-btn" id="stopBtn" type="button" hidden>Stop</button>
+          </header>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
+            <i id="progressBar"></i>
+          </div>
+          <ol class="steps" id="steps"></ol>
+          <footer class="agent-foot">
+            <button class="btn ghost" id="newScanBtn" type="button">New scan</button>
+            <span id="agentMeta" class="agent-meta"></span>
+          </footer>
+        </aside>
+        <section class="report" id="report" aria-live="polite"></section>
+      </section>
+    </main>
+
+    <dialog class="backend-dialog" id="backendDialog">
+      <form method="dialog" id="backendForm">
+        <h2>Agent backend</h2>
+        <p class="dialog-note">
+          The web app calls the same streaming endpoint as the extension:
+          <code>POST /api/v1/xray/stream</code>.
+        </p>
+        <label class="field">
+          <span>API base URL</span>
+          <input id="apiBaseInput" type="url" placeholder="http://localhost:8787" autocomplete="off" spellcheck="false" />
+        </label>
+        <div class="dialog-status" id="dialogStatus"></div>
+        <div class="dialog-actions">
+          <button class="btn secondary" id="testBackend" type="button">Test connection</button>
+          <button class="btn primary" value="save" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

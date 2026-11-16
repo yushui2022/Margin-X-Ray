@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const preview = join(root, "preview");
+const web = join(root, "web");
 const isWatch = process.argv.includes("--watch");
 
 const ENTRIES = [
@@ -35,6 +36,11 @@ const ENTRIES = [
     outfile: join(preview, "demo.js"),
     format: "iife",
   },
+  {
+    entryPoints: [join(root, "src/web/app.ts")],
+    outfile: join(web, "app.js"),
+    format: "iife",
+  },
 ];
 
 const buildOptions = {
@@ -55,6 +61,7 @@ const buildOptions = {
 async function copyStatic() {
   await mkdir(dist, { recursive: true });
   await mkdir(preview, { recursive: true });
+  await mkdir(web, { recursive: true });
 
   await cp(join(root, "manifest.json"), join(dist, "manifest.json"));
 
@@ -96,6 +103,15 @@ async function copyStatic() {
     // Mascot assets are optional; the wordmark still renders.
   }
 
+  // The agent web app is a standalone frontend served by scripts/serve-demo.mjs.
+  await cp(join(root, "src/web/index.html"), join(web, "index.html"));
+  await cp(join(root, "src/web/app.css"), join(web, "app.css"));
+  await cp(join(root, "src/styles/tokens.css"), join(web, "tokens.css"));
+  await cp(join(root, "src/styles/fonts.css"), join(web, "fonts.css"));
+  await mkdir(join(web, "assets"), { recursive: true });
+  await cp(join(root, "assets/fonts"), join(web, "assets/fonts"), { recursive: true });
+  await cp(join(root, "assets/mascot"), join(web, "assets/mascot"), { recursive: true });
+
   // The preview is a dev-only harness. It is deliberately kept outside dist/
   // so the extension package contains only the extension.
   await cp(join(root, "src/styles/tokens.css"), join(preview, "tokens.css"));
@@ -128,6 +144,7 @@ async function runBuild() {
   await rm(preview, { recursive: true, force: true });
   await mkdir(dist, { recursive: true });
   await mkdir(preview, { recursive: true });
+  await mkdir(web, { recursive: true });
 
   if (isWatch) {
     const contexts = await Promise.all(

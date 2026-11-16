@@ -104,6 +104,7 @@ test("fairness and match thresholds stay explicit", () => {
   assert.equal(matchStrengthOf(null), "unknown");
   assert.equal(matchStrengthOf(0), "none");
   assert.equal(matchStrengthOf(1), "low");
+  assert.equal(matchStrengthOf(3), "medium");
   assert.equal(matchStrengthOf(5), "medium");
   assert.equal(matchStrengthOf(20), "high");
 });
