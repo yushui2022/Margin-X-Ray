@@ -149,6 +149,17 @@ the system serif without breaking layout.
   button. A screenshot started from the in-page HUD may be blocked by Chrome;
   in that case the page's product image is used and the report says so.
 
+## Research
+
+Week 1 is a data problem, not a UI problem. The team collects 50 real viral
+products with live 1688 quotes and registry checks before more automation:
+
+- `research/GROUND-TRUTH-SOP.md` — selection rules, image search, supplier
+  calling script, registry checks, P25/P50/P75, QA and compliance
+- `research/ground-truth-50.csv` — 50 candidate categories, ready to fill
+- `research/supplier-quotes.csv` — supplier quotes and verification fields
+- `research/REPORT-TEMPLATE.md` — the first-20 report format
+
 ## Quick start
 
 ```bash
