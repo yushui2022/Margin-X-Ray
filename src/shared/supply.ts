@@ -10,6 +10,7 @@ import type {
 } from "./types";
 
 const PROVIDER_LABEL = {
+  justoneapi: "JustOneAPI 1688 image search",
   onebound: "OneBound 1688 image search",
   "alibaba-open": "1688 open platform image search",
 } as const;
@@ -188,7 +189,11 @@ function toFactory(
     note: `${formatCny(tier.unitCny)} on 1688`,
   }));
   const amounts = tiers.map((tier) => tier.unitUsd);
-  const shop = offer.shopName && !offer.shopName.startsWith("_sopid") ? offer.shopName : offer.title;
+  const shop =
+    offer.companyName ??
+    (offer.shopName && !offer.shopName.startsWith("_sopid")
+      ? offer.shopName
+      : offer.title);
   return {
     id: offer.id,
     maskedName: shop.slice(0, 80),
@@ -203,6 +208,27 @@ function toFactory(
         value: offer.tiers.map((tier) => `MOQ ${tier.moq}: ${formatCny(tier.unitCny)}`).join("; "),
         source: PROVIDER_LABEL[offer.provider],
       },
+      ...(offer.companyName
+        ? [{ label: "Company", value: offer.companyName, source: "1688 listing" }]
+        : []),
+      ...(offer.factoryFlag !== undefined
+        ? [
+            {
+              label: "Factory flag",
+              value: offer.factoryFlag ? "Listed as a factory" : "Not listed as a factory",
+              source: "1688 listing filter",
+            },
+          ]
+        : []),
+      ...(offer.verifiedFlag !== undefined
+        ? [
+            {
+              label: "Verified flag",
+              value: offer.verifiedFlag ? "Verified supplier on 1688" : "No verified-supplier flag",
+              source: "1688 listing filter",
+            },
+          ]
+        : []),
       ...(offer.sales !== undefined
         ? [{ label: "Sales", value: String(offer.sales), source: PROVIDER_LABEL[offer.provider] }]
         : []),
@@ -215,7 +241,7 @@ function toFactory(
     ],
     confidence: "medium",
     confidenceReason:
-      "Price comes from a 1688 listing returned by image search. The shop name is not a registry-verified factory.",
+      "Price comes from a 1688 listing returned by image search. The company name and 1688 flags are not a registry, headcount or litigation check.",
   };
 }
 

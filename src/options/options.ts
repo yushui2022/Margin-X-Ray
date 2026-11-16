@@ -13,6 +13,7 @@ const apiToken = document.getElementById("apiToken") as HTMLInputElement;
 const tikhubToken = document.getElementById("tikhubToken") as HTMLInputElement;
 const baiduApiKey = document.getElementById("baiduApiKey") as HTMLInputElement;
 const baiduSecretKey = document.getElementById("baiduSecretKey") as HTMLInputElement;
+const justoneapiToken = document.getElementById("justoneapiToken") as HTMLInputElement;
 const oneboundKey = document.getElementById("oneboundKey") as HTMLInputElement;
 const oneboundSecret = document.getElementById("oneboundSecret") as HTMLInputElement;
 const oneboundFetchTiers = document.getElementById("oneboundFetchTiers") as HTMLInputElement;
@@ -29,6 +30,7 @@ const saveBtn = document.getElementById("saveBtn") as HTMLButtonElement;
 const testBtn = document.getElementById("testBtn") as HTMLButtonElement;
 const testTikhubBtn = document.getElementById("testTikhubBtn") as HTMLButtonElement;
 const testRecognizerBtn = document.getElementById("testRecognizerBtn") as HTMLButtonElement;
+const testJustOneApiBtn = document.getElementById("testJustOneApiBtn") as HTMLButtonElement;
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
 const statusEl = document.getElementById("status") as HTMLDivElement;
 const modeBadge = document.getElementById("modeBadge") as HTMLSpanElement;
@@ -59,6 +61,7 @@ function fillForm(settings: Settings): void {
   tikhubToken.value = settings.tikhubToken;
   baiduApiKey.value = settings.baiduApiKey;
   baiduSecretKey.value = settings.baiduSecretKey;
+  justoneapiToken.value = settings.justoneapiToken;
   oneboundKey.value = settings.oneboundKey;
   oneboundSecret.value = settings.oneboundSecret;
   oneboundFetchTiers.checked = settings.oneboundFetchTiers;
@@ -79,6 +82,7 @@ function readForm(): Partial<Settings> {
     tikhubToken: tikhubToken.value.trim(),
     baiduApiKey: baiduApiKey.value.trim(),
     baiduSecretKey: baiduSecretKey.value.trim(),
+    justoneapiToken: justoneapiToken.value.trim(),
     oneboundKey: oneboundKey.value.trim(),
     oneboundSecret: oneboundSecret.value.trim(),
     oneboundFetchTiers: oneboundFetchTiers.checked,
@@ -251,10 +255,20 @@ testRecognizerBtn.addEventListener("click", () => {
   });
 });
 
+testJustOneApiBtn.addEventListener("click", () => {
+  void runKeyedTest(testJustOneApiBtn, "Testing JustOneAPI…", {
+    type: "TEST_JUSTONEAPI",
+    token: justoneapiToken.value.trim(),
+  });
+});
+
 async function runKeyedTest(
   button: HTMLButtonElement,
   pending: string,
-  message: { type: "TEST_TIKHUB"; token: string } | { type: "TEST_RECOGNIZER"; apiKey: string; secretKey: string },
+  message:
+    | { type: "TEST_TIKHUB"; token: string }
+    | { type: "TEST_RECOGNIZER"; apiKey: string; secretKey: string }
+    | { type: "TEST_JUSTONEAPI"; token: string },
 ): Promise<void> {
   button.disabled = true;
   setStatus(pending);

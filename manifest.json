@@ -10,6 +10,7 @@
     "http://localhost:8787/*",
     "https://api.tikhub.io/*",
     "https://aip.baidubce.com/*",
+    "https://api.justoneapi.com/*",
     "https://api-gw.onebound.cn/*",
     "https://gw.open.1688.com/*"
   ],

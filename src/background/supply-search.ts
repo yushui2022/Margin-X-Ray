@@ -1,5 +1,6 @@
 import { imageBase64 } from "./recognize";
 import { isAbortError } from "./deadline";
+import { searchJustOneAPI } from "./justoneapi";
 import { searchAlibabaOpen } from "./alibaba";
 import { searchOneBound } from "./onebound";
 import { buildSupplyReport, parseFxRate } from "../shared/supply";
@@ -15,10 +16,12 @@ export async function searchSupply(
     settings.alibabaAppKey && settings.alibabaAppSecret && settings.alibabaAccessToken,
   );
   const onebound = Boolean(settings.oneboundKey && settings.oneboundSecret);
-  if (!official && !onebound) {
+  const justoneapi = Boolean(settings.justoneapiToken);
+  if (!official && !onebound && !justoneapi) {
     return {
       ...request.context,
-      supplyNote: "OneBound and 1688 open platform keys are not set, so no listing price was fetched.",
+      supplyNote:
+        "JustOneAPI, OneBound and 1688 open platform keys are not set, so no listing price was fetched.",
     };
   }
 
@@ -41,7 +44,30 @@ export async function searchSupply(
   const fxRate = parseFxRate(settings.usdCnyRate);
   let report: SupplyReport | undefined;
 
-  if (onebound && (image.url || image.base64)) {
+  if (justoneapi) {
+    try {
+      const found = await searchJustOneAPI({
+        token: settings.justoneapiToken,
+        ...(image.url ? { imageUrl: image.url } : {}),
+        ...(image.base64 ? { imageBase64: image.base64 } : {}),
+        isFactory: true,
+        verifiedSupplier: false,
+        signal,
+      });
+      if (found.offers.length) {
+        report = buildSupplyReport("justoneapi", found.scanned, found.offers, fxRate);
+      } else {
+        notes.push("JustOneAPI returned no priced 1688 listings.");
+      }
+    } catch (error) {
+      if (isAbortError(error)) throw error;
+      notes.push(
+        error instanceof Error ? error.message : "JustOneAPI image search failed.",
+      );
+    }
+  }
+
+  if (!report && onebound) {
     try {
       const found = await searchOneBound({
         key: settings.oneboundKey,
@@ -85,7 +111,7 @@ export async function searchSupply(
   }
 
   const message = report
-    ? `${report.provider === "alibaba-open" ? "1688 open platform" : "OneBound"} returned ${report.cnyLabel}.`
+    ? `${providerLabel(report.provider)} returned ${report.cnyLabel}.`
     : notes[0] ?? "1688 image search returned no price.";
 
   await onProgress({
@@ -100,6 +126,17 @@ export async function searchSupply(
     ...(report ? { supply: report } : {}),
     ...(notes.length ? { supplyNote: notes.join(" ") } : {}),
   };
+}
+
+function providerLabel(provider: SupplyReport["provider"]): string {
+  switch (provider) {
+    case "justoneapi":
+      return "JustOneAPI";
+    case "alibaba-open":
+      return "1688 open platform";
+    case "onebound":
+      return "OneBound";
+  }
 }
 
 function imageForSearch(context: PageContext): { url?: string; base64?: string } | null {

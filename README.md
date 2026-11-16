@@ -13,9 +13,9 @@ neither ships inside the extension package.
 
 The current build is an **MVP shell with a clearly labeled demo dataset** for
 factory verification. The optional live adapters now call TikHub, browser-side
-video frame extraction, Baidu product recognition, and OneBound or the 1688
-open platform when their credentials are saved. The factory report still
-comes from the configured Margin X-Ray API; the extension does not turn a
+video frame extraction, Baidu product recognition, and JustOneAPI, OneBound or
+the 1688 open platform when their credentials are saved. The factory report
+still comes from the configured Margin X-Ray API; the extension does not turn a
 marketplace listing into a verified factory quote.
 
 ---
@@ -51,10 +51,14 @@ marketplace listing into a verified factory quote.
     cover and an anchored shop price when the payload states the currency
   - the content script samples up to three video frames locally
   - Baidu product recognition labels the frame, upload, cover or page image
+  - JustOneAPI runs 1688 image search first when its token is saved:
+    `convert-image` turns a URL or JPEG into a reference, then
+    `search-item-by-image` returns listings with MOQ tiers, company name,
+    shipping city and 1688 factory / verified flags
   - OneBound `item_search_img` searches 1688 image listings and can optionally
     fetch one listing's MOQ tiers with `item_get`
   - the official 1688 open platform adapter signs and calls the similar-offer
-    image search endpoint when OneBound is not configured
+    image search endpoint when the third-party providers are not configured
   - a missing key, a failed call, or a score under 45% is shown as a note and
     does not replace a real page title or invent a factory quote
 - Dev-only HUD preview page (`npm run preview`), kept outside the extension
@@ -82,12 +86,18 @@ so page CSS cannot leak in.
   **sample data**. They are labeled `DEMO DATA` in the HUD.
 - The local mock server returns `MOCK API` data. It is a test harness, not the
   real pipeline.
-- 1688 image search runs only when OneBound or open-platform keys are saved.
-  Returned listing prices stay in CNY unless a CNY-per-USD rate is saved.
-  These are listing prices, not factory verification, freight, duty or a
-  supplier quote.
-  Qichacha/DueSight, payment and auth are not connected. Shop names are not
-  treated as verified factories.
+- 1688 image search runs when JustOneAPI, OneBound or open-platform keys are
+  saved, in that order. Returned listing prices stay in CNY unless a
+  CNY-per-USD rate is saved. These are listing prices, not factory
+  verification, freight, duty or a supplier quote. Company names and 1688
+  flags come from the listing and are not a registry, headcount or litigation
+  check.
+- Qichacha / Tianyancha / Qixinbao / DueSight data is **not connected**. The
+  "manufacturing scope, insured headcount >= 15, paid-in capital, contract
+  disputes" sourcing filter still needs a real registry endpoint and field
+  contract.
+- TikTok Shop live price and sales lookup is not connected. TikTok metadata
+  comes from TikHub or the page DOM.
 - The screenshot path first tries a canvas frame from the current video, then
   `chrome.tabs.captureVisibleTab` through the background worker. Chrome grants
   `captureVisibleTab` when the scan starts from the popup's **Capture screen**
@@ -174,7 +184,8 @@ src/
     enrich.ts                 TikHub + frame sample + Baidu recognition
     tikhub.ts                 TikHub video client
     recognize.ts              Baidu product recognition client
-    supply-search.ts          OneBound / 1688 image-search orchestration
+    supply-search.ts          JustOneAPI / OneBound / 1688 orchestration
+    justoneapi.ts             JustOneAPI image conversion + image search
     onebound.ts               OneBound listing adapter
     alibaba.ts                1688 open-platform adapter
   content/
@@ -191,6 +202,8 @@ src/
     types.ts                  data contract
     capture.ts                link/image capture context helpers
     identity.ts               TikHub / Baidu parsers and title rules
+    justoneapi.ts             tolerant JustOneAPI response parser
+    supply.ts                 supply reports and 1688 offer mapping
     pricing.ts                landed-cost waterfall + MOQ helper
     format.ts                 price parsing and safe formatting
     sse.ts                    chunk-safe SSE parser

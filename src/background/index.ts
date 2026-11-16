@@ -2,6 +2,7 @@ import { runDemoScan } from "./demo-runner";
 import { enrichScan } from "./enrich";
 import { searchSupply } from "./supply-search";
 import { testRecognizer } from "./recognize";
+import { probeJustOneAPI } from "./justoneapi";
 import { testTikHub } from "./tikhub";
 import {
   ApiError,
@@ -119,6 +120,9 @@ async function handleMessage(message: RuntimeMessage): Promise<RuntimeResponse> 
         ok: true,
         apiTest: await testRecognizer(message.apiKey, message.secretKey),
       };
+
+    case "TEST_JUSTONEAPI":
+      return { ok: true, apiTest: await probeJustOneAPI(message.token) };
 
     case "SAVE_LEAD": {
       const lead = makeLead(message.lead, message.result);

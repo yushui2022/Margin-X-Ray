@@ -25,6 +25,7 @@ export type RuntimeMessage =
   | { type: "TEST_API"; settings?: Partial<Settings> }
   | { type: "TEST_TIKHUB"; token: string }
   | { type: "TEST_RECOGNIZER"; apiKey: string; secretKey: string }
+  | { type: "TEST_JUSTONEAPI"; token: string }
   | { type: "EXTRACT_FRAMES" }
   | { type: "SAVE_LEAD"; lead: LeadInput; result: ScanResult }
   | { type: "CLEAR_DATA" };

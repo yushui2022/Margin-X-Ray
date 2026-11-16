@@ -115,6 +115,23 @@
         </div>
 
         <div class="field">
+          <label for="justoneapiToken">JustOneAPI token</label>
+          <input
+            id="justoneapiToken"
+            name="justoneapiToken"
+            type="password"
+            placeholder="Token from dashboard.justoneapi.com"
+            autocomplete="off"
+          />
+          <div class="field-hint">
+            Runs 1688 image search first when this token is saved:
+            <code>convert-image</code> then <code>search-item-by-image</code>.
+            Test it without spending a search call. If it fails, the scan falls
+            back to OneBound or the 1688 open platform.
+          </div>
+        </div>
+
+        <div class="field">
           <label for="oneboundKey">OneBound key</label>
           <input id="oneboundKey" name="oneboundKey" type="password" autocomplete="off" />
         </div>
@@ -147,8 +164,8 @@
           <label for="alibabaAccessToken">1688 access token</label>
           <input id="alibabaAccessToken" name="alibabaAccessToken" type="password" autocomplete="off" />
           <div class="field-hint">
-            Leave these blank for now. OneBound is used first. The official
-            search runs only when OneBound is not configured.
+            Leave these blank for now. OneBound and JustOneAPI are used first.
+            The official search runs only when neither is configured.
           </div>
         </div>
         <div class="field compact">
@@ -163,7 +180,7 @@
         <label class="switch-row" for="demoMode">
           <span>
             <span class="switch-title">Demo mode</span>
-            <span class="switch-sub">Factory report uses the sample dataset. TikHub and Baidu still run when their keys are saved.</span>
+            <span class="switch-sub">Factory report uses the sample dataset. TikHub, Baidu and 1688 image search still run when their keys are saved.</span>
           </span>
           <input id="demoMode" name="demoMode" type="checkbox" />
           <span class="switch" aria-hidden="true"></span>
@@ -202,6 +219,9 @@
           </button>
           <button id="testRecognizerBtn" class="btn secondary" type="button">
             Test recognition
+          </button>
+          <button id="testJustOneApiBtn" class="btn secondary" type="button">
+            Test JustOneAPI
           </button>
         </div>
         <div id="status" class="status" role="status" aria-live="polite">

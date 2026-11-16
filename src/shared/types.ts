@@ -98,19 +98,26 @@ export interface SupplyTier {
   unitCny: number;
 }
 
+export type SupplyProvider = "justoneapi" | "onebound" | "alibaba-open";
+
 export interface SupplyOffer {
   id: string;
   title: string;
-  provider: "onebound" | "alibaba-open";
+  provider: SupplyProvider;
   tiers: SupplyTier[];
   location?: string;
   shopName?: string;
+  /** Registered company name when the listing exposes it. */
+  companyName?: string;
+  /** 1688 flags from the listing itself, not a registry check. */
+  factoryFlag?: boolean;
+  verifiedFlag?: boolean;
   detailUrl?: string;
   sales?: number;
 }
 
 export interface SupplyReport {
-  provider: "onebound" | "alibaba-open";
+  provider: SupplyProvider;
   scanned: number;
   priced: number;
   offers: SupplyOffer[];
@@ -291,6 +298,7 @@ export interface Settings {
   tikhubToken: string;
   baiduApiKey: string;
   baiduSecretKey: string;
+  justoneapiToken: string;
   oneboundKey: string;
   oneboundSecret: string;
   oneboundFetchTiers: boolean;
