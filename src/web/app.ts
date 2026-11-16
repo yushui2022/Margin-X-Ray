@@ -16,6 +16,7 @@ import {
 } from "../shared/format";
 import { EXTENSION_VERSION } from "../shared/version";
 import { downloadPoster, renderPosterBlob } from "../content/ui/poster";
+import { renderProWorkspace } from "./pro";
 import type {
   Confidence,
   CostWaterfall,
@@ -75,6 +76,7 @@ const els = {
   dialogStatus: byId<HTMLElement>("dialogStatus"),
   testBackend: byId<HTMLButtonElement>("testBackend"),
   toast: byId<HTMLElement>("toast"),
+  proView: byId<HTMLElement>("proView"),
 };
 
 let apiBase = normalizeBase(localStorage.getItem(STORAGE_KEY) || DEFAULT_API);
@@ -85,6 +87,7 @@ let startedAt = 0;
 let stepStates: StepStatus[] = AGENT_STEPS.map(() => "pending");
 let result: ScanResult | null = null;
 let context: PageContext | null = null;
+let scanStarted = false;
 
 boot();
 
@@ -127,7 +130,31 @@ function boot(): void {
       els.urlInput.focus();
     });
   }
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-view]")) {
+    button.addEventListener("click", () => {
+      const view = button.dataset.view === "pro" ? "pro" : "scan";
+      showView(view);
+    });
+  }
+  if (location.hash === "#pro") showView("pro");
   void refreshHealth();
+}
+
+function showView(view: "scan" | "pro"): void {
+  const pro = view === "pro";
+  els.proView.hidden = !pro;
+  els.hero.hidden = pro || scanStarted;
+  els.workspace.hidden = pro || !scanStarted;
+  document.body.dataset.view = view;
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-view]")) {
+    button.classList.toggle("active", button.dataset.view === view);
+  }
+  if (pro) {
+    renderProWorkspace();
+    location.hash = "#pro";
+  } else if (location.hash === "#pro") {
+    history.replaceState(null, "", location.pathname + location.search);
+  }
 }
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -384,6 +411,8 @@ function abortScan(): void {
 
 function resetToHero(): void {
   abortScan();
+  scanStarted = false;
+  showView("scan");
   els.workspace.hidden = true;
   els.hero.hidden = false;
   els.report.replaceChildren();
@@ -397,7 +426,8 @@ function resetToHero(): void {
 }
 
 function showWorkspace(): void {
-  els.hero.hidden = true;
+  scanStarted = true;
+  showView("scan");
   els.workspace.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }

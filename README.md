@@ -39,6 +39,9 @@ Onion Head reports what it measured, not what a seller intended.
   agent trace stream (read → identify → 1688 → verify → price), then read the
   verdict, breakdown, listings and share card. Calls the same
   `POST /api/v1/xray/stream` contract as the extension.
+- Pro workspace tab: opportunity radar, live net-profit calculator, masked
+  supplier shortlist and a factory evidence request form. All workspace data is
+  labeled sample data; the calculator is a real editable model.
 - Chrome MV3 extension, loadable as an unpacked extension.
 - Page adapters for TikTok, Amazon, Shopify and generic product pages.
 - Floating `Scan product` launcher on supported hosts.

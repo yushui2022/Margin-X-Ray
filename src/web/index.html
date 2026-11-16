@@ -18,6 +18,10 @@
           <span>Don't be the onion head</span>
         </span>
       </a>
+      <nav class="topnav" aria-label="Product area">
+        <button class="topnav-btn active" data-view="scan" type="button">Scan</button>
+        <button class="topnav-btn" data-view="pro" type="button">Pro workspace</button>
+      </nav>
       <div class="topbar-right">
         <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
         <button class="btn ghost" id="backendBtn" type="button">Backend</button>
@@ -105,6 +109,30 @@
           </footer>
         </aside>
         <section class="report" id="report" aria-live="polite"></section>
+      </section>
+
+      <section class="pro" id="proView" hidden>
+        <header class="pro-head">
+          <div>
+            <p class="eyebrow">Pro workspace</p>
+            <h1>Price it. Source it. Quote it.</h1>
+            <p class="lede">
+              The seller view of the same scan: a live net-profit model, a masked
+              supplier shortlist, and a factory evidence request.
+            </p>
+          </div>
+          <span class="mock-badge">Sample workspace data</span>
+        </header>
+        <div class="pro-grid">
+          <aside class="radar">
+            <header class="radar-head">
+              <h2>Opportunity radar</h2>
+              <span>24h · mock</span>
+            </header>
+            <div class="radar-list" id="radarList"></div>
+          </aside>
+          <div class="pro-main" id="proMain"></div>
+        </div>
       </section>
     </main>
 
