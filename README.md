@@ -1,8 +1,8 @@
-# 别做洋葱头 (Don't Be the Onion Head)
+# Onion Head (Don't Be the Onion Head)
 
 **See the real cost before you buy.**
 
-别做洋葱头 is a consumer price-transparency tool. Paste a TikTok video or
+Onion Head is a consumer price-transparency tool. Paste a TikTok video or
 product link, upload a photo, or scan the page you are on. It estimates the
 factory cost behind the product, shows a fair retail range, and reports how
 many near-identical 1688 listings exist — then exports a share card.
@@ -20,7 +20,7 @@ range: a missing input is shown as missing.
 
 ## Positioning
 
-别做洋葱头 reports what it measured, not what a seller intended.
+Onion Head reports what it measured, not what a seller intended.
 
 - Neutral labels only: **markup**, **fair price range**, **near-identical
   listing**, **generic white-label match**. No “scam”, “fraud” or “rip-off”.
@@ -63,7 +63,7 @@ range: a missing input is shown as missing.
   out of the page).
 - Local settings, scan history and lead storage in `chrome.storage.local`.
 - Popup with **Scan this product** and **Capture screen** actions + full options page.
-- Right-click **“Scan with 别做洋葱头”** on any page (uses `activeTab`, not a
+- Right-click **“Scan with Onion Head”** on any page (uses `activeTab`, not a
   broad all-sites permission).
 - Local mock API (`server/mock-xray.mjs`) for end-to-end testing.
 - Optional live capture and sourcing adapters, used only when their keys are

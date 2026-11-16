@@ -53,7 +53,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`\n  别做洋葱头 agent web: http://localhost:${port}/\n`);
+  console.log(`\n  Onion Head agent web: http://localhost:${port}/\n`);
   console.log("  Agent scan frontend. Point it at http://localhost:8787 or your API.\n");
   console.log("  The extension itself is built to dist/; this page is the web frontend.\n");
 });

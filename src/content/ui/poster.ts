@@ -91,7 +91,7 @@ function drawHeader(
   context.textAlign = "left";
   context.fillStyle = INK;
   context.font = "700 30px 'PingFang SC', 'Helvetica Neue', Arial, sans-serif";
-  context.fillText("别做洋葱头", PAD + 58, 74);
+  context.fillText("ONION HEAD", PAD + 58, 74);
   context.fillStyle = MUTED;
   context.font = "600 15px 'Helvetica Neue', Arial, sans-serif";
   context.fillText("DON'T BE THE ONION HEAD", PAD + 58, 97);
@@ -274,7 +274,7 @@ function drawFooter(
   context.font = "500 13px 'Helvetica Neue', Arial, sans-serif";
   context.fillText(`Generated ${generatedAt}`, PAD, 1310);
   context.textAlign = "right";
-  context.fillText("别做洋葱头 · estimates only", WIDTH - PAD, 1310);
+  context.fillText("Onion Head · estimates only", WIDTH - PAD, 1310);
   context.textAlign = "left";
 }
 

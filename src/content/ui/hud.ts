@@ -285,7 +285,7 @@ export class Hud {
 
     this.root = el("div", {
       className: "xray-root mx-theme",
-      attrs: { role: "region", "aria-label": "别做洋葱头" },
+      attrs: { role: "region", "aria-label": "Onion Head" },
     });
     this.shadow.appendChild(this.root);
     this.render();
@@ -444,7 +444,7 @@ export class Hud {
     const launcher = button("", "xray-launcher", () =>
       this.callbacks.onLauncherClick(),
     {
-      "aria-label": "Scan this product with 别做洋葱头",
+      "aria-label": "Scan this product with Onion Head",
       title: "See the real cost before you buy",
     });
     launcher.append(
@@ -727,7 +727,7 @@ export class Hud {
       className: "xray-panel",
       attrs: {
         role: "dialog",
-        "aria-label": "别做洋葱头 report",
+        "aria-label": "Onion Head report",
         "aria-modal": "false",
       },
     });
@@ -745,7 +745,7 @@ export class Hud {
     const brand = el("div", { className: "xray-brand" }, [
       mascotImage(onionHeadImage, "xray-logo"),
       el("div", { className: "xray-brand-text" }, [
-        el("div", { className: "xray-brand-name", text: "别做洋葱头" }),
+        el("div", { className: "xray-brand-name", text: "Onion Head" }),
         el("div", {
           className: "xray-brand-sub",
           text: "Don't be the onion head",
@@ -758,14 +758,14 @@ export class Hud {
       "xray-icon-btn",
       () => this.callbacks.onOpenOptions(),
       {
-        "aria-label": "Open 别做洋葱头 settings",
+        "aria-label": "Open Onion Head settings",
         title: "Settings",
       },
     );
     settings.append(createIcon("settings", 15));
 
     const close = button("", "xray-icon-btn", () => this.handleClose(), {
-      "aria-label": "Close 别做洋葱头",
+      "aria-label": "Close Onion Head",
       title: "Close",
     });
     close.append(createIcon("x", 15));
@@ -2299,7 +2299,7 @@ export class Hud {
           text:
             state.kind === "empty" && state.message
               ? state.message
-              : "Open a TikTok video, TikTok Shop product, Shopify product page, or Amazon listing. You can also right-click any page and choose “Scan with 别做洋葱头”.",
+              : "Open a TikTok video, TikTok Shop product, Shopify product page, or Amazon listing. You can also right-click any page and choose “Scan with Onion Head”.",
         }),
       ]),
     );

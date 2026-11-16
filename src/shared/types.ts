@@ -1,6 +1,6 @@
 /**
  * Shared data contracts between the extension UI, the background worker,
- * and the (future) 别做洋葱头 API.
+ * and the (future) Onion Head API.
  *
  * Rule: every number that looks authoritative must carry its source and/or
  * confidence. The UI never invents a fallback price.

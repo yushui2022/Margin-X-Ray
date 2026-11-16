@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "别做洋葱头 — Don't Be the Onion Head",
-  "short_name": "别做洋葱头",
+  "name": "Onion Head — Real Cost Scanner",
+  "short_name": "Onion Head",
   "version": "0.2.0",
   "description": "Don't Be the Onion Head: scan a TikTok video or product page to see the estimated factory cost, a fair price range, and how many near-identical 1688 listings exist.",
   "minimum_chrome_version": "114",
@@ -16,7 +16,7 @@
   ],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "action": {
-    "default_title": "别做洋葱头",
+    "default_title": "Onion Head",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "assets/icons/icon-16.png",
