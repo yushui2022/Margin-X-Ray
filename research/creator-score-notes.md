@@ -103,16 +103,41 @@ cookie before concurrent row reads to avoid competing first-visit sessions.
 
 ### Rotten Onion Index
 
-This separate community metric is `round(down / (up + down) × 1000) / 10`.
-Higher values mean a greater share of “Needs review” responses to this score.
-It is not computed as `100 - Evidence Score`, because limited research is not
-evidence of wrongdoing. It does not change evidence points, sorting or vote data.
+The user selected an evidence-confidence leaderboard. The current index is
+`round((100 - confidence) × 10) / 10`, replacing the original vote-share metric.
+It describes confidence in collected evidence, not wrongdoing. The separate
+`confidence-v1` methodology combines source reliability (40), `evidence-v3`
+coverage scaled to 40, and reviewed corroboration (20). Confidence is editorial,
+not a calibrated probability. The old evidence rubric and vote scope stay intact.
+
+`creator-confidence-assessments.json` explicitly assesses all 21 accepted products.
+Each assessment selects relationship/listing sources and retrieval provenance.
+The weaker of the two source factors counts (direct primary 1, indexed primary
+0.6, secondary 0.3); average product reliability is multiplied by 40. Repeated
+product IDs count once. Completeness is 40 × the existing coverage total / 100.
+Corroboration averages 0 (none), 0.5 (a direct creator caption agrees with a
+separate brand listing on the product line), or 1 (an independently matched exact
+offer). No current record earns exact-offer corroboration. Two records earn
+partial product-line points, with variant, stock and offer conflicts retained.
+Same-brand pages, company-issued releases copied elsewhere and indexed originals
+do not automatically count as independent validation. Per-component rounding to
+tenths precedes the exact sum; Nikkie is 34.7 + 24.9 + 3.3 = 62.9 confidence,
+giving index 37.1. Weights and provenance factors are editorial choices.
+
+Eligibility requires a usable account-matched public sample, at least one accepted
+priced product and an explicit assessment for every accepted product. Currently
+12 reports qualify; 488 are pending. Pending is not zero confidence or a rotten
+verdict. Eligible reports sort by confidence descending by default, equal scores
+share competition rank, and pending reports follow rated reports in either
+confidence direction. Filtering does not change global ranks. Ranking is an
+output of confidence, not another input that double-counts the same evidence.
 
 The displayed rounded value selects the illustration: Fresh [0,20), Spotted
 [20,40), Bruised [40,60), Spoiled [60,80), Rotten [80,100]. The UI calls these
 visual states of the index, not a verified rating of the person. They use different
 sprouts, expressions, patches and colors in six local SVGs (including gray unrated).
-Zero votes, failed requests and invalid counts have no numeric index. Loading and
-unavailable states are distinct from a confirmed empty tally. One vote can produce
-0.0 or 100.0; fewer than five votes get an Early label. That threshold is a UI cue,
-not a statistical confidence guarantee. All counts remain anonymous browser votes.
+Vote totals, selections, unavailable feedback and retries never affect the index.
+There is no vote-based Early label. All counts remain anonymous browser feedback
+on the coverage score, scoped to `evidence-v3`, so existing votes retain their
+original meaning and storage. Reports expose confidence and its source assessment
+separately from the feedback section.

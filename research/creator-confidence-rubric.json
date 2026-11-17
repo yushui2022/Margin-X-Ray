@@ -1,0 +1,14 @@
+{
+  "version": "confidence-v1",
+  "observedAt": "2026-11-17",
+  "weights": { "sources": 40, "coverage": 40, "corroboration": 20 },
+  "provenance": { "direct-primary": 1, "indexed-primary": 0.6, "secondary": 0.3 },
+  "corroboration": { "none": 0, "product-line": 0.5, "exact-offer": 1 },
+  "scope": "Editorial confidence in the collected product report, not statistical probability, personal trustworthiness, product quality or financial certainty.",
+  "eligibility": "An account-matched public sample with usable captions and at least one accepted priced product. Every accepted product needs a source assessment; otherwise the report is pending.",
+  "sourceRule": "For each product, use the weaker provenance of its selected relationship and listing sources. Average across products, then multiply by 40. Direct primary = 1; indexed primary = 0.6; secondary = 0.3. Retrieval provenance does not establish current availability or truth of every claim.",
+  "coverageRule": "40 × evidence-v3 total / 100. This deliberately retains missing financial evidence and the existing volume caps; it does not relabel coverage alone as confidence.",
+  "corroborationRule": "20 × mean reviewed corroboration across products. None = 0. Product-line agreement between a directly retrieved creator caption and a separate brand listing = 0.5; exact variant, price, market and conditions independently matched = 1. Same-publisher pages, syndicated releases and unretrieved original captions do not count. Product-line agreement is not independent validation of the offer.",
+  "rounding": "Round each of the three components to one decimal, then sum integer tenths. Rotten Onion Index = 100 minus confidence, to one decimal. Pending reports have neither a numeric index nor a rank.",
+  "ranking": "Highest confidence first; equal scores share competition rank. Name and handle stabilize display ties. Pending profiles follow rated profiles in either confidence sort direction. Filtering does not recalculate global ranks."
+}

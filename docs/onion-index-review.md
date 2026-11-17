@@ -1,5 +1,8 @@
 # Rotten Onion Index · design review
 
+Historical feature review. The vote-share formula and Early labels described
+below were superseded by `confidence-v1`; see `confidence-ranking-review.md`.
+
 Scope: a community disagreement index and score-band onion illustrations in
 directory rows and real creator reports. Evaluated with the fixed rubric in
 `frontend-self-review.md`. Scores below are agent judgments about this feature's

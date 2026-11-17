@@ -3,7 +3,8 @@ import { productCount, renderCreatorProducts } from "./creator-products";
 import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
 import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor, formatEvidenceScore } from "../shared/creator-evidence-score";
 import { renderCreatorFeedback } from "./creator-feedback";
-import { renderOnionScale } from "./onion-index";
+import { renderOnionScale, renderConfidenceReport } from "./onion-index";
+import { CONFIDENCE_SCORES, confidenceFor, confidenceRank } from "../shared/creator-confidence";
 
 type PublicCreator = CreatorProfile;
 
@@ -35,7 +36,7 @@ let root: HTMLElement;
 let category = "All";
 let sort = "score";
 let mode: "public" | "examples" = "public";
-let directorySort: "followers" | "name" | "evidence" | "evidence-low" = "evidence";
+let directorySort: "followers" | "name" | "evidence" | "evidence-low" | "confidence" | "confidence-low" = "confidence";
 let directoryQuery = "";
 let directoryPageNumber = 1;
 let productsOnly = false;
@@ -209,6 +210,7 @@ function renderPublicProfile(item: PublicCreator): void {
   const sample = screeningFor(item.handle);
   const leads = brandLeadsFor(item.handle);
   const evidence = evidenceScoreFor(item.handle)!;
+  const confidence = confidenceFor(item.handle)!;
   const header = node("header", "creator-scorecard creator-evidence-card");
   const main = node("div", "creator-scorecard-main");
   const identity = node("div", "creator-public-identity");
@@ -217,11 +219,13 @@ function renderPublicProfile(item: PublicCreator): void {
   identity.append(portrait(item), text);
   const verdict = node("div", "creator-verdict-line");
   verdict.append(node("span", "creator-coverage-dot"), node("div", "", `${evidence.level} · Preliminary`));
-  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "Follow the evidence, layer by layer." : sample?.status === "sampled" ? "A first look. More layers to uncover." : "A research gap. More sources needed."), node("p", "creator-scorecard-note", "Report coverage, not creator honesty or product quality. Missing evidence means more research is needed."));
+  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "Follow the evidence, layer by layer." : sample?.status === "sampled" ? "A first look. More layers to uncover." : "A research gap. More sources needed."), node("p", "creator-scorecard-note", "Confidence in the collected evidence: source reliability, completeness and cross-checks. Pending means a sourced product review is needed."));
   const strip = node("div", "creator-scorecard-strip");
   strip.append(node("span", "", item.followersLabel ? `${item.followersLabel} followers · Directory snapshot` : "Follower count not collected"), node("span", "", `${productCount(item.handle)} priced records · ${leads.length} follow-up leads`), node("span", "", screeningLabel(item.handle)));
-  const display = scoreDisplay(evidence.total, true);
-  display.append(node("span", "creator-score-check-count", `${evidence.dimensions.filter(dimension => dimension.points > 0).length} of 10 checks have evidence`));
+  const display = scoreDisplay(confidence.points?.total ?? null, true);
+  display.querySelector(".eyebrow")!.textContent = "Evidence Confidence · Beta";
+  display.setAttribute("aria-label", confidence.points ? `Evidence confidence: ${confidence.points.total} out of 100` : "Evidence confidence: pending review");
+  display.append(node("span", "creator-score-check-count", `Evidence coverage: ${evidence.total.toFixed(1)}/100 · ${evidence.dimensions.filter(dimension => dimension.points > 0).length} of 10 checks`));
   header.append(main, display, strip);
   const details = node("section", "card creator-evidence");
   details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", "The preliminary Evidence Score measures this report's collected sources. Creator transparency, product quality and personal earnings have not received a verified rating."));
@@ -236,7 +240,7 @@ function renderPublicProfile(item: PublicCreator): void {
   if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products & earnings for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
   const scorePanel = node("div");
   scorePanel.append(evidenceBreakdown(item.handle), evidenceMethodology());
-  root.replaceChildren(reportToolbar(), header, renderCreatorFeedback(item.handle), reportSections([
+  root.replaceChildren(reportToolbar(), header, renderConfidenceReport(item.handle), renderCreatorFeedback(item.handle), reportSections([
     { label: "Score breakdown", content: scorePanel },
     { label: `Products & earnings (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
     { label: "Profile sources", content: details },
@@ -397,8 +401,9 @@ function renderBoard(): void {
   const preview = node("a", "creator-score-preview");
   preview.href = "#creator/%40nikkietutorials";
   const previewCopy = node("div");
-  previewCopy.append(node("p", "eyebrow", "Inside a report"), node("strong", "", "NikkieTutorials"), node("span", "", "Explore the points & sources ↗"));
-  preview.append(previewCopy, node("strong", "creator-preview-number", formatEvidenceScore(evidenceScoreFor("nikkietutorials")!.total)));
+  previewCopy.append(node("p", "eyebrow", "Evidence confidence"), node("strong", "", "NikkieTutorials"), node("span", "", "Explore the points & sources ↗"));
+  const previewConfidence = confidenceFor("nikkietutorials")?.points?.total;
+  preview.append(previewCopy, node("strong", "creator-preview-number", previewConfidence === undefined ? "—" : formatEvidenceScore(previewConfidence)));
   const lookup = node("details", "creator-lookup");
   lookup.open = !window.matchMedia("(max-width: 760px)").matches;
   const lookupSummary = node("summary");
@@ -469,8 +474,8 @@ function renderBoard(): void {
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
   const votingGuide = node("div", "creator-voting-guide");
-  votingGuide.append(node("span", "", "Rotten Onion Index"), node("span", "", "↑ Seems fair"), node("span", "", "↓ Needs review"), renderOnionScale());
-  votingGuide.title = "One choice per browser. Click your selected vote again to undo.";
+  votingGuide.append(node("span", "", "Evidence confidence ranking"), node("span", "", "↑ Coverage fair · ↓ Review"), renderOnionScale());
+  votingGuide.title = "Votes are feedback on the ten-check Evidence Score; they never change confidence, the onion index or rank. One choice per browser; click again to undo.";
   const pagination = node("nav", "creator-pagination");
   pagination.setAttribute("aria-label", "Creator directory pages");
   const empty = node("div", "creator-directory-empty");
@@ -480,7 +485,7 @@ function renderBoard(): void {
   function renderRows(): void {
     const activeResearchFilters = Number(productsOnly) + Number(researchFilter !== "all");
     refineSummary.textContent = `Research filters${activeResearchFilters ? ` · ${activeResearchFilters} active` : ""}`;
-    select.replaceChildren(...(mode === "public" ? [["evidence", "Highest score"], ["evidence-low", "Lowest score"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
+    select.replaceChildren(...(mode === "public" ? [["confidence", "Highest confidence"], ["confidence-low", "Lowest confidence"], ["evidence", "Most evidence"], ["evidence-low", "Least evidence"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
       const option = node("option", "", text); option.value = value!; return option;
     }));
     select.value = mode === "public" ? directorySort : sort;
@@ -499,13 +504,13 @@ function renderBoard(): void {
     if (exampleKey) exampleKey.hidden = mode === "public";
     pagination.hidden = mode !== "public";
     empty.hidden = true;
-    boardTitle.textContent = mode === "public" ? "Creator index" : "Scoring examples";
+    boardTitle.textContent = mode === "public" ? "Confidence leaderboard" : "Scoring examples";
     if (mode === "public") {
       const profiles = PUBLIC_CREATORS.filter((item) => researchFilter === "all"
         || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
         || (researchFilter === "unavailable" && screeningFor(item.handle)?.status === "unavailable")
         || (researchFilter === "leads" && brandLeadsFor(item.handle).length > 0));
-      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES }, profiles);
+      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES, confidenceScores: CONFIDENCE_SCORES }, profiles);
       directoryPageNumber = result.page;
       list.replaceChildren(...result.items.map((item) => {
         const li = node("li", "creator-public-item");
@@ -514,17 +519,19 @@ function renderBoard(): void {
         const identity = node("div", "creator-identity");
         identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers` : `${item.category} · Followers not collected`));
         const evidence = evidenceScoreFor(item.handle)!;
+        const confidence = confidenceFor(item.handle)!;
+        const rank = confidenceRank(item.handle);
         const value = node("div", "creator-list-score creator-evidence-score");
-        value.append(node("span", "creator-evidence-label", "Evidence"), node("strong", "", formatEvidenceScore(evidence.total)), node("span", "creator-evidence-total", "out of 100"));
-        value.setAttribute("aria-label", `Preliminary evidence score: ${evidence.total} out of 100. ${evidence.level}`);
+        value.append(node("span", "creator-evidence-label", "Confidence"), node("strong", "", confidence.points ? formatEvidenceScore(confidence.points.total) : "—"), node("span", "creator-evidence-total", rank === null ? "Not ranked" : `Rank #${rank}`));
+        value.setAttribute("aria-label", confidence.points ? `Evidence confidence: ${confidence.points.total} out of 100. Global rank ${rank}.` : `Confidence pending: ${confidence.reason}`);
         const total = productCount(item.handle);
         const leads = brandLeadsFor(item.handle).length;
         const status = node("span", "creator-row-status", total ? `${total} priced ${total === 1 ? "product" : "products"}` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Unverified` : screeningLabel(item.handle));
         identity.append(status);
         const mini = node("span", "creator-mini-score");
         mini.setAttribute("aria-hidden", "true");
-        value.title = evidence.groups.map(group => `${group.name}: ${group.points}/${group.maximum}`).join(" · ");
-        for (const group of evidence.groups) {
+        value.title = confidence.points ? `Source reliability ${confidence.points.sources}/40 · Completeness ${confidence.points.coverage}/40 · Cross-checks ${confidence.points.corroboration}/20. Evidence coverage ${evidence.total}/100.` : confidence.reason;
+        for (const group of confidence.points ? [{ id: "sample", points: confidence.points.sources, maximum: 40 }, { id: "commercial", points: confidence.points.coverage, maximum: 40 }, { id: "offers", points: confidence.points.corroboration, maximum: 20 }] : []) {
           const segment = node("i", `group-${group.id}`);
           segment.style.setProperty("--coverage", `${100 * group.points / group.maximum}%`);
           mini.append(segment);
@@ -534,8 +541,8 @@ function renderBoard(): void {
         li.append(link, renderCreatorFeedback(item.handle, true));
         return li;
       }));
-      const order = directorySort === "followers" ? "Most followers first" : directorySort === "name" ? "Alphabetical order" : directorySort === "evidence-low" ? "Lowest evidence first" : "Highest evidence first";
-      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} · ${order}` : "0 matching profiles";
+      const order = directorySort === "followers" ? "Most followers first" : directorySort === "name" ? "Alphabetical order" : directorySort === "confidence" ? "Highest confidence first" : directorySort === "confidence-low" ? "Lowest confidence first" : directorySort === "evidence-low" ? "Lowest evidence first" : "Highest evidence first";
+      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} · ${order} · ${CONFIDENCE_SCORES.size} rated overall` : "0 matching profiles";
       empty.hidden = result.total > 0;
       pagination.replaceChildren();
       pagination.hidden = result.pageCount <= 1;

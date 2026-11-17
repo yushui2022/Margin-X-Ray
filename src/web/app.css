@@ -418,6 +418,12 @@ body[data-view="creators"] .topbar-right { display: none; }
 .onion-scale-grid strong { color: var(--mx-ink); }
 .creator-voting-guide .onion-scale[open] { flex-basis: 100%; }
 .creator-feedback-copy .onion-scale { margin-top: 10px; }
+.creator-confidence-report { margin: 20px 0; padding: 22px 24px; border: 1px solid var(--mx-line-strong); border-radius: 12px; background: var(--mx-panel); }
+.creator-confidence-report h2 { margin: 0 0 8px; font: 500 26px var(--mx-font-display); }
+.creator-confidence-report > p { font-size: 13px; color: var(--mx-muted); }
+.creator-confidence-report .creator-confidence-summary { font-weight: 600; color: #79566e; }
+.creator-confidence-source { padding: 14px 0; border-top: 1px solid var(--mx-line); }
+.creator-confidence-source a { display: block; overflow-wrap: anywhere; margin-top: 8px; color: var(--mx-accent-strong); }
 .creator-masthead { display: grid; grid-template-columns: minmax(0, 1fr) 300px; align-items: center; gap: 40px; padding: 10px 0 28px; margin-bottom: 24px; border-bottom: 1px solid var(--mx-line-strong); }
 .creator-masthead .creator-rating-intro { text-align: left; margin: 0; }
 .creator-masthead .creator-rating-intro h1 { font-size: clamp(40px, 5vw, 64px); }

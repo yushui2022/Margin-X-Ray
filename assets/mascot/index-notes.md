@@ -7,7 +7,8 @@ external assets, scripts or fonts. Files: `index-fresh.svg`, `index-spotted.svg`
 
 States differ through leaf posture, facial expression and skin markings as well
 as color. The gray neutral state means no index is available. The illustrations
-describe a community disagreement metric; the UI provides its formula and limits.
+describe the inverse evidence-confidence metric; the UI provides its formula and
+limits. The original vote-share definition was replaced by `confidence-v1`.
 
 The image-generation service failed with an invalid-credential error during this
 task. No generated sprite was used; the shipped icons were drawn as SVG paths.

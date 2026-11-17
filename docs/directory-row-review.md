@@ -1,5 +1,8 @@
 # Directory row refinement
 
+Historical layout review. The subsequent confidence-ranking change replaces
+vote-derived onions and directory evidence numbers; see `confidence-ranking-review.md`.
+
 Review scope: the crowded evidence/index/voting area identified by the user.
 Uses the fixed rubric in `frontend-self-review.md`. These are subjective design
 judgments for this task, not independent certification. The previous feature

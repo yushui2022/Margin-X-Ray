@@ -26,10 +26,11 @@ and research filters use disclosures to bring searchable creator rows forward.
 The launch directory includes **500 public TikTok creator profiles**, all with
 locally stored portraits and searchable names/handles. It retains Glamzilla,
 Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
-Famadex's public TikTok people ranking. All 500 now display a **preliminary Evidence
-Score**, measuring report coverage rather than creator trustworthiness. The
-default sort is descending evidence score, with name/handle ties. Verified creator
-transparency ratings remain unassigned. Browse 20 records per page, search the full collection,
+Famadex's public TikTok people ranking. All 500 reports retain a **preliminary Evidence
+Score**, measuring report coverage rather than creator trustworthiness. The directory
+now displays **Evidence Confidence** and sorts it descending, with pending reports
+last and name/handle ties. Verified creator transparency ratings remain unassigned.
+Browse 20 records per page, search the full collection,
 sort by name, filter by collected category, or show the twelve profiles with
 priced product evidence. Research filters also select sampled accounts, sourced
 follow-up leads or unavailable samples. Summary counts separate these from ratings.
@@ -70,15 +71,24 @@ Directory controls sit beside each score on desktop and below the row on narrow
 screens. Voting does not open the report. The directory and report read the same
 saved choice; initial parallel row loads share one anonymous browser session.
 
-The **Rotten Onion Index** visualizes community disagreement with a report's score:
-`Needs review votes / all votes × 100`, rounded to one decimal. It is separate from
-the Evidence Score. Five local SVG onion states map to 0–<20 (Fresh), 20–<40
-(Spotted), 40–<60 (Bruised), 60–<80 (Spoiled), and 80–100 (Rotten). No votes produce
-a gray onion and an em dash, never an invented zero. Fewer than five votes are
-marked Early. Directory and report indicators update from confirmed API responses,
-including switching/withdrawing a choice. “Onion scale” explains the formula and
-all five ranges. This is anonymous opinion about a score, not established creator
-misconduct, product quality, financial risk or a representative public survey.
+The **Rotten Onion Index** is now `100 − Evidence Confidence`, under the versioned
+`confidence-v1` rubric. This replaces the earlier vote-share definition. Confidence
+combines source reliability (40), report completeness (40, based on `evidence-v3`)
+and reviewed cross-checks (20). Explicit product-by-product assessments are stored
+in `research/creator-confidence-assessments.json`; weights, eligibility and exact
+rules are in `research/creator-confidence-rubric.json`. Every report exposes its
+calculation, selected sources and limitations. It is an editorial research score,
+not a statistical probability, creator character rating or product-quality verdict.
+
+The default leaderboard sorts confidence descending. Equal scores share global
+competition rank; names and handles break display ties. Filters do not change
+global rank. Only 12 profiles currently qualify for scoring; the remaining 488
+stay pending, with a gray onion, no index and no rank. Pending profiles sort last
+in both confidence directions. Coverage, follower and alphabetical sorts remain.
+Five local SVG states map index values to 0–<20 (Fresh), 20–<40 (Spotted), 40–<60
+(Bruised), 60–<80 (Spoiled), and 80–100 (Rotten). Higher confidence gives a fresher
+onion. Votes remain feedback on the existing Evidence Score; changing, withdrawing,
+loading or failing to load votes cannot change confidence, the index or rank.
 
 The proposed transparency Onion Score, used only in fictional examples, weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
