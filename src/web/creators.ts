@@ -480,7 +480,7 @@ function renderBoard(): void {
       const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES }, profiles);
       directoryPageNumber = result.page;
       list.replaceChildren(...result.items.map((item) => {
-        const li = node("li");
+        const li = node("li", "creator-public-item");
         const link = node("a", "creator-rank-row creator-public-row");
         link.href = `#creator/${encodeURIComponent(`@${item.handle}`)}`;
         const identity = node("div", "creator-identity");
@@ -503,7 +503,7 @@ function renderBoard(): void {
         }
         value.append(mini);
         link.append(portrait(item), identity, value, node("span", "creator-arrow", "↗"));
-        li.append(link);
+        li.append(link, renderCreatorFeedback(item.handle, true));
         return li;
       }));
       const order = directorySort === "followers" ? "Directory follower order" : directorySort === "name" ? "Alphabetical order" : "Preliminary evidence coverage order";

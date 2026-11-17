@@ -49,7 +49,7 @@ unknown purchase condition does not verify that condition. Volume checks now use
 proportional collection targets, rounded to one decimal before summing. V3 replaces
 v2; changed scores can reflect the rubric alone. See `research/creator-score-notes.md`.
 
-Reports also offer **↑ Seems fair / ↓ Needs review** feedback with shared counts,
+Directory rows and reports offer **↑ Seems fair / ↓ Needs review** feedback with shared counts,
 agreement percentage, switching and withdrawal. The web server requires **Node 22.13+
 or Node 24+** for built-in SQLite. `npm run serve:demo` serves the same-origin
 `/api/creator-feedback` endpoint and stores votes in `data/creator-feedback.sqlite`
@@ -59,6 +59,9 @@ Votes are scoped to creator and rubric version, with one choice per anonymous
 browser cookie, not one authenticated person. They never change evidence scores.
 Static-only hosting needs this API routed to the Node server; without it the UI
 shows unavailable feedback with Retry rather than inventing counts.
+Directory controls sit beside each score on desktop and below the row on narrow
+screens. Voting does not open the report. The directory and report read the same
+saved choice; initial parallel row loads share one anonymous browser session.
 
 The proposed transparency Onion Score, used only in fictional examples, weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the

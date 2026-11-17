@@ -81,7 +81,7 @@ the same four group colors. The financial group remains visibly incomplete.
 
 ## Community feedback
 
-Reports offer “↑ Seems fair” and “↓ Needs review” on the score's reasoning.
+Directory rows and reports offer “↑ Seems fair” and “↓ Needs review” on the score's reasoning.
 The two buttons are mutually exclusive; clicking the selected button removes the
 choice. Counts and agreement percentage come from the shared server, starting at
 zero without seeded or simulated votes. Requests are idempotent, and the UI waits
@@ -95,3 +95,8 @@ starts a new tally; votes within a version apply to that version's evolving repo
 The UI refreshes counts when opening/reloading a report, voting or retrying; it does
 not stream updates from other visitors. There is no moderation inbox or automatic
 research job. “Needs review” records a signal for future review.
+
+Compact directory controls are sibling elements of the report link, so voting
+does not navigate and no buttons are nested inside links. They share the report's
+API, selection rules and error recovery. The client establishes the anonymous
+cookie before concurrent row reads to avoid competing first-visit sessions.
