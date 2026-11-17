@@ -7,9 +7,15 @@ web interface supports category filtering, score/name sorting, fictional creator
 reports, and TikTok username/profile-link input. Product scanning and the Pro
 sourcing workspace remain available through the navigation.
 
-The creator leaderboard is an interface preview: all six ranked identities,
-post counts and scores are fictional fixtures. Arbitrary TikTok handles show
-**Not rated**; no creator retrieval service is connected and no lookup is queued.
+The default creator list includes four public profiles with locally stored
+portraits: Glamzilla, Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials.
+All four are **Not rated**, listed alphabetically, with TikTok links and portrait
+source/date information. Searching their handles opens the collected profile.
+Portraits come from public Linktree, Linkme and Nutcake pages; they are not
+claimed to be current TikTok avatars. Provenance is in `assets/creators/sources.json`.
+The separate Scoring examples view contains six fictional ranked identities,
+post counts and scores. Unknown TikTok handles also show **Not rated**;
+no creator retrieval service is connected and no lookup is queued.
 The proposed Onion Score weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
 interface and is not a validated measure of personal integrity. Product evidence

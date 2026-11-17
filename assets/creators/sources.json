@@ -1,0 +1,46 @@
+[
+  {
+    "handle": "glamzilla",
+    "name": "Glamzilla",
+    "category": "Beauty",
+    "initials": "GL",
+    "source": "https://linktr.ee/glamzilla",
+    "imageUrl": "https://ugc.production.linktr.ee/93aa76b7-7acc-4e34-bcc3-7dd3fe1c0093_IMG-4171.jpeg?io=true&size=avatar-v3_0",
+    "image": "assets/creators/glamzilla.webp",
+    "retrievedAt": "2026-11-17",
+    "note": "Public Linktree profile image. Not verified as the current TikTok avatar."
+  },
+  {
+    "handle": "mikaylanogueira",
+    "name": "Mikayla Nogueira",
+    "category": "Beauty",
+    "initials": "MN",
+    "source": "https://linktr.ee/Mikaylanogueira",
+    "imageUrl": "https://ugc.production.linktr.ee/BPty2GlfQxOVv2tX6D9M_UzTMg29t12iBwM07?io=true&size=avatar-v3_0",
+    "image": "assets/creators/mikaylanogueira.webp",
+    "retrievedAt": "2026-11-17",
+    "note": "Public Linktree profile image. Not verified as the current TikTok avatar."
+  },
+  {
+    "handle": "mrwhosetheboss",
+    "name": "Mrwhosetheboss",
+    "category": "Tech",
+    "initials": "MW",
+    "source": "https://www.nutcake.com/creators/mrwhosetheboss",
+    "imageUrl": "https://d2jmt1ah33cxcs.cloudfront.net/avatars/43969-a62a42cc-614e-44df-82f8-b78f9237b947.png",
+    "image": "assets/creators/mrwhosetheboss.webp",
+    "retrievedAt": "2026-11-17",
+    "note": "Portrait associated with the named profile header on the Nutcake directory. Not independently verified as the current TikTok avatar."
+  },
+  {
+    "handle": "nikkietutorials",
+    "name": "NikkieTutorials",
+    "category": "Beauty",
+    "initials": "NT",
+    "source": "https://link.me/nikkietutorials",
+    "imageUrl": "https://media.link.me/_resize/image/width=100,height=100,quality=90,format=webp/images/user-profile/2820206/tmp-5647-1780066926161.jpg",
+    "image": "assets/creators/nikkietutorials.webp",
+    "retrievedAt": "2026-11-17",
+    "note": "Public Linkme profile image. Not verified as the current TikTok avatar."
+  }
+]

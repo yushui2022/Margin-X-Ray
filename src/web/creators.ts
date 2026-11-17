@@ -1,3 +1,7 @@
+import PUBLIC_CREATORS from "../../assets/creators/sources.json";
+
+type PublicCreator = (typeof PUBLIC_CREATORS)[number];
+
 interface CreatorExample {
   id: string;
   name: string;
@@ -25,6 +29,7 @@ const DIMENSIONS = [
 let root: HTMLElement;
 let category = "All";
 let sort = "score";
+let mode: "public" | "examples" = "public";
 
 export function initCreators(container: HTMLElement): void {
   root = container;
@@ -36,8 +41,10 @@ export function renderCreatorRoute(): void {
     let id: string;
     try { id = decodeURIComponent(location.hash.slice(9)); }
     catch { renderUnavailable(""); return; }
+    const profile = PUBLIC_CREATORS.find((item) => item.handle === parseHandle(id));
     const example = EXAMPLES.find((item) => item.id === id);
-    if (example) renderProfile(example);
+    if (profile) renderPublicProfile(profile);
+    else if (example) renderProfile(example);
     else renderUnavailable(id);
     return;
   }
@@ -64,6 +71,44 @@ function action(text: string, onClick: () => void, className = "btn secondary"):
 
 function sampleNotice(): HTMLElement {
   return node("p", "creator-notice", "Interface preview · All ranked creators, scores and evidence below are fictional examples. Live TikTok lookup is not connected.");
+}
+
+function portrait(item: PublicCreator): HTMLElement {
+  const wrapper = node("span", "creator-avatar creator-photo");
+  const image = node("img");
+  image.src = item.image;
+  image.alt = `${item.name} profile portrait`;
+  image.width = 160;
+  image.height = 160;
+  image.addEventListener("error", () => {
+    wrapper.textContent = item.initials;
+    wrapper.setAttribute("aria-label", `${item.name} — portrait unavailable`);
+  }, { once: true });
+  wrapper.append(image);
+  return wrapper;
+}
+
+function externalLink(label: string, url: string): HTMLAnchorElement {
+  const link = node("a", "btn secondary", label);
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  return link;
+}
+
+function renderPublicProfile(item: PublicCreator): void {
+  const header = node("header", "creator-profile-head");
+  const identity = node("div", "creator-public-identity");
+  const text = node("div");
+  text.append(node("p", "eyebrow", `${item.category} creator`), node("h1", "", item.name), node("p", "", `@${item.handle}`));
+  identity.append(portrait(item), text);
+  header.append(identity, node("span", "creator-unrated", "Not rated"));
+  const details = node("section", "card creator-evidence");
+  details.append(node("h2", "", "Public profile, awaiting review"), node("p", "", "This profile and portrait were collected from public pages. Shopping recommendations have not been retrieved or reviewed, so no Onion Score or rank is assigned."));
+  const links = node("div", "creator-profile-links");
+  links.append(externalLink("Open TikTok profile ↗", `https://www.tiktok.com/@${item.handle}`), externalLink("Portrait source ↗", item.source));
+  details.append(links, node("p", "", `Portrait retrieved ${item.retrievedAt}. ${item.note}`));
+  root.replaceChildren(backLink(), header, details, searchForm());
 }
 
 function searchForm(): HTMLElement {
@@ -137,7 +182,8 @@ function renderBoard(): void {
   const board = node("section", "creator-board");
   const header = node("div", "creator-board-head");
   const title = node("div");
-  title.append(node("p", "eyebrow", "Shopping transparency"), node("h2", "", "The Onion ranking"));
+  const boardTitle = node("h2", "", "Explore creators");
+  title.append(node("p", "eyebrow", "Shopping transparency"), boardTitle);
   const selectLabel = node("label", "creator-sort", "Sort by ");
   const select = node("select");
   for (const [value, text] of [["score", "Highest score"], ["name", "Creator name"]]) {
@@ -149,6 +195,16 @@ function renderBoard(): void {
   select.addEventListener("change", () => { sort = select.value; renderRows(); });
   selectLabel.append(select);
   header.append(title, selectLabel);
+  const modes = node("div", "creator-filters creator-modes");
+  for (const [value, label] of [["public", "Public profiles"], ["examples", "Scoring examples"]] as const) {
+    const button = action(label, () => {
+      mode = value;
+      for (const child of modes.querySelectorAll("button")) child.setAttribute("aria-pressed", String(child === button));
+      renderRows();
+    }, "creator-filter");
+    button.setAttribute("aria-pressed", String(mode === value));
+    modes.append(button);
+  }
   const filters = node("div", "creator-filters");
   filters.setAttribute("aria-label", "Filter creators by category");
   for (const name of ["All", "Home", "Beauty", "Tech", "Style"]) {
@@ -164,6 +220,25 @@ function renderBoard(): void {
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
   function renderRows(): void {
+    selectLabel.hidden = mode === "public";
+    boardTitle.textContent = mode === "public" ? "Explore creators" : "The Onion ranking · examples";
+    if (mode === "public") {
+      const items = PUBLIC_CREATORS.filter((item) => category === "All" || item.category === category).sort((a, b) => a.name.localeCompare(b.name));
+      list.replaceChildren(...items.map((item) => {
+        const li = node("li");
+        const link = node("a", "creator-rank-row creator-public-row");
+        link.href = `#creator/${encodeURIComponent(`@${item.handle}`)}`;
+        const identity = node("div", "creator-identity");
+        identity.append(node("strong", "", item.name), node("span", "", `@${item.handle} · ${item.category}`));
+        const coverage = node("div", "creator-coverage");
+        coverage.append(node("strong", "", "Public profile"), node("span", "", "Evidence not reviewed"));
+        link.append(portrait(item), identity, coverage, node("span", "creator-unrated", "Not rated"), node("span", "creator-arrow", "↗"));
+        li.append(link);
+        return li;
+      }));
+      count.textContent = items.length ? `${items.length} public profiles · Alphabetical order · Scores pending evidence review` : "No public profiles in this category yet. Try Beauty or Tech, or enter a TikTok username above.";
+      return;
+    }
     const ranked = [...EXAMPLES].sort((a, b) => score(b) - score(a));
     const items = ranked.filter((item) => category === "All" || item.category === category);
     if (sort === "name") items.sort((a, b) => a.name.localeCompare(b.name));
@@ -184,8 +259,8 @@ function renderBoard(): void {
     count.textContent = `${items.length} fictional creators · Ranks reflect the full example list · No live accounts have been rated`;
   }
   renderRows();
-  board.append(header, filters, count, list);
-  root.replaceChildren(hero, sampleNotice(), board, methodology());
+  board.append(header, modes, filters, count, list);
+  root.replaceChildren(hero, node("p", "creator-notice", "Public portraits are sourced from linked profile pages. Live TikTok lookup is not connected. Scoring examples use fictional identities only."), board, methodology());
 }
 
 function backLink(): HTMLElement {

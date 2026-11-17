@@ -111,6 +111,7 @@ async function copyStatic() {
   await mkdir(join(web, "assets"), { recursive: true });
   await cp(join(root, "assets/fonts"), join(web, "assets/fonts"), { recursive: true });
   await cp(join(root, "assets/mascot"), join(web, "assets/mascot"), { recursive: true });
+  await cp(join(root, "assets/creators"), join(web, "assets/creators"), { recursive: true });
 
   // The preview is a dev-only harness. It is deliberately kept outside dist/
   // so the extension package contains only the extension.

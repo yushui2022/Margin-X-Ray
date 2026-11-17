@@ -1,4 +1,13 @@
 /* Creator discovery */
+.creator-modes { margin-bottom: 14px; }
+.creator-photo { overflow: hidden; border-radius: 50%; }
+.creator-photo img { width: 100%; height: 100%; object-fit: cover; }
+.creator-rank-row.creator-public-row { grid-template-columns: 46px minmax(0, 1fr) 150px 100px 16px; }
+.creator-public-row .creator-unrated { margin: 0; text-align: center; font-size: 11px; }
+.creator-public-identity { display: flex; gap: 20px; align-items: center; min-width: 0; }
+.creator-public-identity .creator-photo { width: 88px; height: 88px; flex: none; }
+.creator-profile-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.creator-evidence + .creator-search { margin-top: 24px; }
 .creator-hero { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 40px; align-items: center; margin: 12px 0 28px; }
 .creator-hero h1 { margin: 12px 0 18px; max-width: 700px; font-family: var(--mx-font-display); font-size: clamp(38px, 5vw, 62px); line-height: 1.06; font-weight: 600; letter-spacing: -.025em; }
 .creator-hero h1 em { color: var(--mx-accent); }
@@ -61,6 +70,10 @@
 .creator-unavailable > .btn { margin-top: 18px; }
 #creatorsView :is(a, button, input, select, summary):focus-visible { outline: 3px solid var(--mx-accent); outline-offset: 4px; }
 @media (max-width: 760px) {
+  .creator-rank-row.creator-public-row { grid-template-columns: 40px minmax(0, 1fr) 70px; }
+  .creator-public-row .creator-unrated { padding: 5px; font-size: 10px; }
+  .creator-public-row .creator-identity span { overflow-wrap: anywhere; }
+  .creator-public-identity .creator-photo { width: 64px; height: 64px; }
   .creator-hero { grid-template-columns: 1fr; margin-top: 0; }
   .creator-mascot { display: none; }
   .creator-board-head { padding: 20px 16px 16px; flex-wrap: wrap; }
