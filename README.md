@@ -18,9 +18,28 @@ post counts and scores. Unknown TikTok handles also show **Not rated**;
 no creator retrieval service is connected and no lookup is queued.
 The proposed Onion Score weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
-interface and is not a validated measure of personal integrity. Product evidence
-cards are placeholders, not evidence supporting the fixture scores. Live scoring
+interface and is not a validated measure of personal integrity. Fictional product
+cards do not support real creator scores. Live scoring
 requires source observations, dates, coverage thresholds and review rules.
+
+Real creator profiles now include **8 public product records** observed on
+2026-11-17: 3 third-party promotions/mentions, 4 founder-brand products (POV and
+Nimya), and 1 Nudestix collaboration. One unresolved MISSHA mention is kept as a
+lead without a price or calculator. `research/creator-products.json` stores
+source URLs, extracts, access methods, historical post dates, variants, currencies,
+purchase conditions and relationship confidence. Search-index observations are
+explicitly distinguished from directly retrieved pages. These are reference
+prices and selected evidence, not a complete catalog or verified TikTok Shop sales.
+
+**Actual earnings and margins remain unknown for every record.** No commission
+contracts, sponsorship fees, settlements, product cost accounts or creator
+distributions were obtained. Each product provides optional assumption-only
+calculators for affiliate commission and/or merchant/brand gross and contribution
+margins. Inputs start blank, currencies stay separate, and net revenue must exclude
+sales tax/VAT and account for discounts/refunds. Zero revenue produces undefined
+margin percentages; losses remain visible. Assumptions are local to the current
+view, clear on navigation/reload, and never update evidence or creator scores.
+See `research/creator-products-notes.md` for the evidence gaps and collection rules.
 
 `web/` is the standalone frontend (`npm run serve:demo`, port 4173; default route
 `#creators`). `dist/` is the loadable Chrome extension. `preview/` is a dev-only

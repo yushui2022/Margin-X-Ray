@@ -1,4 +1,34 @@
 /* Creator discovery */
+.creator-product-overview { margin-bottom: 26px; }
+.creator-products h2 { margin: 8px 0 12px; font-family: var(--mx-font-display); font-size: 24px; font-weight: 600; }
+.creator-products h3 { margin: 10px 0; font-size: 19px; line-height: 1.3; }
+.creator-products p { color: var(--mx-muted); font-size: 13px; }
+.creator-product-group { margin: 28px 0; }
+.creator-product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 16px; align-items: start; }
+.creator-product { min-width: 0; padding: 22px; }
+.creator-product .eyebrow { font-size: 10px; color: var(--mx-accent); }
+.creator-product-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 16px 0; border-block: 1px solid var(--mx-line); margin: 18px 0; }
+.creator-product-facts span, .creator-product-facts small { display: block; font-size: 11px; color: var(--mx-muted); }
+.creator-product-facts strong { display: block; margin: 5px 0; font-size: 22px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.creator-product-status { background: var(--mx-soft); padding: 10px; border-radius: 8px; }
+.creator-products details { border-top: 1px solid var(--mx-line); padding: 14px 0; font-size: 12px; }
+.creator-products summary { cursor: pointer; font-weight: 600; }
+.creator-products a { color: var(--mx-accent-strong); overflow-wrap: anywhere; }
+.creator-product-sources ul { padding-left: 18px; }
+.creator-product-sources li { margin: 14px 0; }
+.creator-product-sources p { margin: 5px 0; font-size: 12px; }
+.creator-calculator[open] { background: var(--mx-soft); padding: 14px; border-radius: 8px; }
+.creator-scenario-fields { display: grid; gap: 12px; margin: 16px 0; }
+.creator-scenario-fields label { display: grid; gap: 6px; font-size: 12px; }
+.creator-scenario-fields input { width: 100%; min-width: 0; border: 1px solid var(--mx-line-strong); border-radius: 7px; background: var(--mx-panel); color: var(--mx-ink); padding: 10px; font: inherit; }
+.creator-scenario-fields input[aria-invalid="true"] { border-color: var(--mx-accent); }
+.creator-scenario-output { display: block; padding: 12px; background: var(--mx-panel); border-left: 3px solid var(--mx-accent); font-size: 13px; margin-bottom: 14px; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .creator-product-grid { grid-template-columns: 1fr; }
+  .creator-product { padding: 18px; }
+  .creator-product-facts { gap: 10px; }
+  .creator-product-facts strong { font-size: 19px; }
+}
 .creator-modes { margin-bottom: 14px; }
 .creator-photo { overflow: hidden; border-radius: 50%; }
 .creator-photo img { width: 100%; height: 100%; object-fit: cover; }

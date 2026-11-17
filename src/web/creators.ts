@@ -1,4 +1,5 @@
 import PUBLIC_CREATORS from "../../assets/creators/sources.json";
+import { productCount, renderCreatorProducts } from "./creator-products";
 
 type PublicCreator = (typeof PUBLIC_CREATORS)[number];
 
@@ -104,11 +105,11 @@ function renderPublicProfile(item: PublicCreator): void {
   identity.append(portrait(item), text);
   header.append(identity, node("span", "creator-unrated", "Not rated"));
   const details = node("section", "card creator-evidence");
-  details.append(node("h2", "", "Public profile, awaiting review"), node("p", "", "This profile and portrait were collected from public pages. Shopping recommendations have not been retrieved or reviewed, so no Onion Score or rank is assigned."));
+  details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", "This profile includes product listings and promotion evidence with sources and access limitations. Coverage is incomplete and has not undergone a scoring review, so no Onion Score or rank is assigned."));
   const links = node("div", "creator-profile-links");
   links.append(externalLink("Open TikTok profile ↗", `https://www.tiktok.com/@${item.handle}`), externalLink("Portrait source ↗", item.source));
   details.append(links, node("p", "", `Portrait retrieved ${item.retrievedAt}. ${item.note}`));
-  root.replaceChildren(backLink(), header, details, searchForm());
+  root.replaceChildren(backLink(), header, renderCreatorProducts(item.handle), details, searchForm());
 }
 
 function searchForm(): HTMLElement {
@@ -231,7 +232,7 @@ function renderBoard(): void {
         const identity = node("div", "creator-identity");
         identity.append(node("strong", "", item.name), node("span", "", `@${item.handle} · ${item.category}`));
         const coverage = node("div", "creator-coverage");
-        coverage.append(node("strong", "", "Public profile"), node("span", "", "Evidence not reviewed"));
+        coverage.append(node("strong", "", `${productCount(item.handle)} product records`), node("span", "", "Earnings unknown"));
         link.append(portrait(item), identity, coverage, node("span", "creator-unrated", "Not rated"), node("span", "creator-arrow", "↗"));
         li.append(link);
         return li;

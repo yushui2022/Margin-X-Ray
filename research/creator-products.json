@@ -1,0 +1,119 @@
+{
+  "observedAt": "2026-11-17",
+  "scope": "Manually collected public product and relationship evidence. Not a complete promotion history or a live TikTok Shop feed. Reference prices are observations, not verified checkout or historical video prices.",
+  "unknownEconomics": {
+    "appliesTo": "Every product in this collection; null means unknown, never zero.",
+    "commissionRatePct": null,
+    "sponsorshipFee": null,
+    "settledSales": null,
+    "netRevenuePerUnit": null,
+    "costOfGoodsPerUnit": null,
+    "variableCostsPerUnit": null,
+    "creatorOwnershipPct": null,
+    "creatorPersonalProfit": null,
+    "grossMarginPct": null,
+    "contributionMarginPct": null
+  },
+  "sources": [
+    { "id": "pov-founder", "label": "POV · About It", "url": "https://povbeauty.com/pages/about-it", "access": "Direct page", "excerpt": "a note from Mikayla … So, I decided to create it myself.", "publishedAt": null },
+    { "id": "pov-drench", "label": "POV · Drench It", "url": "https://povbeauty.com/products/drench-it-hydrating-priming-milk-toner", "access": "Direct page", "excerpt": "150 mL / 5.07 fl. oz; one-time purchase $34; $23.80; 30% off first 3 orders; 15% off future orders.", "publishedAt": null },
+    { "id": "pov-glaze", "label": "POV · Glaze It", "url": "https://povbeauty.com/products/glaze-it", "access": "Direct page", "excerpt": "50 mL / 1.69 fl. oz; one-time purchase $28; $19.60; 30% off first 3 orders; 15% off future orders.", "publishedAt": null },
+    { "id": "mikayla-loreal-post", "label": "TikTok · Mikayla's Telescopic Lift post", "url": "https://www.tiktok.com/@mikaylanogueira/video/7192357598744759598", "access": "Search index; direct TikTok content unavailable", "excerpt": "Paid partnership; #TelescopicLift #LorealParisPartner #LorealParis", "publishedAt": "2023-01-24" },
+    { "id": "loreal-lift", "label": "L’Oréal US · Telescopic Lift Washable", "url": "https://www.lorealparisusa.com/makeup/eye/mascara/telescopic-lift-mascara-washable", "access": "Official page via search index", "excerpt": "Telescopic Instant Lift Washable Mascara for Lifted Lashes & Volume; $15.99", "publishedAt": null },
+    { "id": "nimya-founder", "label": "Nimya · About Us", "url": "https://nimya.com/pages/about-us", "access": "Direct page", "excerpt": "As founder and curator of the best products, NikkieTutorials is Nimya’s guide.", "publishedAt": null },
+    { "id": "nimya-cream", "label": "Nimya · Where It All Starts Cream", "url": "https://nimya.com/products/where-it-all-starts-cream", "access": "Direct page", "excerpt": "€27,99; Tax included. Shipping calculated at checkout. Sold out; 45 ml", "publishedAt": null },
+    { "id": "nimya-spray", "label": "Nimya · Set It & Forget It", "url": "https://nimya.com/products/set-it-forget-it-setting-spray", "access": "Direct page", "excerpt": "€22,99; Tax included. Shipping calculated at checkout. Sold out; 90 ml", "publishedAt": null },
+    { "id": "nikkie-missha-lead", "label": "TikTok · Nikkie's MISSHA mention", "url": "https://www.tiktok.com/@nikkietutorials/video/7650554978368621855", "access": "Search title only; direct TikTok content unavailable", "excerpt": "23 MILLION views later, I finally tried the VIRAL @missha …", "publishedAt": null },
+    { "id": "nudestix-kit", "label": "Nudestix US · Glamzilla Dirty 30 Blush Kit", "url": "https://www.nudestix.com/products/glamzilla-dirty-30-blush-kit", "access": "Direct page", "excerpt": "$49.00; Stephanie Valentine, @Glamzilla … collaborating with Nudestix to create a limited-edition blush kit", "publishedAt": null },
+    { "id": "nudestix-sale", "label": "Nudestix US · Indexed kit offer", "url": "https://www.nudestix.com/collections/kits/products/dirty-30-blush-kit?from=card-price", "access": "Official page via search index; conflicts with direct product-page observation", "excerpt": "$19.60; $49.00; 60% OFF; Default Title - $19.60", "publishedAt": null },
+    { "id": "nudestix-equity", "label": "Glossy · Nudestix influencer investment report", "url": "https://www.glossy.co/beauty/glossy-pop-newsletter-nudestix-turns-its-beauty-influencers-into-investors", "access": "Article via search index", "excerpt": "partners and ambassadors, but also as investors … Stephanie Valentine, aka Glamzilla … in exchange for equity in the company", "publishedAt": "2022-07-15" },
+    { "id": "glamzilla-loreal-post", "label": "TikTok · Glamzilla's Magic Root Cover Up post", "url": "https://www.tiktok.com/@glamzilla/video/7453459977592786181", "access": "Search index; direct TikTok content unavailable", "excerpt": "@L’Oréal Paris has had thier Magic Root Cover Up for a long time but they came out with new shades and I was just curious….", "publishedAt": "2024-12-28" },
+    { "id": "loreal-root", "label": "L’Oréal US · Magic Root Cover Up", "url": "https://www.lorealparisusa.com/hair-color/root-touch-up/magic-root-cover-up", "access": "Official page via search index", "excerpt": "Magic Root Temporary Root Cover Up Spray for Gray Root Coverage; $12.99", "publishedAt": null },
+    { "id": "sony-promotion", "label": "Nutcake · Mrwhosetheboss post listing", "url": "https://www.nutcake.com/creators/mrwhosetheboss", "access": "Direct secondary page; original TikTok video not retrieved", "excerpt": "Sony cooked on this one … @SonyElectronics @Sony Europe #ad #WF1000XM6", "publishedAt": null },
+    { "id": "sony-price", "label": "Sony US · WF-1000XM6 Platinum Silver", "url": "https://electronics.sony.com/audio/headphones/truly-wireless-earbuds/p/wf1000xm6-s", "access": "Official page via search index", "excerpt": "WF-1000XM6/S; Sale Price $299.99; Save $30.00", "publishedAt": null },
+    { "id": "arun-site", "label": "Mrwhosetheboss · Official website", "url": "https://mrwhosetheboss.com/", "access": "Official page via search index", "excerpt": "I'm planning some big things so if you'd like to be the first to know about them, drop your email here", "publishedAt": null }
+  ],
+  "creators": [
+    {
+      "handle": "glamzilla",
+      "brandNote": "Nudestix collaboration confirmed by the brand. A 2022 report describes an equity-for-content relationship; current stake and compensation are unknown. This is not evidence of sole ownership or a founder brand.",
+      "brandSources": ["nudestix-kit", "nudestix-equity"],
+      "thirdPartyNote": "One indexed TikTok product mention collected. Sponsorship and TikTok Shop affiliation are unconfirmed.",
+      "leads": []
+    },
+    {
+      "handle": "mikaylanogueira",
+      "brandNote": "POV identifies Mikayla as the creator of its products. Ownership percentage, cost accounts and personal distributions are unknown. These are brand-store listings; a corresponding TikTok Shop sale has not been verified.",
+      "brandSources": ["pov-founder"],
+      "thirdPartyNote": "One historical TikTok paid-partnership post collected. A sponsorship disclosure does not establish an affiliate commission or a TikTok Shop transaction.",
+      "leads": []
+    },
+    {
+      "handle": "mrwhosetheboss",
+      "brandNote": "No founder-brand product was established in this collection. The official website shows a future-plans newsletter. This limited search does not establish that no brand exists.",
+      "brandSources": ["arun-site"],
+      "thirdPartyNote": "One Sony promotion identified through a secondary listing of a TikTok caption. The caption includes #ad; payment terms and TikTok Shop sales are unknown.",
+      "leads": []
+    },
+    {
+      "handle": "nikkietutorials",
+      "brandNote": "Nimya explicitly names NikkieTutorials as founder. Ownership percentage and personal distributions are unknown. These are brand-store listings; a corresponding TikTok Shop sale has not been verified.",
+      "brandSources": ["nimya-founder"],
+      "thirdPartyNote": "No third-party SKU matched with sufficient evidence in this collection. The MISSHA lead below is excluded from product counts and calculations.",
+      "leads": [{ "title": "MISSHA mention · SKU unresolved", "note": "The indexed title names MISSHA, but the exact product, shade, price and commercial relationship could not be verified. Search snippets include unrelated content; no candidate retail price has been attached.", "sources": ["nikkie-missha-lead"] }]
+    }
+  ],
+  "products": [
+    {
+      "id": "mikayla-telescopic", "handle": "mikaylanogueira", "kind": "third-party", "name": "L’Oréal Telescopic Lift Mascara", "variant": "Washable reference listing; exact video shade unverified",
+      "relationship": "Paid partnership disclosed in indexed TikTok post", "confidence": "Moderate · indexed post; historical promotion", "promotionDate": "2023-01-24",
+      "postUrl": "https://www.tiktok.com/@mikaylanogueira/video/7192357598744759598",
+      "price": { "amount": 15.99, "currency": "USD", "market": "United States", "conditions": "Official reference price observed in the search index. Tax and shipping not established; this is not the 2023 promotion's checkout price." },
+      "sources": ["mikayla-loreal-post", "loreal-lift"], "shopStatus": "TikTok Shop listing and attributed sales unverified"
+    },
+    {
+      "id": "pov-drench", "handle": "mikaylanogueira", "kind": "founder-brand", "name": "POV Drench It", "variant": "Soothing Priming Milk · 150 mL",
+      "relationship": "Founder-associated brand · POV", "confidence": "High for brand relationship and listing; economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 34, "currency": "USD", "market": "United States", "conditions": "One-time purchase. Subscription: USD 23.80 for the first 3 orders (30% off), then 15% off. Subscription includes free shipping; one-time orders have free US shipping over USD 50. Free returns within 30 days advertised. Tax not established." },
+      "sources": ["pov-drench", "pov-founder"], "shopStatus": "Brand-store listing; TikTok Shop sales unverified"
+    },
+    {
+      "id": "pov-glaze", "handle": "mikaylanogueira", "kind": "founder-brand", "name": "POV Glaze It", "variant": "Glowy Gripping Primer · 50 mL",
+      "relationship": "Founder-associated brand · POV", "confidence": "High for brand relationship and listing; economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 28, "currency": "USD", "market": "United States", "conditions": "One-time purchase. Subscription: USD 19.60 for the first 3 orders (30% off), then 15% off. Subscription includes free shipping; one-time orders have free US shipping over USD 50. Free returns within 30 days advertised. Tax not established." },
+      "sources": ["pov-glaze", "pov-founder"], "shopStatus": "Brand-store listing; TikTok Shop sales unverified"
+    },
+    {
+      "id": "nimya-cream", "handle": "nikkietutorials", "kind": "founder-brand", "name": "Nimya Where It All Starts Cream", "variant": "Moisturizer / Primer Hybrid · 45 mL",
+      "relationship": "Founder brand · Nimya", "confidence": "High for brand relationship and listing; economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 27.99, "currency": "EUR", "market": "Netherlands", "conditions": "Tax included; shipping at checkout. Sold out on the observed storefront. Tax-inclusive retail price cannot be used directly as net brand revenue." },
+      "sources": ["nimya-cream", "nimya-founder"], "shopStatus": "Brand-store listing; TikTok Shop sales unverified"
+    },
+    {
+      "id": "nimya-spray", "handle": "nikkietutorials", "kind": "founder-brand", "name": "Nimya Set It & Forget It Setting Spray", "variant": "90 mL",
+      "relationship": "Founder brand · Nimya", "confidence": "High for brand relationship and listing; economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 22.99, "currency": "EUR", "market": "Netherlands", "conditions": "Tax included; shipping at checkout. Sold out on the observed storefront. Tax-inclusive retail price cannot be used directly as net brand revenue." },
+      "sources": ["nimya-spray", "nimya-founder"], "shopStatus": "Brand-store listing; TikTok Shop sales unverified"
+    },
+    {
+      "id": "glamzilla-dirty30", "handle": "glamzilla", "kind": "collaboration", "name": "Nudestix Glamzilla Dirty 30 Blush Kit", "variant": "Limited-edition kit · Dirty 30, Flirty and Thriving shades",
+      "relationship": "Product collaboration; historical equity relationship reported in 2022", "confidence": "High for collaboration; current equity and economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 49, "currency": "USD", "market": "United States", "conditions": "Direct product-page reference price. Search-indexed kit pages separately showed USD 19.60 (60% off USD 49); conflicting page observations and current checkout price were not reconciled. Shipping and taxes at checkout; availability unverified." },
+      "sources": ["nudestix-kit", "nudestix-sale", "nudestix-equity"], "shopStatus": "Collaboration listing; TikTok Shop sales unverified"
+    },
+    {
+      "id": "glamzilla-root", "handle": "glamzilla", "kind": "third-party", "name": "L’Oréal Magic Root Cover Up", "variant": "Root cover-up spray · exact shade in video unverified",
+      "relationship": "Product mention; paid relationship unconfirmed", "confidence": "Moderate · product named in indexed caption; shade unresolved", "promotionDate": "2024-12-28",
+      "postUrl": "https://www.tiktok.com/@glamzilla/video/7453459977592786181",
+      "price": { "amount": 12.99, "currency": "USD", "market": "United States", "conditions": "Official reference price observed in the search index. Tax and shipping not established; this is not the 2024 video's checkout price." },
+      "sources": ["glamzilla-loreal-post", "loreal-root"], "shopStatus": "TikTok Shop listing and attributed sales unverified"
+    },
+    {
+      "id": "arun-sony", "handle": "mrwhosetheboss", "kind": "third-party", "name": "Sony WF-1000XM6", "variant": "Reference listing: WF-1000XM6/S · Platinum Silver; video color unverified",
+      "relationship": "#ad in a secondary source's copy of the TikTok caption", "confidence": "Moderate · secondary caption; original video not retrieved", "promotionDate": null,
+      "postUrl": "https://www.tiktok.com/@mrwhosetheboss/video/7606015834678381831",
+      "price": { "amount": 299.99, "currency": "USD", "market": "United States", "conditions": "Search-indexed official sale price for Platinum Silver; USD 30 saving shown. Tax and shipping not established. This reference variant and price are not verified against the promoted offer." },
+      "sources": ["sony-promotion", "sony-price"], "shopStatus": "TikTok Shop listing and attributed sales unverified"
+    }
+  ]
+}
