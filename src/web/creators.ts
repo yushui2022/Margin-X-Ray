@@ -1,7 +1,7 @@
-import PUBLIC_CREATORS from "../../assets/creators/sources.json";
+import { PUBLIC_CREATORS, directoryPage, type CreatorProfile } from "../shared/creator-directory";
 import { productCount, renderCreatorProducts } from "./creator-products";
 
-type PublicCreator = (typeof PUBLIC_CREATORS)[number];
+type PublicCreator = CreatorProfile;
 
 interface CreatorExample {
   id: string;
@@ -31,6 +31,11 @@ let root: HTMLElement;
 let category = "All";
 let sort = "score";
 let mode: "public" | "examples" = "public";
+let directorySort: "followers" | "name" = "followers";
+let directoryQuery = "";
+let directoryPageNumber = 1;
+let productsOnly = false;
+const PRODUCT_HANDLES = new Set(PUBLIC_CREATORS.filter((item) => productCount(item.handle) > 0).map((item) => item.handle));
 
 export function initCreators(container: HTMLElement): void {
   root = container;
@@ -170,6 +175,8 @@ function portrait(item: PublicCreator): HTMLElement {
   image.alt = `${item.name} profile portrait`;
   image.width = 160;
   image.height = 160;
+  image.loading = "lazy";
+  image.decoding = "async";
   image.addEventListener("error", () => {
     wrapper.textContent = item.initials;
     wrapper.setAttribute("aria-label", `${item.name} — portrait unavailable`);
@@ -187,6 +194,7 @@ function externalLink(label: string, url: string): HTMLAnchorElement {
 }
 
 function renderPublicProfile(item: PublicCreator): void {
+  const hasProducts = productCount(item.handle) > 0;
   const header = node("header", "creator-scorecard");
   const main = node("div", "creator-scorecard-main");
   const identity = node("div", "creator-public-identity");
@@ -195,15 +203,20 @@ function renderPublicProfile(item: PublicCreator): void {
   identity.append(portrait(item), text);
   const verdict = node("div", "creator-verdict-line");
   verdict.append(gradeBadge(null), node("div", "", "Not rated · Evidence review pending"));
-  main.append(identity, verdict, node("p", "creator-verdict-copy", "The receipts are coming together."), node("p", "creator-scorecard-note", "Products and relationships are collected. Comparable promotion sampling and a scoring review are still needed."));
+  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts ? "The receipts are coming together." : "On the radar. Ready for research."), node("p", "creator-scorecard-note", hasProducts ? "Products and relationships are collected. Comparable promotion sampling and a scoring review are still needed." : "This account is included in the launch directory. Product research and promotion sampling have not started; no score has been assigned."));
   const strip = node("div", "creator-scorecard-strip");
-  strip.append(node("span", "", `${productCount(item.handle)} product records`), node("span", "", "Earnings unknown"), node("span", "", `Collected ${item.retrievedAt}`));
+  strip.append(node("span", "", item.followersLabel ? `${item.followersLabel} followers · Directory snapshot` : "Follower count not collected"), node("span", "", `${productCount(item.handle)} product records`), node("span", "", `Collected ${item.retrievedAt}`));
   header.append(main, scoreDisplay(null), strip);
   const details = node("section", "card creator-evidence");
-  details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", "This profile includes product listings and promotion evidence with sources and access limitations. Coverage is incomplete and has not undergone a scoring review, so no Onion Score or rank is assigned."));
+  details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", hasProducts ? "This profile includes product listings and promotion evidence with sources and access limitations. Coverage is incomplete and has not undergone a scoring review, so no Onion Score or rank is assigned." : "Account name, handle and portrait were collected from a public creator directory. This is a discovery record, with no completed product research or scoring review."));
   const links = node("div", "creator-profile-links");
-  links.append(externalLink("Open TikTok profile ↗", `https://www.tiktok.com/@${item.handle}`), externalLink("Portrait source ↗", item.source));
+  links.append(externalLink("Open TikTok profile ↗", `https://www.tiktok.com/@${item.handle}`), externalLink("Profile & portrait source ↗", item.source));
   details.append(links, node("p", "", `Portrait retrieved ${item.retrievedAt}. ${item.note}`));
+  if (item.followersLabel && item.followersSource) {
+    details.append(node("p", "", `${item.followersLabel} followers · Observed ${item.followersObservedAt}. ${item.followersNote}`), externalLink("Follower count source ↗", item.followersSource));
+  }
+  if (item.sourceCategory) details.append(node("p", "", `Directory category: ${item.sourceCategory}. ${item.category === "Uncategorized" ? "A product niche has not been established." : ""}`));
+  if (item.country) details.append(node("p", "", `Directory country label: ${item.country}. Not independently verified.`));
   const scorePanel = node("div");
   scorePanel.append(breakdown(), methodology());
   root.replaceChildren(reportToolbar(), header, reportSections([
@@ -290,7 +303,7 @@ function renderBoard(): void {
     link.href = `#creator/${encodeURIComponent(`@${handle}`)}`;
     quick.append(link);
   }
-  formCard.append(quick, node("p", "creator-entry-note", "4 collected profiles. Live lookup is not connected; unreviewed accounts remain unrated."));
+  formCard.append(quick, node("p", "creator-entry-note", `${PUBLIC_CREATORS.length} collected profiles. Search any included handle to open its scorecard. Live lookup is not connected; unreviewed accounts remain unrated.`));
   const preview = node("a", "creator-score-preview");
   preview.href = "#creator/demo-01";
   const previewCopy = node("div");
@@ -305,19 +318,19 @@ function renderBoard(): void {
   title.append(node("p", "eyebrow", "The Onion index"), boardTitle);
   const selectLabel = node("label", "creator-sort", "Sort by ");
   const select = node("select");
-  for (const [value, text] of [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]) {
-    const option = node("option", "", text);
-    option.value = value!;
-    select.append(option);
-  }
-  select.value = sort;
-  select.addEventListener("change", () => { sort = select.value; renderRows(); });
+  select.addEventListener("change", () => {
+    if (mode === "public") { directorySort = select.value === "name" ? "name" : "followers"; directoryPageNumber = 1; }
+    else sort = select.value;
+    renderRows();
+  });
   selectLabel.append(select);
   header.append(title, selectLabel);
   const modes = node("div", "creator-filters creator-modes");
   for (const [value, label] of [["public", "Public profiles"], ["examples", "Scoring examples"]] as const) {
     const button = action(label, () => {
       mode = value;
+      category = "All";
+      directoryPageNumber = 1;
       for (const child of modes.querySelectorAll("button")) child.setAttribute("aria-pressed", String(child === button));
       renderRows();
     }, "creator-filter");
@@ -326,39 +339,85 @@ function renderBoard(): void {
   }
   const filters = node("div", "creator-filters");
   filters.setAttribute("aria-label", "Filter creators by category");
-  for (const name of ["All", "Home", "Beauty", "Tech", "Style"]) {
-    const button = action(name, () => {
-      category = name;
-      for (const child of filters.querySelectorAll("button")) child.setAttribute("aria-pressed", String(child.textContent === category));
-      renderRows();
-    }, "creator-filter");
-    button.setAttribute("aria-pressed", String(name === category));
-    filters.append(button);
-  }
+  const directoryTools = node("div", "creator-directory-tools");
+  const directoryInput = node("input");
+  directoryInput.type = "search";
+  directoryInput.placeholder = `Search ${PUBLIC_CREATORS.length} names or @handles`;
+  directoryInput.setAttribute("aria-label", "Search collected creators");
+  directoryInput.value = directoryQuery;
+  directoryInput.addEventListener("input", () => { directoryQuery = directoryInput.value; directoryPageNumber = 1; renderRows(); });
+  const coverageLabel = node("label", "creator-coverage-filter");
+  const coverageInput = node("input");
+  coverageInput.type = "checkbox";
+  coverageInput.checked = productsOnly;
+  coverageInput.addEventListener("change", () => { productsOnly = coverageInput.checked; directoryPageNumber = 1; renderRows(); });
+  coverageLabel.append(coverageInput, node("span", "", `With product evidence (${PRODUCT_HANDLES.size})`));
+  directoryTools.append(directoryInput, coverageLabel);
   const list = node("ol", "creator-ranking");
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
+  const pagination = node("nav", "creator-pagination");
+  pagination.setAttribute("aria-label", "Creator directory pages");
+  const empty = node("div", "creator-directory-empty");
+  empty.append(node("p", "", "No creators match these filters."), action("Reset filters", () => {
+    category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; directoryPageNumber = 1; renderRows();
+  }));
   function renderRows(): void {
-    selectLabel.hidden = mode === "public";
+    select.replaceChildren(...(mode === "public" ? [["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
+      const option = node("option", "", text); option.value = value!; return option;
+    }));
+    select.value = mode === "public" ? directorySort : sort;
+    const categories = ["All", ...new Set((mode === "public" ? PUBLIC_CREATORS : EXAMPLES).map((item) => item.category))];
+    filters.replaceChildren(...categories.map((name) => {
+      const button = action(name, () => { category = name; directoryPageNumber = 1; renderRows(); }, "creator-filter");
+      button.setAttribute("aria-pressed", String(name === category));
+      return button;
+    }));
+    directoryTools.hidden = mode !== "public";
+    pagination.hidden = mode !== "public";
+    empty.hidden = true;
     boardTitle.textContent = mode === "public" ? "The leaderboard" : "The leaderboard · examples";
     if (mode === "public") {
-      const items = PUBLIC_CREATORS.filter((item) => category === "All" || item.category === category).sort((a, b) => a.name.localeCompare(b.name));
-      list.replaceChildren(...items.map((item) => {
+      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined });
+      directoryPageNumber = result.page;
+      list.replaceChildren(...result.items.map((item) => {
         const li = node("li");
         const link = node("a", "creator-rank-row creator-public-row");
         link.href = `#creator/${encodeURIComponent(`@${item.handle}`)}`;
         const identity = node("div", "creator-identity");
-        identity.append(node("strong", "", item.name), node("span", "", `@${item.handle} · ${item.category}`));
+        identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers · Snapshot` : `${item.category} · Followers not collected`));
         const value = node("div", "creator-list-score is-pending");
         value.append(node("strong", "", "—"), node("span", "", "Not rated"));
         const total = productCount(item.handle);
-        const status = node("span", "creator-row-status", `${total} ${total === 1 ? "product" : "products"} · Review pending`);
+        const status = node("span", "creator-row-status", total ? `${total} ${total === 1 ? "product" : "products"} · Review pending` : "Profile collected · Products not researched");
         identity.append(status);
         link.append(gradeBadge(null), portrait(item), identity, value, node("span", "creator-arrow", "↗"));
         li.append(link);
         return li;
       }));
-      count.textContent = items.length ? `${items.length} real creators · Alphabetical, awaiting rating` : "No collected profiles here yet. Try Beauty or Tech.";
+      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} profiles · ${directorySort === "followers" ? "Directory follower order, not score rank" : "Alphabetical order"}` : "0 matching profiles";
+      empty.hidden = result.total > 0;
+      pagination.replaceChildren();
+      pagination.hidden = result.pageCount <= 1;
+      const go = (page: number) => {
+        directoryPageNumber = page; renderRows();
+        board.scrollIntoView({ block: "start", behavior: "instant" });
+        pagination.querySelector<HTMLButtonElement>('[aria-current="page"]')?.focus({ preventScroll: true });
+      };
+      const previous = action("← Previous", () => go(result.page - 1));
+      previous.disabled = result.page === 1;
+      pagination.append(previous);
+      const pages = [...new Set([1, result.page - 1, result.page, result.page + 1, result.pageCount])].filter((page) => page >= 1 && page <= result.pageCount).sort((a, b) => a - b);
+      for (const [index, page] of pages.entries()) {
+        if (index && page - pages[index - 1]! > 1) pagination.append(node("span", "", "…"));
+        const button = action(String(page), () => go(page));
+        button.setAttribute("aria-label", `Page ${page}`);
+        if (page === result.page) button.setAttribute("aria-current", "page");
+        pagination.append(button);
+      }
+      const next = action("Next →", () => go(result.page + 1));
+      next.disabled = result.page === result.pageCount;
+      pagination.append(next);
       return;
     }
     const ranked = [...EXAMPLES].sort((a, b) => score(b) - score(a));
@@ -381,7 +440,7 @@ function renderBoard(): void {
     count.textContent = `${items.length} fictional creators · Ranks reflect the full example list · No live accounts have been rated`;
   }
   renderRows();
-  board.append(header, modes, filters, count, list);
+  board.append(header, modes, directoryTools, filters, count, empty, list, pagination);
   const key = node("div", "creator-grade-key");
   key.append(node("span", "", "Example tiers"));
   for (const [letter, threshold] of [["S", "90+"], ["A", "80+"], ["B", "70+"], ["C", "60+"], ["D", "<60"]]) {
@@ -391,7 +450,11 @@ function renderBoard(): void {
   }
   board.append(key);
   layout.append(entry, board);
-  root.replaceChildren(hero, layout, methodology());
+  const coverage = node("div", "creator-launch-stats");
+  for (const [value, label] of [[String(PUBLIC_CREATORS.length), "Collected profiles"], [String(PRODUCT_HANDLES.size), "With product evidence"], ["0", "Rated creators"]]) {
+    const stat = node("div"); stat.append(node("strong", "", value), node("span", "", label)); coverage.append(stat);
+  }
+  root.replaceChildren(hero, coverage, layout, methodology());
 }
 
 function backLink(): HTMLElement {

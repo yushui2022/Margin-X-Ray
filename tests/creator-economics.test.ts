@@ -41,10 +41,9 @@ test("collected products retain traceable sources without factual earnings claim
     assert.equal(new URL(source.url).protocol, "https:");
     assert.ok(source.excerpt && source.access);
   }
-  for (const profile of profiles) {
-    const creator = research.creators.find((item) => item.handle === profile.handle);
-    assert.ok(creator, `Missing research for ${profile.handle}`);
-    assert.ok(research.products.some((item) => item.handle === profile.handle));
+  for (const creator of research.creators) {
+    assert.ok(profiles.some((item) => item.handle === creator.handle), `Missing profile for ${creator.handle}`);
+    assert.ok(research.products.some((item) => item.handle === creator.handle));
     checkSources(creator.brandSources);
     for (const lead of creator.leads) checkSources(lead.sources);
   }

@@ -125,7 +125,12 @@ function productCard(product: Product): HTMLElement {
 export function renderCreatorProducts(handle: string): HTMLElement {
   const wrapper = node("div", "creator-products");
   const creator = RESEARCH.creators.find((item) => item.handle === handle);
-  if (!creator) return wrapper;
+  if (!creator) {
+    const empty = node("section", "card creator-product-overview");
+    empty.append(node("p", "eyebrow", "Research not started"), node("h2", "", "Products & earnings"), node("p", "", "This creator is in the launch directory. Product recommendations, brand relationships, prices and financial evidence have not been collected yet."), node("p", "", "0 product records · Earnings unknown · No research request is queued. This does not mean the creator has no products or brand."));
+    wrapper.append(empty);
+    return wrapper;
+  }
   const products = RESEARCH.products.filter((item) => item.handle === handle);
   const overview = node("section", "card creator-product-overview");
   overview.append(node("p", "eyebrow", `Public evidence · Collected ${RESEARCH.observedAt}`), node("h2", "", "Products & earnings"), node("p", "", `${products.length} product records · ${creator.leads.length} unresolved leads · 0 verified earnings records`), node("p", "", RESEARCH.scope), node("p", "creator-notice", "Actual creator income and product margins remain unknown. The calculators below use only assumptions you enter; they do not estimate a creator's real earnings."));

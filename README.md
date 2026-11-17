@@ -16,12 +16,23 @@ breakdown, products/earnings and profile sources; copying a report link copies
 the current URL without publishing anything. The warm Onion Head visual identity
 and mascot are retained.
 
-The default creator list includes four public profiles with locally stored
-portraits: Glamzilla, Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials.
-All four are **Not rated**, listed alphabetically, with TikTok links and portrait
-source/date information. Searching their handles opens the collected profile.
-Portraits come from public Linktree, Linkme and Nutcake pages; they are not
-claimed to be current TikTok avatars. Provenance is in `assets/creators/sources.json`.
+The launch directory includes **500 public TikTok creator profiles**, all with
+locally stored portraits and searchable names/handles. It retains Glamzilla,
+Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
+Famadex's public TikTok people ranking. All are **Not rated**. The default sort is
+descending directory follower count, with unknown counts last; it is not an
+Onion Score ranking. Browse 20 records per page, search the full collection,
+sort by name, filter by collected category, or show the four profiles with
+product evidence. Summary counts keep profile coverage separate from ratings.
+
+Follower counts are rounded secondary-source observations collected 2026-11-17,
+not live platform counts. Broad source labels do not establish product niches;
+new profiles currently show Uncategorized. Every profile has a TikTok link,
+source/date information and an explicit product-research state. Portraits from
+Famadex, Linktree, Linkme and Nutcake are not claimed to be current TikTok avatars.
+Provenance is in `assets/creators/sources.json` and
+`research/creator-seed-evidence.json`; collection rules are in
+`research/creator-seed-notes.md`.
 The separate Scoring examples view contains six fictional ranked identities,
 post counts and scores. Unknown TikTok handles also show **Not rated**;
 no creator retrieval service is connected and no lookup is queued.
