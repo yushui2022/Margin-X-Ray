@@ -103,6 +103,31 @@ cookie before concurrent row reads to avoid competing first-visit sessions.
 
 ### Onion Score
 
+Current definition: **product-issues-v1**, higher is worse. The former confidence
+method below is historical and is no longer connected to the public Onion Score.
+Current methodology and data-entry requirements are in `creator-issue-rubric.json`
+and `creator-issue-reviews.json`; implementation/review notes are in
+`../docs/product-problem-ranking-review.md`. No completed issue samples currently
+qualify, so all 500 real profiles have no score or rank. A lack of complaints or
+an empty research file is not a reviewed zero.
+
+The score combines affected-product frequency (70 points) and maximum severity
+per reviewed product (30 points) within a fixed sample window. At least three
+distinct products need completed, source-backed reviews with a consistent selection
+method. Every product needs a documented creator link and review outcome; confirmed
+problems need dated primary sources and severity explanations. Alleged, disputed,
+unresolved, incomplete and out-of-window inputs are pending. Repeated incident
+reports do not multiply one product's contribution. Higher scores sort first;
+pending follows eligible zero in both directions. Weights and the sample threshold
+are editorial choices. Scores describe the reviewed sample, not population risk.
+
+Current bands: Fresh [0,20), Spotted [20,40), Bruised [40,60), Spoiled [60,80),
+Rotten [80,100]. Neither evidence coverage, its complement, historical confidence,
+followers nor votes enter this calculation. Existing votes remain scoped to
+`evidence-v3` and continue to mean feedback about coverage.
+
+### Historical confidence-based Onion Score (superseded)
+
 The user selected an evidence-confidence leaderboard, then requested a single
 score with higher values meaning fresher onions. The Onion Score now displays
 the confidence total directly; the inverse `100 - confidence` metric has been

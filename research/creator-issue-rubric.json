@@ -1,0 +1,15 @@
+{
+  "version": "product-issues-v1",
+  "windowStart": "2025-11-18",
+  "windowEnd": "2026-11-17",
+  "minimumProducts": 3,
+  "weights": { "frequency": 70, "severity": 30 },
+  "severity": { "minor": 0.25, "moderate": 0.5, "serious": 0.75, "critical": 1 },
+  "scope": "Documented product problems in a defined reviewed sample of creator-linked products. Higher scores mean more frequent or severe documented problems in that sample. This is not a population failure rate or a judgment of personal intent.",
+  "eligibility": "A completed, source-reviewed sample of at least three distinct creator-linked products in the published window. Record a consistent selection method, reviewed outcomes, exact product links and dated primary evidence. Incomplete samples, allegations or unresolved outcomes remain pending, not zero.",
+  "frequencyRule": "70 × number of reviewed products with confirmed problems ÷ all reviewed products.",
+  "severityRule": "30 × sum of each reviewed product's highest confirmed severity factor ÷ all reviewed products. Minor 0.25: limited usability or service failure; moderate 0.5: material defect, misleading product claim or unresolved contractual remedy; serious 0.75: documented injury or major safety/compliance failure; critical 1: life-threatening harm or an authority's highest-risk recall. Severity requires a source-linked written assessment.",
+  "evidenceRule": "Accept dated regulator findings, official recalls, final rulings, attributable test reports or documented seller admissions/resolutions with an exact product match. Record the creator's promotion or brand relationship separately. A caption, price difference, conflicting indexed page, complaint count, missing research or community vote alone does not establish a product problem.",
+  "rounding": "Round frequency and severity contributions to one decimal, then sum their integer tenths. Repeated reports of the same problem do not multiply a product's contribution. A fully reviewed sample with no documented problems can score zero; missing research cannot.",
+  "ranking": "Highest Onion Score first. Equal scores share competition rank; name and handle stabilize display ties. Pending reports have no rank and follow rated reports in either score direction. Filtering does not recalculate global ranks."
+}

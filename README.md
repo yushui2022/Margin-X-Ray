@@ -28,8 +28,10 @@ locally stored portraits and searchable names/handles. It retains Glamzilla,
 Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
 Famadex's public TikTok people ranking. All 500 reports retain a **preliminary Evidence
 Score**, measuring report coverage rather than creator trustworthiness. The directory
-now displays one **Onion Score**, based on evidence confidence, and sorts it descending, with pending reports
-last and name/handle ties. Verified creator transparency ratings remain unassigned.
+now supports one **Onion Score** for documented product problems: higher is worse,
+and higher scores sort first. Pending reports have no rank. Currently all 500
+profiles are pending because no completed product-problem sample has been accepted;
+the directory is explicitly unranked, with alphabetical ties in score-sort modes.
 Browse 20 records per page, search the full collection,
 sort by name, filter by collected category, or show the twelve profiles with
 priced product evidence. Research filters also select sampled accounts, sourced
@@ -43,7 +45,7 @@ Famadex, Linktree, Linkme and Nutcake are not claimed to be current TikTok avata
 Provenance is in `assets/creators/sources.json` and
 `research/creator-seed-evidence.json`; collection rules are in
 `research/creator-seed-notes.md`.
-The separate Scoring examples view contains six fictional ranked identities,
+The separate Transparency examples view contains six fictional ranked identities,
 post counts and scores. Unknown TikTok handles also show **Not rated**;
 no creator retrieval service is connected and no lookup is queued.
 The real-profile Evidence Score uses the `evidence-v3` rubric: public sample (20),
@@ -71,29 +73,36 @@ Directory controls sit beside each score on desktop and below the row on narrow
 screens. Voting does not open the report. The directory and report read the same
 saved choice; initial parallel row loads share one anonymous browser session.
 
-The **Onion Score** displays Evidence Confidence directly, under the versioned
-`confidence-v1` rubric. Higher scores mean fresher onions. It replaces the earlier
-paired confidence/inverse-index presentation and the original vote-share definition. Confidence
-combines source reliability (40), report completeness (40, based on `evidence-v3`)
-and reviewed cross-checks (20). Explicit product-by-product assessments are stored
-in `research/creator-confidence-assessments.json`; weights, eligibility and exact
-rules are in `research/creator-confidence-rubric.json`. Every report exposes its
-calculation, selected sources and limitations. It is an editorial research score,
-not a statistical probability, creator character rating or product-quality verdict.
+The **Onion Score** now uses `product-issues-v1`. It is neither evidence confidence
+nor its inverse. Frequency contributes `70 × affected products / reviewed products`;
+severity contributes `30 × sum of per-product maximum severity / reviewed products`.
+Severity factors are 0.25 (minor), 0.5 (moderate), 0.75 (serious), and 1 (critical).
+Each component is rounded to one decimal before summing. Weights, evidence rules,
+sample window and minimum review size are explicit editorial choices in
+`research/creator-issue-rubric.json`, not a statistically calibrated failure rate.
 
-The default leaderboard sorts confidence descending. Equal scores share global
-competition rank; names and handles break display ties. Filters do not change
-global rank. Only 12 profiles currently qualify for scoring; the remaining 488
-stay pending, with a gray onion, no score and no rank. Pending profiles sort last
-in both confidence directions. Coverage, follower and alphabetical sorts remain.
-Five local SVG states map scores to 80–100 (Fresh), 60–<80 (Spotted), 40–<60
-(Bruised), 20–<40 (Spoiled), and 0–<20 (Rotten). Each row shows one score beside
-its onion, with band and global rank beneath. Reports show one headline score;
-the underlying coverage calculation remains in the detailed breakdown. Votes
-remain feedback on that coverage; changing, withdrawing, loading or failing to
-load votes cannot change the Onion Score or rank.
+Eligibility requires a completed sample of at least three distinct creator-linked
+products in the published window, a consistent selection method, dated primary
+evidence, explicit reviewed outcomes and source-backed severity assessments.
+Missing, disputed, alleged, out-of-window or unresolved records remain pending.
+Repeated reports do not multiply one product's contribution. A reviewed zero means
+no documented problems in that sample; it is different from unreviewed research.
 
-The proposed transparency Onion Score, used only in fictional examples, weights price transparency (40%), commercial disclosure
+`research/creator-issue-reviews.json` is currently empty. Existing price listings,
+caption samples, unresolved price conflicts, research confidence and votes have
+not been converted into product-problem allegations. The previous 12 confidence
+ratings are historical research assessments and no longer drive any public score.
+The directory explains the absence of eligible rankings and remains searchable.
+
+Highest problem scores rank first. Equal scores share global competition rank;
+names and handles stabilize ties, and filters do not change global ranks. Pending
+profiles sort after rated profiles, including reviewed zero, in both directions.
+The five onion states are Fresh [0,20), Spotted [20,40), Bruised [40,60), Spoiled
+[60,80), Rotten [80,100]. Gray means pending. Each row/report has one headline
+score; sources and calculations can be expanded. Votes retain their original
+`evidence-v3` coverage-feedback scope and cannot change the problem score or rank.
+
+The legacy transparency score, used only in explicitly labeled fictional examples, weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
 interface and is not a validated measure of personal integrity. Fictional product
 cards do not support real creator scores. Live scoring

@@ -1,5 +1,5 @@
 import { ONION_BANDS, UNRATED_ONION, onionScore } from "../shared/onion-index";
-import { CONFIDENCE_RUBRIC, CONFIDENCE_VERSION, confidenceFor, confidenceRank } from "../shared/creator-confidence";
+import { ISSUE_RUBRIC, ISSUE_VERSION, issueFor, issueRank } from "../shared/creator-issues";
 
 export function createOnionIndicator(handle: string, compact: boolean) {
   const element = document.createElement("div");
@@ -10,16 +10,16 @@ export function createOnionIndicator(handle: string, compact: boolean) {
   const value = element.querySelector<HTMLElement>(".onion-index-value")!;
   const state = element.querySelector<HTMLElement>(".onion-index-state")!;
   label.textContent = "Onion Score";
-  const report = confidenceFor(handle);
+  const report = issueFor(handle);
   const index = onionScore(report?.points?.total);
   const band = index?.band ?? UNRATED_ONION;
   element.dataset.band = band.id;
   image.src = band.image;
   image.alt = `${band.label} onion`;
   value.textContent = index ? index.value.toFixed(1) : "—";
-  state.textContent = index ? `${band.label} · #${confidenceRank(handle)}` : "Pending review";
-  const detail = index ? `${index.value.toFixed(1)}/100 · ${band.label}. Global rank #${confidenceRank(handle)}. Higher is fresher.` : report?.reason ?? "Source review needed";
-  element.title = `Onion Score: ${detail} ${CONFIDENCE_VERSION}. Based on evidence confidence. Votes do not affect the score or rank.`;
+  state.textContent = index ? `${band.label} · #${issueRank(handle)}` : "Pending review";
+  const detail = index ? `${index.value.toFixed(1)}/100 · ${band.label}. Global rank #${issueRank(handle)}. Higher means more frequent or severe documented product problems in the reviewed sample.` : report?.reason ?? "Source review needed";
+  element.title = `Onion Score: ${detail} ${ISSUE_VERSION}. Votes and evidence coverage do not determine the score or rank.`;
   element.setAttribute("aria-label", element.title);
   return element;
 }
@@ -31,7 +31,7 @@ export function renderOnionScale(): HTMLDetailsElement {
   summary.textContent = "Onion scale";
   summary.setAttribute("aria-label", "Onion Score scale and meaning");
   const explanation = document.createElement("p");
-  explanation.textContent = "Onion Score runs from 0 to 100. Higher is fresher and ranks higher by default. The score uses source reliability (40), report completeness (40) and cross-checks (20). Votes do not affect scores, onions or ranks.";
+  explanation.textContent = "Onion Score runs from 0 to 100. Higher is worse: more frequent or severe documented product problems in a reviewed sample. Highest scores rank first. Problem frequency contributes up to 70 points and severity up to 30. Votes and evidence coverage do not add points.";
   const grid = document.createElement("div");
   grid.className = "onion-scale-grid";
   for (const band of ONION_BANDS) {
@@ -43,22 +43,22 @@ export function renderOnionScale(): HTMLDetailsElement {
     item.append(image, label, range); grid.append(item);
   }
   const note = document.createElement("p");
-  note.textContent = "Gray onion: pending a sourced product review, with no score or rank. The score describes confidence in collected evidence, not a creator’s character or product quality. It is an editorial score, not a statistical probability. Open a report for its sources and calculation.";
+  note.textContent = `Gray onion: no completed issue review, so no score or rank. A rating needs at least ${ISSUE_RUBRIC.minimumProducts} reviewed products in the ${ISSUE_RUBRIC.windowStart} to ${ISSUE_RUBRIC.windowEnd} window. Fresh describes a low documented-problem score in that sample; it is not a safety guarantee. Allegations and missing research do not count as confirmed problems.`;
   details.append(summary, explanation, grid, note);
   return details;
 }
 
-export function renderConfidenceReport(handle: string): HTMLElement {
-  const report = confidenceFor(handle)!;
+export function renderIssueReport(handle: string): HTMLElement {
+  const report = issueFor(handle)!;
   const section = document.createElement("section");
   section.className = "creator-confidence-report";
   const heading = document.createElement("h2");
   heading.textContent = "Behind the Onion Score";
   const description = document.createElement("p");
-  description.textContent = `${CONFIDENCE_VERSION} · Reviewed ${report.observedAt}. ${CONFIDENCE_RUBRIC.scope}`;
+  description.textContent = `${ISSUE_VERSION} · Review window: ${ISSUE_RUBRIC.windowStart} to ${ISSUE_RUBRIC.windowEnd}. ${ISSUE_RUBRIC.scope}`;
   const summary = document.createElement("p");
   summary.className = "creator-confidence-summary";
-  summary.textContent = report.points ? "Higher is fresher. Explore the three scoring components and their sources below." : `Pending review · ${report.reason}. No score or rank yet.`;
+  summary.textContent = report.points ? `${report.points.affected} of ${report.points.reviewed} reviewed products have confirmed problems. Higher is worse. See the calculation and sources below.` : "Not ranked yet. Price listings, public captions and research gaps alone cannot establish recurring product problems. A completed issue review is needed.";
   section.append(heading, description, summary, renderOnionScale());
   const calculation = document.createElement("details");
   calculation.className = "creator-method";
@@ -66,28 +66,35 @@ export function renderConfidenceReport(handle: string): HTMLElement {
   title.textContent = "Score calculation & sources";
   calculation.append(title);
   for (const [key, label, rule] of [
-    ["sources", "Source reliability", CONFIDENCE_RUBRIC.sourceRule],
-    ["coverage", "Report completeness", CONFIDENCE_RUBRIC.coverageRule],
-    ["corroboration", "Cross-checks", CONFIDENCE_RUBRIC.corroborationRule],
+    ["frequency", "Problem frequency", ISSUE_RUBRIC.frequencyRule],
+    ["severity", "Problem severity", ISSUE_RUBRIC.severityRule],
   ] as const) {
     const paragraph = document.createElement("p");
-    paragraph.textContent = `${label}: ${report.points ? report.points[key].toFixed(1) : "—"}/${CONFIDENCE_RUBRIC.weights[key]}. ${rule}`;
+    paragraph.textContent = `${label}: ${report.points ? report.points[key].toFixed(1) : "—"}/${ISSUE_RUBRIC.weights[key]}. ${rule}`;
     calculation.append(paragraph);
   }
   const rules = document.createElement("p");
-  rules.textContent = `${CONFIDENCE_RUBRIC.eligibility} ${CONFIDENCE_RUBRIC.rounding} ${CONFIDENCE_RUBRIC.ranking}`;
+  rules.textContent = `${ISSUE_RUBRIC.eligibility} ${ISSUE_RUBRIC.evidenceRule} ${ISSUE_RUBRIC.rounding} ${ISSUE_RUBRIC.ranking}`;
   calculation.append(rules);
-  for (const { product, review, relationship, listing } of report.reviewed) {
+  if (report.review) {
+    const method = document.createElement("p");
+    method.textContent = `Sample selection: ${report.review.selectionMethod} · Reviewed ${report.review.reviewedAt}`;
+    calculation.append(method);
+  }
+  for (const product of report.review?.products ?? []) {
     const item = document.createElement("div");
     item.className = "creator-confidence-source";
     const name = document.createElement("strong"); name.textContent = product.name;
-    const note = document.createElement("p"); note.textContent = review.note;
-    const factors = document.createElement("p");
-    factors.textContent = `Relationship: ${review.relationshipProvenance}; listing: ${review.listingProvenance}; cross-check: ${review.corroboration}.`;
-    item.append(name, note, factors);
-    for (const [role, source] of [["Relationship", relationship], ["Listing", listing]] as const) {
+    const note = document.createElement("p"); note.textContent = `${product.variant} · ${product.outcome}. ${product.reviewNote}`;
+    item.append(name, note);
+    for (const issue of product.issues) {
+      const finding = document.createElement("p");
+      finding.textContent = `${issue.occurredAt} · ${issue.status} · ${issue.severity}: ${issue.assessment}`;
+      item.append(finding);
+    }
+    for (const source of [product.creatorLink, ...product.reviewSources, ...product.issues.map(issue => issue.source)]) {
       const link = document.createElement("a"); link.href = source.url; link.target = "_blank"; link.rel = "noopener noreferrer";
-      link.textContent = `${role}: ${source.label} ↗`;
+      link.textContent = `${source.label} · ${source.observedAt} ↗`;
       item.append(link);
     }
     calculation.append(item);

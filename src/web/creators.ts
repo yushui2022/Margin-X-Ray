@@ -3,8 +3,8 @@ import { productCount, renderCreatorProducts } from "./creator-products";
 import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
 import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor, formatEvidenceScore } from "../shared/creator-evidence-score";
 import { renderCreatorFeedback } from "./creator-feedback";
-import { createOnionIndicator, renderOnionScale, renderConfidenceReport } from "./onion-index";
-import { CONFIDENCE_SCORES, confidenceFor } from "../shared/creator-confidence";
+import { createOnionIndicator, renderOnionScale, renderIssueReport } from "./onion-index";
+import { ISSUE_SCORES, issueFor } from "../shared/creator-issues";
 
 type PublicCreator = CreatorProfile;
 
@@ -36,7 +36,7 @@ let root: HTMLElement;
 let category = "All";
 let sort = "score";
 let mode: "public" | "examples" = "public";
-let directorySort: "followers" | "name" | "evidence" | "evidence-low" | "confidence" | "confidence-low" = "confidence";
+let directorySort: "followers" | "name" | "evidence" | "evidence-low" | "issues" | "issues-low" = "issues";
 let directoryQuery = "";
 let directoryPageNumber = 1;
 let productsOnly = false;
@@ -91,7 +91,7 @@ function gradeBadge(value: number | null): HTMLElement {
 
 function scoreDisplay(value: number | null, evidence = false): HTMLElement {
   const display = node("div", `creator-score-display${value === null ? " is-pending" : ""}`);
-  const title = evidence ? "Evidence Score · Beta" : value === null ? "Onion Score" : "Example Onion Score";
+  const title = evidence ? "Evidence Score · Beta" : value === null ? "Onion Score" : "Example transparency";
   display.append(node("span", "eyebrow", title), node("strong", "creator-score-number", value === null ? "—" : evidence ? formatEvidenceScore(value) : String(value)), node("span", "creator-score-denominator", "/ 100"));
   display.setAttribute("aria-label", value === null ? "Onion Score: not rated" : `${title}: ${value} out of 100`);
   return display;
@@ -218,11 +218,11 @@ function renderPublicProfile(item: PublicCreator): void {
   identity.append(portrait(item), text);
   const verdict = node("div", "creator-verdict-line");
   verdict.append(node("span", "creator-coverage-dot"), node("div", "", `${evidence.level} · Preliminary`));
-  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "Follow the evidence, layer by layer." : sample?.status === "sampled" ? "A first look. More layers to uncover." : "A research gap. More sources needed."), node("p", "creator-scorecard-note", "Confidence in the collected evidence: source reliability, completeness and cross-checks. Pending means a sourced product review is needed."));
+  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "Follow the evidence, layer by layer." : sample?.status === "sampled" ? "A first look. More layers to uncover." : "A research gap. More sources needed."), node("p", "creator-scorecard-note", "Onion Score measures documented product problems in a reviewed sample. Higher is worse. Evidence coverage below describes research progress, not a product-problem rating."));
   const strip = node("div", "creator-scorecard-strip");
   strip.append(node("span", "", item.followersLabel ? `${item.followersLabel} followers · Directory snapshot` : "Follower count not collected"), node("span", "", `${productCount(item.handle)} priced records · ${leads.length} follow-up leads`), node("span", "", screeningLabel(item.handle)));
   const display = node("div", "creator-score-display creator-onion-display");
-  display.append(createOnionIndicator(item.handle, false), node("span", "creator-score-check-count", "Out of 100 · Higher is fresher"));
+  display.append(createOnionIndicator(item.handle, false), node("span", "creator-score-check-count", "Out of 100 · Higher is worse"));
   header.append(main, display, strip);
   const details = node("section", "card creator-evidence");
   details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", "The preliminary Evidence Score measures this report's collected sources. Creator transparency, product quality and personal earnings have not received a verified rating."));
@@ -237,8 +237,8 @@ function renderPublicProfile(item: PublicCreator): void {
   if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products & earnings for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
   const scorePanel = node("div");
   scorePanel.append(evidenceBreakdown(item.handle), evidenceMethodology());
-  root.replaceChildren(reportToolbar(), header, renderConfidenceReport(item.handle), renderCreatorFeedback(item.handle), reportSections([
-    { label: "Score breakdown", content: scorePanel },
+  root.replaceChildren(reportToolbar(), header, renderIssueReport(item.handle), renderCreatorFeedback(item.handle), reportSections([
+    { label: "Evidence coverage", content: scorePanel },
     { label: `Products & earnings (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
     { label: "Profile sources", content: details },
   ]));
@@ -365,7 +365,7 @@ function evidenceMethodology(): HTMLElement {
 
 function methodology(): HTMLElement {
   const details = node("details", "creator-method");
-  details.append(node("summary", "", "How the Onion Score works"));
+  details.append(node("summary", "", "How the example transparency score works"));
   details.append(node("p", "", "Proposed scoring rules · v0.1. The score describes transparency in sampled shopping recommendations. It does not measure a person’s character or prove product quality."));
   for (const dim of DIMENSIONS) details.append(node("p", "", `${dim.name} · ${dim.weight}% — ${dim.rule}`));
   details.append(node("p", "", "Example score = 40 × price checks / posts + 35 × disclosure checks / posts + 25 × return checks / posts, rounded to a whole number. All 20 example posts are evaluable in each dimension. These are constructed examples, not collected evidence."));
@@ -399,8 +399,8 @@ function renderBoard(): void {
   preview.href = "#creator/%40nikkietutorials";
   const previewCopy = node("div");
   previewCopy.append(node("p", "eyebrow", "Onion Score"), node("strong", "", "NikkieTutorials"), node("span", "", "Explore the points & sources ↗"));
-  const previewConfidence = confidenceFor("nikkietutorials")?.points?.total;
-  preview.append(previewCopy, node("strong", "creator-preview-number", previewConfidence === undefined ? "—" : formatEvidenceScore(previewConfidence)));
+  const previewScore = issueFor("nikkietutorials")?.points?.total;
+  preview.append(previewCopy, node("strong", "creator-preview-number", previewScore === undefined ? "—" : formatEvidenceScore(previewScore)));
   const lookup = node("details", "creator-lookup");
   lookup.open = !window.matchMedia("(max-width: 760px)").matches;
   const lookupSummary = node("summary");
@@ -425,7 +425,7 @@ function renderBoard(): void {
   selectLabel.append(select);
   header.append(title, selectLabel);
   const modes = node("div", "creator-filters creator-modes");
-  for (const [value, label] of [["public", "Public profiles"], ["examples", "Scoring examples"]] as const) {
+  for (const [value, label] of [["public", "Public profiles"], ["examples", "Transparency examples"]] as const) {
     const button = action(label, () => {
       mode = value;
       category = "All";
@@ -471,18 +471,19 @@ function renderBoard(): void {
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
   const votingGuide = node("div", "creator-voting-guide");
-  votingGuide.append(node("span", "", "Higher score. Fresher onion."), node("span", "", "↑ Coverage fair · ↓ Review"), renderOnionScale());
+  votingGuide.append(node("span", "", "Higher score. More product problems."), node("span", "", "↑ Coverage fair · ↓ Review"), renderOnionScale());
   votingGuide.title = "Votes are feedback on the ten-check evidence coverage; they never change the Onion Score or rank. One choice per browser; click again to undo.";
   const pagination = node("nav", "creator-pagination");
   pagination.setAttribute("aria-label", "Creator directory pages");
   const empty = node("div", "creator-directory-empty");
+  const rankingNote = node("p", "creator-ranking-note");
   empty.append(node("p", "", "No creators match these filters."), action("Reset filters", () => {
     category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; researchFilter = "all"; researchSelect.value = "all"; directoryPageNumber = 1; renderRows();
   }));
   function renderRows(): void {
     const activeResearchFilters = Number(productsOnly) + Number(researchFilter !== "all");
     refineSummary.textContent = `Research filters${activeResearchFilters ? ` · ${activeResearchFilters} active` : ""}`;
-    select.replaceChildren(...(mode === "public" ? [["confidence", "Highest score"], ["confidence-low", "Lowest score"], ["evidence", "Most evidence"], ["evidence-low", "Least evidence"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
+    select.replaceChildren(...(mode === "public" ? [["issues", "Highest problem score"], ["issues-low", "Lowest problem score"], ["evidence", "Most evidence"], ["evidence-low", "Least evidence"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest transparency"], ["lowest", "Lowest transparency"], ["name", "Creator name"]]).map(([value, text]) => {
       const option = node("option", "", text); option.value = value!; return option;
     }));
     select.value = mode === "public" ? directorySort : sort;
@@ -497,17 +498,19 @@ function renderBoard(): void {
     }));
     directoryTools.hidden = mode !== "public";
     votingGuide.hidden = mode !== "public";
+    rankingNote.hidden = mode !== "public";
+    rankingNote.textContent = ISSUE_SCORES.size ? "Higher scores indicate more frequent or severe documented product problems in the reviewed sample. Pending profiles are unranked." : "No problem rankings published yet. The profiles below are an unranked research directory: existing price and caption records do not establish recurring product problems.";
     const exampleKey = board.querySelector<HTMLElement>(".creator-grade-key");
     if (exampleKey) exampleKey.hidden = mode === "public";
     pagination.hidden = mode !== "public";
     empty.hidden = true;
-    boardTitle.textContent = mode === "public" ? "Onion leaderboard" : "Scoring examples";
+    boardTitle.textContent = mode === "public" ? ISSUE_SCORES.size ? "Product problem leaderboard" : "Creator research directory" : "Transparency examples";
     if (mode === "public") {
       const profiles = PUBLIC_CREATORS.filter((item) => researchFilter === "all"
         || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
         || (researchFilter === "unavailable" && screeningFor(item.handle)?.status === "unavailable")
         || (researchFilter === "leads" && brandLeadsFor(item.handle).length > 0));
-      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES, confidenceScores: CONFIDENCE_SCORES }, profiles);
+      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES, issueScores: ISSUE_SCORES }, profiles);
       directoryPageNumber = result.page;
       list.replaceChildren(...result.items.map((item) => {
         const li = node("li", "creator-public-item");
@@ -523,8 +526,8 @@ function renderBoard(): void {
         li.append(link, renderCreatorFeedback(item.handle, true));
         return li;
       }));
-      const order = directorySort === "followers" ? "Most followers first" : directorySort === "name" ? "Alphabetical order" : directorySort === "confidence" ? "Highest score first" : directorySort === "confidence-low" ? "Lowest score first" : directorySort === "evidence-low" ? "Lowest evidence first" : "Highest evidence first";
-      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} · ${order} · ${CONFIDENCE_SCORES.size} rated overall` : "0 matching profiles";
+      const order = directorySort === "followers" ? "Most followers first" : directorySort === "name" ? "Alphabetical order" : directorySort === "issues" || directorySort === "issues-low" ? !ISSUE_SCORES.size ? "Unranked · Alphabetical order" : directorySort === "issues" ? "Highest problem score first" : "Lowest problem score first" : directorySort === "evidence-low" ? "Lowest evidence first" : "Highest evidence first";
+      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} · ${order} · ${ISSUE_SCORES.size} rated overall` : "0 matching profiles";
       empty.hidden = result.total > 0;
       pagination.replaceChildren();
       pagination.hidden = result.pageCount <= 1;
@@ -569,7 +572,7 @@ function renderBoard(): void {
     count.textContent = `${items.length} fictional creators · Ranks reflect the full example list · No live accounts have been rated`;
   }
   renderRows();
-  board.append(header, modes, directoryTools, filters, count, votingGuide, empty, list, pagination);
+  board.append(header, modes, directoryTools, filters, count, votingGuide, rankingNote, empty, list, pagination);
   const key = node("div", "creator-grade-key");
   key.hidden = mode === "public";
   key.append(node("span", "", "Example tiers"));
@@ -585,7 +588,7 @@ function renderBoard(): void {
     const stat = node("div"); stat.append(node("strong", "", value), node("span", "", label)); coverage.append(stat);
   }
   const collection = node("details", "creator-collection-note");
-  collection.append(node("summary", "", "Evidence Score · Beta — measures report coverage. Low scores mean limited research."), node("p", "", EVIDENCE_SCORE_SCOPE), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
+  collection.append(node("summary", "", "Onion Score · Higher means more documented product problems."), node("p", "", "Only completed product-issue reviews receive a score or rank. Source confidence, missing research and community votes do not establish product problems."), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
   const masthead = node("div", "creator-masthead");
   masthead.append(hero, coverage);
   root.replaceChildren(masthead, collection, layout, evidenceMethodology());

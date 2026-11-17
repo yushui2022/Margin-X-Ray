@@ -1,5 +1,9 @@
 # One Onion Score, higher is fresher
 
+Historical review. The subsequent user clarification makes higher scores worse
+and requires actual documented product problems. See `product-problem-ranking-review.md`;
+the confidence totals and high-is-fresh bands below are no longer public ratings.
+
 The user identified the redundant confidence and inverse-index columns and asked
 for one score with higher values meaning fresher onions. The directory now shows
 the confidence total directly as **Onion Score**, next to its illustration, band

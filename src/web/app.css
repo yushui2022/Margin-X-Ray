@@ -436,6 +436,8 @@ body[data-view="creators"] .topbar-right { display: none; }
 .creator-voting-guide { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 10px 20px; font-size: 12px; color: var(--mx-muted); background: var(--mx-soft); }
 .creator-voting-guide > span:first-child { margin-right: auto; color: var(--mx-ink); font-weight: 600; }
 .creator-voting-guide[hidden] { display: none; }
+.creator-ranking-note { margin: 0; padding: 14px 20px; color: var(--mx-muted); background: var(--mx-soft); border-top: 1px solid var(--mx-line); font-size: 12px; line-height: 1.6; }
+.creator-ranking-note[hidden] { display: none; }
 .creator-public-item:hover, .creator-public-item:focus-within { background: #f8f3eb; }
 .creator-home .creator-public-item .creator-public-row:hover { background: transparent; }
 .creator-home .creator-identity strong { font-size: 15px; }
@@ -474,7 +476,7 @@ body[data-view="creators"] .topbar-right { display: none; }
   .creator-sort-caption { display: none; }
   .creator-home .creator-sort select { width: 132px; font-size: 12px; padding-inline: 6px; }
   .creator-voting-guide { padding: 10px 14px; gap: 6px 10px; }
-  .creator-voting-guide > span:first-child { display: none; }
+  .creator-voting-guide > span:first-child { flex-basis: 100%; }
 }
 @media (max-width: 350px) {
   .creator-home .creator-board-head { grid-template-columns: 1fr; }

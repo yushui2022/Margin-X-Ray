@@ -1,5 +1,6 @@
 {
   "version": "confidence-v1",
+  "status": "Historical evidence-confidence methodology. Superseded as the public Onion Score by product-issues-v1; never interpret confidence as a product-problem rating.",
   "observedAt": "2026-11-17",
   "weights": { "sources": 40, "coverage": 40, "corroboration": 20 },
   "provenance": { "direct-primary": 1, "indexed-primary": 0.6, "secondary": 0.3 },
