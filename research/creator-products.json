@@ -31,7 +31,30 @@
     { "id": "loreal-root", "label": "L’Oréal US · Magic Root Cover Up", "url": "https://www.lorealparisusa.com/hair-color/root-touch-up/magic-root-cover-up", "access": "Official page via search index", "excerpt": "Magic Root Temporary Root Cover Up Spray for Gray Root Coverage; $12.99", "publishedAt": null },
     { "id": "sony-promotion", "label": "Nutcake · Mrwhosetheboss post listing", "url": "https://www.nutcake.com/creators/mrwhosetheboss", "access": "Direct secondary page; original TikTok video not retrieved", "excerpt": "Sony cooked on this one … @SonyElectronics @Sony Europe #ad #WF1000XM6", "publishedAt": null },
     { "id": "sony-price", "label": "Sony US · WF-1000XM6 Platinum Silver", "url": "https://electronics.sony.com/audio/headphones/truly-wireless-earbuds/p/wf1000xm6-s", "access": "Official page via search index", "excerpt": "WF-1000XM6/S; Sale Price $299.99; Save $30.00", "publishedAt": null },
-    { "id": "arun-site", "label": "Mrwhosetheboss · Official website", "url": "https://mrwhosetheboss.com/", "access": "Official page via search index", "excerpt": "I'm planning some big things so if you'd like to be the first to know about them, drop your email here", "publishedAt": null }
+    { "id": "arun-site", "label": "Mrwhosetheboss · Official website", "url": "https://mrwhosetheboss.com/", "access": "Official page via search index", "excerpt": "I'm planning some big things so if you'd like to be the first to know about them, drop your email here", "publishedAt": null },
+    { "id": "feastables-founder", "label": "Feastables · Tony's Open Chain partnership announcement", "url": "https://feastables.com/pages/feastables-and-tonys-open-chain-partnership-announcement", "access": "Official announcement via search index", "excerpt": "Feastables is a global snacking company founded in 2022, by Jimmy Donaldson (better known as MrBeast).", "publishedAt": "2024-09-24" },
+    { "id": "feastables-store", "label": "Feastables · Official store destination", "url": "https://feastables.com/", "access": "Official page via search index", "excerpt": "ONLINE SALES HAVE MOVED TO MRBEAST.STORE", "publishedAt": null },
+    { "id": "feastables-standard", "label": "MrBeast Store · Milk Chocolate Pack, 10 Standard Bars", "url": "https://mrbeast.store/products/feastables-milk-chocolate-pack", "access": "Official store via search index; direct request returned HTTP 429", "excerpt": "Milk Chocolate Pack - 10 Bars; $20.99; Pack: Milk Chocolate Pack (10 Standard Bars). Free Shipping on Orders over $75. USA orders ship within 7-10 business days. Feastables products are not eligible for returns due to their perishable nature.", "publishedAt": null },
+    { "id": "feastables-king", "label": "MrBeast Store · Milk Chocolate 10 Pack, King Size", "url": "https://mrbeast.store/products/feastables-milk-chocolate-10-pack", "access": "Official store via search index; direct request returned HTTP 429", "excerpt": "Milk Chocolate 10 Pack; $29.99; Flavor: Milk Chocolate; Size: King Size; Free Shipping on Orders Over $75", "publishedAt": null },
+    { "id": "rare-founder", "label": "Rare Beauty · About Us", "url": "https://www.rarebeauty.com/pages/about", "access": "Direct official page", "excerpt": "A Note From Our Founder … Selena Gomez, CA. Free Standard Shipping w/ $50 order.", "publishedAt": null },
+    { "id": "rare-blush", "label": "Rare Beauty · Soft Pinch Liquid Blush", "url": "https://www.rarebeauty.com/products/soft-pinch-liquid-blush", "access": "Official page via search index; direct request returned HTTP 429; price also present in the directly retrieved mini page's related-product card", "excerpt": "Soft Pinch Liquid Blush; Shade Hope; Nude mauve (dewy); Add To Bag • $25", "publishedAt": null },
+    { "id": "rare-mini", "label": "Rare Beauty · Soft Pinch Liquid Blush Mini", "url": "https://www.rarebeauty.com/products/soft-pinch-liquid-blush-mini", "access": "Direct official page", "excerpt": "Soft Pinch Liquid Blush Mini; Shade Intrigue; Watermelon (matte); Add To Bag • $16. Free Standard Shipping w/ $50 order.", "publishedAt": null },
+    { "id": "rhode-acquisition", "label": "e.l.f. Beauty · Fiscal 2026 first-quarter results", "url": "https://investor.elfbeauty.com/stock-and-financial/press-releases/landing-news/2025/08-06-2025-210554531", "access": "Official investor release via search index", "excerpt": "On August 5, 2025, the Company consummated the acquisition of HRBeauty LLC (rhode), a brand founded by Hailey Bieber.", "publishedAt": "2025-08-06" },
+    { "id": "rhode-founder-role", "label": "e.l.f. Beauty · rhode acquisition agreement and founder roles", "url": "https://investor.elfbeauty.com/stock-and-financial/press-releases/landing-news/2025/05-28-2025-210536607", "access": "Official investor release via search index", "excerpt": "Bieber will continue her role as Founder and additionally serve as Chief Creative Officer and Head of Innovation. Co-Founders Michael D. Ratner and Lauren Ratner … founders with CEO Nick Vlahos will continue to lead the brand.", "publishedAt": "2025-05-28" },
+    { "id": "rhode-filing", "label": "e.l.f. Beauty · September 2026 Form 10-Q, acquisition note", "url": "https://www.sec.gov/Archives/edgar/data/1600033/000160003326000050/elf-20260930.htm", "access": "SEC filing via search index", "excerpt": "Upon consummation of the Merger, rhode became a wholly owned subsidiary of e.l.f. Cosmetics, Inc. All outstanding limited liability company interests of rhode were cancelled and converted into the right to receive the consideration.", "publishedAt": "2026-11-05" },
+    { "id": "rhode-treatment", "label": "rhode · Peptide Lip Treatment, Unscented", "url": "https://www.rhodeskin.com/products/peptide-lip-treatment", "access": "Official HTTPS page via search index; direct request returned HTTP 429", "excerpt": "Scent: unscented; Size: 10ml / .3 fl oz; improved formula; BUY lip treatment - $20.00; free US shipping on orders over $45. Get notified when this product is back in stock.", "publishedAt": null },
+    { "id": "rhode-quad-lead", "label": "rhode · Four-scent lip treatments, unresolved offer", "url": "https://rhodeskin.com/products/the-peptide-lip-treatments", "access": "Search index returned an HTTP-version result; HTTPS direct request returned HTTP 429", "excerpt": "All four scents: rhode Vanilla, Salted Caramel, Watermelon Slice, Unscented; 10ml each; BUY lip treatments - $65.00; Original Value: $72. Other indexed observations showed a $72 offer with $80 original value; offer freshness unresolved.", "publishedAt": null },
+    { "id": "kylie-partnership", "label": "Coty · Kylie Jenner partnership announcement", "url": "https://www.coty.com/news/coty-and-kylie-jenner-announce-strategic-partnership-to-expand-beauty-brands", "access": "Official press release via search index", "excerpt": "In November 2015, Kylie launched her cosmetics brand, Kylie Cosmetics. Coty will acquire a 51% ownership in the partnership for $600M.", "publishedAt": "2019-11-18" },
+    { "id": "kylie-closing", "label": "Coty · Kylie Jenner partnership completed", "url": "https://www.coty.com/news/coty-and-kylie-jenner-commence-strategic-partnership", "access": "Official press release via search index", "excerpt": "Coty Inc. and Kylie Jenner announced today that they have completed the transaction to create a long-term strategic partnership.", "publishedAt": "2020-01-06" },
+    { "id": "kylie-matte", "label": "Kylie Cosmetics · Matte Lip Kit, Bare", "url": "https://kyliecosmetics.com/products/matte-lip-kit?variant=43927621632242", "access": "Official US listing via search index; direct request returned HTTP 429", "excerpt": "Matte Lip Kit; Regular price $35; Shade bare; light pink nude; Matte Lip Kit, bare $35. Personalized orders cannot be returned and require 2 to 3 additional processing days.", "publishedAt": null },
+    { "id": "kylie-velvet", "label": "Kylie Cosmetics · Velvet Lip Kit, Bare", "url": "https://kyliecosmetics.com/products/velvet-lip-kit?variant=44109989216498", "access": "Official US listing via search index; direct request returned HTTP 429", "excerpt": "Velvet Lip Kit; Regular price $35; Shade Bare; nude pinky beige; each kit includes velvet liquid lipstick and lip liner.", "publishedAt": null },
+    { "id": "rem-founder", "label": "r.e.m. beauty · About", "url": "https://rembeauty.com/pages/about", "access": "Official page via search index", "excerpt": "from the imagination of our founder Ariana Grande, r.e.m. beauty is an invitation to express yourself through beauty and beyond.", "publishedAt": null },
+    { "id": "rem-investment", "label": "r.e.m. beauty · Sandbridge investment announcement", "url": "https://en.prnasia.com/releases/apac/ariana-grande-s-r-e-m-beauty-announces-strategic-investment-with-sandbridge-capital-404911.shtml", "access": "Brand-issued press release via search index", "excerpt": "Strategic investment led by Sandbridge Capital; participation from Strand Equity, HYBE America, Live Nation Entertainment and Universal Music Group.", "publishedAt": "2023-05-23" },
+    { "id": "rem-gloss", "label": "r.e.m. beauty · On Your Collar Plumping Lip Gloss", "url": "https://rembeauty.com/products/plumping-lip-gloss", "access": "Official page via search index; direct request returned HTTP 429", "excerpt": "on your collar plumping lip gloss; Regular price $22; shade fembot; mauve toned pink with iridescent pink and blue flip; Add to cart; notify me when back in stock.", "publishedAt": null },
+    { "id": "rem-balm", "label": "r.e.m. beauty · Essential Drip Glossy Balm", "url": "https://rembeauty.com/products/glossy-balm", "access": "Official page via search index; direct request returned HTTP 429", "excerpt": "essential drip glossy balm; Regular price $20; cosmo; warm peachy pink. Taxes and shipping calculated at checkout; free shipping on orders $50+. Add to cart; Sold out; notify me when back in stock.", "publishedAt": null },
+    { "id": "papatui-founder", "label": "PAPATUI · Our Story & Founder", "url": "https://papatui.com/pages/about-papatui", "access": "Direct official page", "excerpt": "PAPATUI is a men's care brand founded by Dwayne The Rock Johnson in collaboration with dermatologists, scientists and world-renowned fragrance experts. Shop now on Target, Walmart, Amazon.", "publishedAt": null },
+    { "id": "papatui-wash", "label": "PAPATUI · Refreshing Body Wash, Cedar Sport", "url": "https://papatui.com/products/refreshing-body-wash", "access": "Official page via search index; direct request returned HTTP 429", "excerpt": "Scent: Cedar Sport; FIND THIS PRODUCT NEAR ME; Refreshing Body Wash Cedar Sport Sale price $8.00; Where to Buy; Shop now on Target, Walmart, Amazon.", "publishedAt": null },
+    { "id": "papatui-stick-lead", "label": "PAPATUI · Enhancing Tattoo Stick", "url": "https://papatui.com/products/enhancing-tattoo-stick", "access": "Official page via search index; direct request returned HTTP 429", "excerpt": "Enhancing Tattoo Stick; Scent: Unscented; Unscented, Coconut Woods; FIND THIS PRODUCT NEAR ME; Where to Buy. No usable variant-specific price in the retrieved product extract.", "publishedAt": null }
   ],
   "creators": [
     {
@@ -61,6 +84,48 @@
       "brandSources": ["nimya-founder"],
       "thirdPartyNote": "No third-party SKU matched with sufficient evidence in this collection. The MISSHA lead below is excluded from product counts and calculations.",
       "leads": [{ "title": "MISSHA mention · SKU unresolved", "note": "The indexed title names MISSHA, but the exact product, shade, price and commercial relationship could not be verified. Search snippets include unrelated content; no candidate retail price has been attached.", "sources": ["nikkie-missha-lead"] }]
+    },
+    {
+      "handle": "mrbeast",
+      "brandNote": "Feastables identifies Jimmy Donaldson (MrBeast) as its founder and directs online sales to MrBeast Store. Founder status does not establish sole ownership, current personal equity or distributions. The two records below are different pack sizes, not a price change for the same variant.",
+      "brandSources": ["feastables-founder", "feastables-store"],
+      "thirdPartyNote": "This batch researched Feastables listings. Third-party promotion sampling has not been completed; TikTok Shop affiliation, attributed orders and commissions are unverified.",
+      "leads": []
+    },
+    {
+      "handle": "selenagomez",
+      "brandNote": "Rare Beauty's official About page identifies Selena Gomez as founder. Current ownership percentage and personal distributions were not established. These are brand-store references with no verified TikTok Shop transaction.",
+      "brandSources": ["rare-founder"],
+      "thirdPartyNote": "This batch researched Rare Beauty listings. Third-party promotion sampling has not been completed; absence of a record does not mean absence of paid promotions.",
+      "leads": []
+    },
+    {
+      "handle": "haileybieber",
+      "brandNote": "Hailey Bieber founded rhode with Michael D. Ratner and Lauren Ratner. e.l.f. completed its acquisition on August 5, 2025; its September 2026 filing identifies rhode as a wholly owned subsidiary of e.l.f. Cosmetics. The acquisition announcement assigns Hailey continuing founder, Chief Creative Officer and Head of Innovation roles. Founder-brand here describes the brand's origin and association, not present personal ownership. Her compensation, sale proceeds and distributions are not established by the product price.",
+      "brandSources": ["rhode-founder-role", "rhode-acquisition", "rhode-filing"],
+      "thirdPartyNote": "This batch researched rhode listings and the acquisition relationship. Third-party promotion sampling and TikTok Shop transaction verification have not been completed.",
+      "leads": [{ "title": "rhode four-scent lip treatment set · Offer unresolved", "note": "Indexed versions show USD 65 with USD 72 original value and USD 72 with USD 80 original value. Direct access was rate-limited, so the four-scent set has no accepted reference price or calculator. It must also be distinguished from the three-scent build-your-own set.", "sources": ["rhode-quad-lead"] }]
+    },
+    {
+      "handle": "kyliejenner",
+      "brandNote": "Coty identifies Kylie Jenner as the founder of Kylie Cosmetics, announced a 51% partnership acquisition in 2019 and confirmed completion in January 2020. This is a historically documented majority transaction, not proof of Kylie's current personal percentage or net proceeds. A current cap table and SKU-level economics were not obtained.",
+      "brandSources": ["kylie-partnership", "kylie-closing"],
+      "thirdPartyNote": "This batch researched Kylie Cosmetics listings. Third-party promotion sampling, affiliate terms and TikTok Shop sales have not been established.",
+      "leads": []
+    },
+    {
+      "handle": "arianagrande",
+      "brandNote": "r.e.m. beauty names Ariana Grande as founder. Its 2023 announcement identifies outside investors led by Sandbridge Capital; current ownership percentages and distributions are unknown. Founder status does not establish sole ownership or personal product profit.",
+      "brandSources": ["rem-founder", "rem-investment"],
+      "thirdPartyNote": "This batch researched r.e.m. beauty listings. Third-party promotion sampling and TikTok Shop transaction verification have not been completed.",
+      "leads": []
+    },
+    {
+      "handle": "therock",
+      "brandNote": "PAPATUI's official story names Dwayne The Rock Johnson as founder. The website directs shoppers to retailers; its reference price does not verify a direct checkout offer or any retailer's current price. Ownership percentage and personal distributions are unknown.",
+      "brandSources": ["papatui-founder"],
+      "thirdPartyNote": "This batch researched PAPATUI. Other brands and third-party promotions have not been sampled; no TikTok Shop affiliation or attributed sales were verified.",
+      "leads": [{ "title": "PAPATUI Enhancing Tattoo Stick · Price unresolved", "note": "The official product extract identifies Unscented and Coconut Woods variants and retailer links, but did not yield a usable price for the selected Unscented variant. A generic homepage price is insufficient to establish that offer; no price or calculator is attached.", "sources": ["papatui-stick-lead"] }]
     }
   ],
   "products": [
@@ -114,6 +179,66 @@
       "postUrl": "https://www.tiktok.com/@mrwhosetheboss/video/7606015834678381831",
       "price": { "amount": 299.99, "currency": "USD", "market": "United States", "conditions": "Search-indexed official sale price for Platinum Silver; USD 30 saving shown. Tax and shipping not established. This reference variant and price are not verified against the promoted offer." },
       "sources": ["sony-promotion", "sony-price"], "shopStatus": "TikTok Shop listing and attributed sales unverified"
+    },
+    {
+      "id": "feastables-standard", "handle": "mrbeast", "kind": "founder-brand", "name": "Feastables Milk Chocolate Pack", "variant": "10 Standard Bars · price per pack; bar weight not established",
+      "relationship": "Founder-associated brand · Feastables", "confidence": "High for founder relationship; indexed listing only; checkout and economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 20.99, "currency": "USD", "market": "United States", "conditions": "Indexed official store price for ten standard bars, not ten king-size bars. Free shipping over USD 75 advertised; US orders expected to ship within 7–10 business days. Page says perishable Feastables products are ineligible for returns. Taxes, stock and final checkout total not verified." },
+      "sources": ["feastables-standard", "feastables-founder", "feastables-store"], "shopStatus": "Official store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "feastables-king", "handle": "mrbeast", "kind": "founder-brand", "name": "Feastables Milk Chocolate 10 Pack", "variant": "10 King Size bars · price per pack",
+      "relationship": "Founder-associated brand · Feastables", "confidence": "High for founder relationship; indexed listing only; checkout and economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 29.99, "currency": "USD", "market": "United States", "conditions": "Indexed official price for the King Size pack. Separate from the USD 20.99 Standard Bars listing. Free shipping over USD 75 advertised. Taxes, stock, checkout total and this pack's full return terms not verified." },
+      "sources": ["feastables-king", "feastables-founder", "feastables-store"], "shopStatus": "Official store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "rare-blush", "handle": "selenagomez", "kind": "founder-brand", "name": "Rare Beauty Soft Pinch Liquid Blush", "variant": "Full-size listing · Hope · nude mauve, dewy; volume not established in retained extract",
+      "relationship": "Founder-associated brand · Rare Beauty", "confidence": "High for founder relationship; indexed product page plus direct related-product price; checkout unverified", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 25, "currency": "USD", "market": "United States", "conditions": "Official indexed reference price, also shown for Hope in the directly retrieved mini page's related-product card. Free standard shipping with a USD 50 order advertised. Tax treatment, return conditions, current stock and checkout total not established." },
+      "sources": ["rare-blush", "rare-mini", "rare-founder"], "shopStatus": "Brand-store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "rare-mini", "handle": "selenagomez", "kind": "founder-brand", "name": "Rare Beauty Soft Pinch Liquid Blush Mini", "variant": "Mini listing · Intrigue · watermelon, matte; volume not established in retained extract",
+      "relationship": "Founder-associated brand · Rare Beauty", "confidence": "High for founder relationship and directly retrieved listing; checkout and economics unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 16, "currency": "USD", "market": "United States", "conditions": "Direct official page reference for the selected Intrigue mini. Free standard shipping with a USD 50 order advertised. Tax treatment, return conditions and checkout total not established; an Add To Bag control alone does not verify fulfillment availability." },
+      "sources": ["rare-mini", "rare-founder"], "shopStatus": "Brand-store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "rhode-treatment", "handle": "haileybieber", "kind": "founder-brand", "name": "rhode Peptide Lip Treatment", "variant": "Unscented · 10 mL / .3 fl oz · improved-formula listing",
+      "relationship": "Founder-associated brand · acquired by e.l.f. in 2025", "confidence": "High for founder and acquisition evidence; price from search index; checkout unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 20, "currency": "USD", "market": "United States", "conditions": "USD 20 on the indexed HTTPS US listing; an older HTTP observation showed USD 18 and is not used as the selected price. Free US shipping over USD 45 advertised. Both purchase and back-in-stock language appear, so availability is unresolved. Tax, return conditions and final checkout price not verified." },
+      "sources": ["rhode-treatment", "rhode-founder-role", "rhode-acquisition", "rhode-filing"], "shopStatus": "Brand-store reference for acquired brand; TikTok Shop sales unverified"
+    },
+    {
+      "id": "kylie-matte", "handle": "kyliejenner", "kind": "founder-brand", "name": "Kylie Cosmetics Matte Lip Kit", "variant": "Bare · light pink nude · variant 43927621632242",
+      "relationship": "Founder-associated brand · Coty partnership", "confidence": "High for historical founder/partnership evidence; indexed price; current cap table unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 35, "currency": "USD", "market": "United States", "conditions": "Regular indexed US listing price for Bare, without optional personalization. Personalized orders are described as nonreturnable with 2–3 additional processing days. Standard return terms, taxes, shipping, current stock and checkout price not verified. Regional-currency pages are excluded." },
+      "sources": ["kylie-matte", "kylie-partnership", "kylie-closing"], "shopStatus": "Brand-store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "kylie-velvet", "handle": "kyliejenner", "kind": "founder-brand", "name": "Kylie Cosmetics Velvet Lip Kit", "variant": "Bare · nude pinky beige · liquid lipstick and lip liner · variant 44109989216498",
+      "relationship": "Founder-associated brand · Coty partnership", "confidence": "High for historical founder/partnership evidence; indexed price; current cap table unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 35, "currency": "USD", "market": "United States", "conditions": "Regular indexed US listing price for the Bare kit, without optional personalization. Taxes, shipping, standard return terms, current stock and checkout total not verified. This is a different formula from the Matte Lip Kit." },
+      "sources": ["kylie-velvet", "kylie-partnership", "kylie-closing"], "shopStatus": "Brand-store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "rem-gloss", "handle": "arianagrande", "kind": "founder-brand", "name": "r.e.m. beauty On Your Collar Plumping Lip Gloss", "variant": "Fembot · mauve toned pink with iridescent pink and blue flip",
+      "relationship": "Founder-associated brand · r.e.m. beauty", "confidence": "High for founder relationship; indexed listing; stock and checkout unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 22, "currency": "USD", "market": "United States", "conditions": "Indexed regular price. Store text says taxes and shipping are calculated at checkout and advertises free shipping on orders USD 50+. Purchase and back-in-stock text coexist; stock and final checkout total are unverified. Return terms were not collected." },
+      "sources": ["rem-gloss", "rem-balm", "rem-founder", "rem-investment"], "shopStatus": "Brand-store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "rem-balm", "handle": "arianagrande", "kind": "founder-brand", "name": "r.e.m. beauty Essential Drip Glossy Balm", "variant": "Cosmo · warm peachy pink",
+      "relationship": "Founder-associated brand · r.e.m. beauty", "confidence": "High for founder relationship; indexed listing; stock and checkout unknown", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 20, "currency": "USD", "market": "United States", "conditions": "Indexed regular price. Taxes and shipping calculated at checkout; free shipping on orders USD 50+ advertised. Both Add to cart and Sold out/back-in-stock text appear; availability is unresolved. Return terms and final checkout total were not verified." },
+      "sources": ["rem-balm", "rem-founder", "rem-investment"], "shopStatus": "Brand-store reference; TikTok promotion, Shop listing and sales unverified"
+    },
+    {
+      "id": "papatui-wash", "handle": "therock", "kind": "founder-brand", "name": "PAPATUI Refreshing Body Wash", "variant": "Cedar Sport · bottle volume not established in retained extract",
+      "relationship": "Founder-associated brand · PAPATUI", "confidence": "High for founder relationship; indexed brand reference price only; retailer offer unverified", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 8, "currency": "USD", "market": "United States", "conditions": "Brand page's indexed Cedar Sport reference price, displayed as Sale price with no established comparison price. The site emphasizes Find this product near me and Target/Walmart/Amazon links. Direct purchase availability, retailer price, tax, shipping and returns are unverified." },
+      "sources": ["papatui-wash", "papatui-founder"], "shopStatus": "Brand reference with retailer referrals; direct checkout and TikTok Shop sales unverified"
     }
   ]
 }

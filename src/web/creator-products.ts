@@ -154,12 +154,15 @@ export function renderCreatorProducts(handle: string): HTMLElement {
     const grid = node("div", "creator-product-grid");
     for (const product of items) grid.append(productCard(product));
     section.append(grid);
-    if (group.kind === "third-party") {
-      for (const lead of creator.leads) {
-        const card = node("article", "card creator-product-lead");
-        card.append(node("h3", "", lead.title), node("p", "", lead.note), sources(lead.sources));
-        section.append(card);
-      }
+    wrapper.append(section);
+  }
+  if (creator.leads.length) {
+    const section = node("section", "creator-product-group creator-unresolved-leads");
+    section.append(node("h2", "", `Unresolved product leads · ${creator.leads.length}`), node("p", "", "These leads need further verification and are excluded from product counts and calculators."));
+    for (const lead of creator.leads) {
+      const card = node("article", "card creator-product-lead");
+      card.append(node("h3", "", lead.title), node("p", "", lead.note), sources(lead.sources));
+      section.append(card);
     }
     wrapper.append(section);
   }

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { PUBLIC_CREATORS, DIRECTORY_PAGE_SIZE, directoryPage } from "../src/shared/creator-directory";
+import research from "../research/creator-products.json";
 
 const defaults = { query: "", category: "All", sort: "followers" as const, page: 1 };
 
@@ -47,8 +48,9 @@ test("pagination visits the complete directory exactly once", () => {
 test("directory search is case-insensitive and combines category and coverage filters", () => {
   assert.ok(directoryPage({ ...defaults, query: " @MRBEAST " }).items.some((item) => item.handle === "mrbeast"));
   assert.ok(directoryPage({ ...defaults, query: "Mikayla" }).items.some((item) => item.handle === "mikaylanogueira"));
-  const handles = new Set(["mikaylanogueira", "glamzilla", "nikkietutorials", "mrwhosetheboss"]);
-  assert.equal(directoryPage({ ...defaults, productHandles: handles }).total, 4);
+  const handles = new Set(research.products.map((item) => item.handle));
+  assert.equal(directoryPage({ ...defaults, productHandles: handles }).total, handles.size);
+  assert.ok(directoryPage({ ...defaults, query: "@mrbeast", productHandles: handles }).items.some((item) => item.handle === "mrbeast"));
   const result = directoryPage({ ...defaults, category: "Tech", productHandles: handles });
   assert.deepEqual(result.items.map((item) => item.handle), ["mrwhosetheboss"]);
   const empty = directoryPage({ ...defaults, query: "no-match-!@#$", page: 25 });

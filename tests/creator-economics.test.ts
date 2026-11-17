@@ -33,6 +33,7 @@ test("collected products retain traceable sources without factual earnings claim
   const sources = new Set(research.sources.map((source) => source.id));
   assert.equal(sources.size, research.sources.length);
   assert.equal(new Set(research.products.map((product) => product.id)).size, research.products.length);
+  assert.equal(new Set(research.creators.map((creator) => creator.handle)).size, research.creators.length);
   const checkSources = (ids: string[]) => {
     assert.ok(ids.length > 0);
     for (const id of ids) assert.ok(sources.has(id), `Missing source: ${id}`);
@@ -49,6 +50,7 @@ test("collected products retain traceable sources without factual earnings claim
   }
   for (const product of research.products) {
     assert.ok(profiles.some((profile) => profile.handle === product.handle));
+    assert.ok(research.creators.some((creator) => creator.handle === product.handle));
     assert.ok(["third-party", "founder-brand", "collaboration"].includes(product.kind));
     assert.ok(["USD", "EUR"].includes(product.price.currency));
     assert.ok(Number.isFinite(product.price.amount) && product.price.amount > 0);

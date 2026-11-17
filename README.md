@@ -22,7 +22,7 @@ Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
 Famadex's public TikTok people ranking. All are **Not rated**. The default sort is
 descending directory follower count, with unknown counts last; it is not an
 Onion Score ranking. Browse 20 records per page, search the full collection,
-sort by name, filter by collected category, or show the four profiles with
+sort by name, filter by collected category, or show the ten profiles with
 product evidence. Summary counts keep profile coverage separate from ratings.
 
 Follower counts are rounded secondary-source observations collected 2026-11-17,
@@ -42,10 +42,15 @@ interface and is not a validated measure of personal integrity. Fictional produc
 cards do not support real creator scores. Live scoring
 requires source observations, dates, coverage thresholds and review rules.
 
-Real creator profiles now include **8 public product records** observed on
-2026-11-17: 3 third-party promotions/mentions, 4 founder-brand products (POV and
-Nimya), and 1 Nudestix collaboration. One unresolved MISSHA mention is kept as a
-lead without a price or calculator. `research/creator-products.json` stores
+Real creator profiles now include **18 public product records across 10 creators**
+observed on 2026-11-17: 3 third-party promotions/mentions, 14 founder-associated
+brand products (POV, Nimya, Feastables, Rare Beauty, rhode, Kylie Cosmetics,
+r.e.m. beauty and PAPATUI), and 1 Nudestix collaboration. Founder association
+includes acquired brands; rhode's e.l.f. acquisition and Coty's historical Kylie
+partnership are documented without assigning product profit to the creator.
+Three unresolved leads (MISSHA, a rhode set and a PAPATUI tattoo stick) are kept
+without prices or calculators. 490 directory profiles still have no product
+research. `research/creator-products.json` stores
 source URLs, extracts, access methods, historical post dates, variants, currencies,
 purchase conditions and relationship confidence. Search-index observations are
 explicitly distinguished from directly retrieved pages. These are reference

@@ -44,10 +44,13 @@ follower/name sorting, category filtering, a product-evidence filter and numbere
 pagination. All 500 known handles resolve locally to their own report routes.
 Unknown handles remain unsupported by live retrieval. Images load lazily.
 
-The four researched profiles retain their eight product records. New profiles
-show "Research not started" in Products & earnings, rather than an empty panel
-or copied product claims. All real scores remain null. The six fictional scoring
-examples remain in their separate view.
+At initial seeding, four researched profiles retained their eight product records.
+The first research expansion adds six creators and ten records, bringing coverage
+to ten creators and eighteen priced records, with three unresolved leads. The
+remaining 490 profiles show "Research not started" in Products & earnings. Product
+coverage is derived from `creator-products.json`; the `collection` marker in the
+portrait file records roster provenance, not current research status. All real
+scores remain null. The six fictional scoring examples remain in their separate view.
 
 ## Recollection
 
