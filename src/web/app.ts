@@ -17,6 +17,7 @@ import {
 import { EXTENSION_VERSION } from "../shared/version";
 import { downloadPoster, renderPosterBlob } from "../content/ui/poster";
 import { renderProWorkspace } from "./pro";
+import { initCreators, renderCreatorRoute } from "./creators";
 import type {
   Confidence,
   CostWaterfall,
@@ -77,6 +78,7 @@ const els = {
   testBackend: byId<HTMLButtonElement>("testBackend"),
   toast: byId<HTMLElement>("toast"),
   proView: byId<HTMLElement>("proView"),
+  creatorsView: byId<HTMLElement>("creatorsView"),
 };
 
 let apiBase = normalizeBase(localStorage.getItem(STORAGE_KEY) || DEFAULT_API);
@@ -132,29 +134,37 @@ function boot(): void {
   }
   for (const button of document.querySelectorAll<HTMLButtonElement>("[data-view]")) {
     button.addEventListener("click", () => {
-      const view = button.dataset.view === "pro" ? "pro" : "scan";
+      const view = button.dataset.view === "pro" ? "pro" : button.dataset.view === "scan" ? "scan" : "creators";
       showView(view);
     });
   }
-  if (location.hash === "#pro") showView("pro");
+  initCreators(els.creatorsView);
+  window.addEventListener("hashchange", routeView);
+  routeView();
   void refreshHealth();
 }
 
-function showView(view: "scan" | "pro"): void {
+function routeView(): void {
+  showView(location.hash === "#pro" ? "pro" : location.hash === "#scan" ? "scan" : "creators");
+}
+
+function showView(view: "scan" | "pro" | "creators"): void {
   const pro = view === "pro";
   els.proView.hidden = !pro;
-  els.hero.hidden = pro || scanStarted;
-  els.workspace.hidden = pro || !scanStarted;
+  els.creatorsView.hidden = view !== "creators";
+  els.hero.hidden = view !== "scan" || scanStarted;
+  els.workspace.hidden = view !== "scan" || !scanStarted;
   document.body.dataset.view = view;
   for (const button of document.querySelectorAll<HTMLButtonElement>("[data-view]")) {
     button.classList.toggle("active", button.dataset.view === view);
+    button.setAttribute("aria-pressed", String(button.dataset.view === view));
   }
   if (pro) {
     renderProWorkspace();
-    location.hash = "#pro";
-  } else if (location.hash === "#pro") {
-    history.replaceState(null, "", location.pathname + location.search);
   }
+  const hash = view === "creators" && location.hash.startsWith("#creator/") ? location.hash : `#${view}`;
+  if (location.hash !== hash) location.hash = hash;
+  if (view === "creators") renderCreatorRoute();
 }
 
 function byId<T extends HTMLElement>(id: string): T {

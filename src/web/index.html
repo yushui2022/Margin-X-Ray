@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Onion Head — Agent scan</title>
+    <title>Onion Head — Creator leaderboard</title>
     <link rel="icon" href="assets/mascot/onion-head.webp" />
     <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="tokens.css" />
@@ -19,7 +19,8 @@
         </span>
       </a>
       <nav class="topnav" aria-label="Product area">
-        <button class="topnav-btn active" data-view="scan" type="button">Scan</button>
+        <button class="topnav-btn active" data-view="creators" type="button">Creator scores</button>
+        <button class="topnav-btn" data-view="scan" type="button">Product scan</button>
         <button class="topnav-btn" data-view="pro" type="button">Pro workspace</button>
       </nav>
       <div class="topbar-right">
@@ -29,7 +30,8 @@
     </header>
 
     <main class="page">
-      <section class="hero" id="hero">
+      <section id="creatorsView" aria-label="Creator scores"></section>
+      <section class="hero" id="hero" hidden>
         <div class="hero-grid">
           <div class="hero-copy">
         <p class="eyebrow">Agent scan</p>

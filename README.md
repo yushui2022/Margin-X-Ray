@@ -1,16 +1,25 @@
 # Onion Head (Don't Be the Onion Head)
 
-**See the real cost before you buy.**
+**Check the creator behind the recommendation.**
 
-Onion Head is a consumer price-transparency tool. Paste a TikTok video or
-product link, upload a photo, or scan the page you are on. It estimates the
-factory cost behind the product, shows a fair retail range, and reports how
-many near-identical 1688 listings exist — then exports a share card.
+Onion Head now opens with a creator shopping-transparency leaderboard. The
+web interface supports category filtering, score/name sorting, fictional creator
+reports, and TikTok username/profile-link input. Product scanning and the Pro
+sourcing workspace remain available through the navigation.
 
-The product is the extension. `dist/` is the loadable extension. `preview/` is
-a dev-only HUD preview page generated outside `dist/`, and
-`server/mock-xray.mjs` is a local mock API. Neither ships inside the extension
-package.
+The creator leaderboard is an interface preview: all six ranked identities,
+post counts and scores are fictional fixtures. Arbitrary TikTok handles show
+**Not rated**; no creator retrieval service is connected and no lookup is queued.
+The proposed Onion Score weights price transparency (40%), commercial disclosure
+(35%) and linked-seller returns information (25%). The formula is visible in the
+interface and is not a validated measure of personal integrity. Product evidence
+cards are placeholders, not evidence supporting the fixture scores. Live scoring
+requires source observations, dates, coverage thresholds and review rules.
+
+`web/` is the standalone frontend (`npm run serve:demo`, port 4173; default route
+`#creators`). `dist/` is the loadable Chrome extension. `preview/` is a dev-only
+HUD harness. `server/mock-xray.mjs` supplies fictional product scan responses;
+it does not search or score TikTok creators.
 
 This build still uses a clearly labeled demo dataset for factory verification.
 Live adapters call TikHub, browser-side video frame extraction, Baidu product
