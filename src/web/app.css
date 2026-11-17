@@ -377,7 +377,7 @@ body[data-view="creators"] .topbar-right { display: none; }
 .creator-vote-result { margin: 10px 0 6px; font-size: 13px; color: var(--mx-ink); }
 .creator-vote-note { margin: 0; color: var(--mx-muted); font-size: 12px; }
 .creator-feedback-retry { padding: 8px 0; border: 0; background: none; color: var(--mx-accent-strong); text-decoration: underline; cursor: pointer; }
-.creator-public-item { display: grid; grid-template-columns: minmax(0, 1fr) 132px; align-items: center; border-top: 1px solid var(--mx-line); }
+.creator-public-item { display: grid; grid-template-columns: minmax(0, 1fr) 148px; align-items: center; border-top: 1px solid var(--mx-line); }
 .creator-home .creator-public-item .creator-public-row { grid-template-columns: 44px minmax(0, 1fr) 90px; border-top: 0; padding-right: 16px; }
 .creator-public-item .creator-arrow { display: none; }
 .creator-feedback.creator-feedback-compact { display: block; min-width: 0; margin: 12px 16px 12px 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
@@ -386,6 +386,27 @@ body[data-view="creators"] .topbar-right { display: none; }
 .creator-feedback-compact .creator-vote-buttons button { min-width: 44px; padding: 8px 6px; gap: 5px; }
 .creator-feedback-compact .creator-vote-result { font-size: 11px; margin: 6px 0 0; color: var(--mx-muted); }
 .creator-feedback-compact .creator-feedback-retry { font-size: 12px; }
+.onion-index { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--mx-ink); }
+.onion-index img { display: block; width: 56px; height: 60px; flex: none; object-fit: contain; }
+.onion-index > div { min-width: 0; }
+.onion-index-label { display: block; color: var(--mx-muted); font-size: 12px; }
+.onion-index-value { display: block; font: 600 30px/1.2 var(--mx-font-mono); color: #79566e; }
+.onion-index-state { display: block; font-size: 12px; color: var(--mx-muted); }
+.onion-index[data-band="rotten"] .onion-index-value, .onion-index[data-band="spoiled"] .onion-index-value { color: #65532b; }
+.onion-index.is-compact { gap: 6px; margin-bottom: 8px; }
+.onion-index.is-compact img { width: 42px; height: 46px; }
+.onion-index.is-compact .onion-index-label { font-size: 11px; }
+.onion-index.is-compact .onion-index-value { font-size: 19px; }
+.onion-index.is-compact .onion-index-state { font-size: 11px; }
+.onion-scale { font-size: 12px; color: var(--mx-muted); }
+.onion-scale summary { cursor: pointer; color: var(--mx-accent-strong); padding: 6px 0; }
+.onion-scale p { font-size: 12px; line-height: 1.65; max-width: 720px; }
+.onion-scale-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 14px 0; text-align: center; }
+.onion-scale-grid img { display: block; margin: 0 auto 6px; width: 48px; height: 52px; }
+.onion-scale-grid strong, .onion-scale-grid span { display: block; font-size: 11px; }
+.onion-scale-grid strong { color: var(--mx-ink); }
+.creator-voting-guide .onion-scale[open] { flex-basis: 100%; }
+.creator-feedback-copy .onion-scale { margin-top: 10px; }
 .creator-masthead { display: grid; grid-template-columns: minmax(0, 1fr) 300px; align-items: center; gap: 40px; padding: 10px 0 28px; margin-bottom: 24px; border-bottom: 1px solid var(--mx-line-strong); }
 .creator-masthead .creator-rating-intro { text-align: left; margin: 0; }
 .creator-masthead .creator-rating-intro h1 { font-size: clamp(40px, 5vw, 64px); }
@@ -411,6 +432,8 @@ body[data-view="creators"] .topbar-right { display: none; }
   .creator-feedback-compact .creator-feedback-prompt { margin: 0; }
   .creator-feedback-compact .creator-vote-result { margin: 0; }
   .creator-feedback-compact .creator-vote-buttons button { min-width: 48px; }
+  .creator-feedback-compact .onion-index { margin: 0 auto 0 0; flex: none; }
+  .creator-feedback-compact .creator-feedback-controls { justify-content: flex-end; }
 }
 @media (max-width: 760px) {
   .creator-feedback { grid-template-columns: 1fr; gap: 16px; padding: 18px; }
@@ -437,7 +460,7 @@ body[data-view="creators"] .topbar-right { display: none; }
   .creator-home .creator-board-head .eyebrow { margin-block: 0; }
   .creator-sort-caption { display: none; }
   .creator-home .creator-sort select { width: 132px; font-size: 12px; padding-inline: 6px; }
-  .creator-voting-guide { padding: 10px 14px; gap: 6px 12px; }
+  .creator-voting-guide { padding: 10px 14px; gap: 6px 10px; }
   .creator-voting-guide > span:first-child { display: none; }
 }
 @media (max-width: 350px) {

@@ -70,6 +70,16 @@ Directory controls sit beside each score on desktop and below the row on narrow
 screens. Voting does not open the report. The directory and report read the same
 saved choice; initial parallel row loads share one anonymous browser session.
 
+The **Rotten Onion Index** visualizes community disagreement with a report's score:
+`Needs review votes / all votes × 100`, rounded to one decimal. It is separate from
+the Evidence Score. Five local SVG onion states map to 0–<20 (Fresh), 20–<40
+(Spotted), 40–<60 (Bruised), 60–<80 (Spoiled), and 80–100 (Rotten). No votes produce
+a gray onion and an em dash, never an invented zero. Fewer than five votes are
+marked Early. Directory and report indicators update from confirmed API responses,
+including switching/withdrawing a choice. “Onion scale” explains the formula and
+all five ranges. This is anonymous opinion about a score, not established creator
+misconduct, product quality, financial risk or a representative public survey.
+
 The proposed transparency Onion Score, used only in fictional examples, weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
 interface and is not a validated measure of personal integrity. Fictional product

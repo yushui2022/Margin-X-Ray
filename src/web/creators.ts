@@ -3,6 +3,7 @@ import { productCount, renderCreatorProducts } from "./creator-products";
 import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
 import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor, formatEvidenceScore } from "../shared/creator-evidence-score";
 import { renderCreatorFeedback } from "./creator-feedback";
+import { renderOnionScale } from "./onion-index";
 
 type PublicCreator = CreatorProfile;
 
@@ -468,7 +469,7 @@ function renderBoard(): void {
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
   const votingGuide = node("div", "creator-voting-guide");
-  votingGuide.append(node("span", "", "Your take on the score"), node("span", "", "↑ Seems fair"), node("span", "", "↓ Needs review"));
+  votingGuide.append(node("span", "", "Rotten Onion Index"), node("span", "", "↑ Seems fair"), node("span", "", "↓ Needs review"), renderOnionScale());
   votingGuide.title = "One choice per browser. Click your selected vote again to undo.";
   const pagination = node("nav", "creator-pagination");
   pagination.setAttribute("aria-label", "Creator directory pages");

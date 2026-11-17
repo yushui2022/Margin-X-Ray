@@ -100,3 +100,19 @@ Compact directory controls are sibling elements of the report link, so voting
 does not navigate and no buttons are nested inside links. They share the report's
 API, selection rules and error recovery. The client establishes the anonymous
 cookie before concurrent row reads to avoid competing first-visit sessions.
+
+### Rotten Onion Index
+
+This separate community metric is `round(down / (up + down) × 1000) / 10`.
+Higher values mean a greater share of “Needs review” responses to this score.
+It is not computed as `100 - Evidence Score`, because limited research is not
+evidence of wrongdoing. It does not change evidence points, sorting or vote data.
+
+The displayed rounded value selects the illustration: Fresh [0,20), Spotted
+[20,40), Bruised [40,60), Spoiled [60,80), Rotten [80,100]. The UI calls these
+visual states of the index, not a verified rating of the person. They use different
+sprouts, expressions, patches and colors in six local SVGs (including gray unrated).
+Zero votes, failed requests and invalid counts have no numeric index. Loading and
+unavailable states are distinct from a confirmed empty tally. One vote can produce
+0.0 or 100.0; fewer than five votes get an Early label. That threshold is a UI cue,
+not a statistical confidence guarantee. All counts remain anonymous browser votes.
