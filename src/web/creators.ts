@@ -43,6 +43,11 @@ const PRODUCT_HANDLES = new Set(PUBLIC_CREATORS.filter((item) => productCount(it
 
 export function initCreators(container: HTMLElement): void {
   root = container;
+  const compact = window.matchMedia("(max-width: 760px)");
+  compact.addEventListener("change", () => {
+    const lookup = root.querySelector<HTMLDetailsElement>(".creator-lookup");
+    if (lookup) lookup.open = !compact.matches;
+  });
 }
 
 export function renderCreatorRoute(): void {
@@ -393,15 +398,22 @@ function renderBoard(): void {
   const previewCopy = node("div");
   previewCopy.append(node("p", "eyebrow", "Inside a report"), node("strong", "", "NikkieTutorials"), node("span", "", "Explore the points & sources ↗"));
   preview.append(previewCopy, node("strong", "creator-preview-number", formatEvidenceScore(evidenceScoreFor("nikkietutorials")!.total)));
-  entry.append(formCard, preview);
+  const lookup = node("details", "creator-lookup");
+  lookup.open = !window.matchMedia("(max-width: 760px)").matches;
+  const lookupSummary = node("summary");
+  lookupSummary.append(node("span", "", "Open a report by @handle"), node("span", "creator-lookup-icon", "+"));
+  lookup.append(lookupSummary, formCard, preview);
+  entry.append(lookup);
 
   const board = node("section", "creator-board");
   const header = node("div", "creator-board-head");
   const title = node("div");
-  const boardTitle = node("h2", "", "The leaderboard");
-  title.append(node("p", "eyebrow", "The Onion index"), boardTitle);
-  const selectLabel = node("label", "creator-sort", "Sort by ");
+  const boardTitle = node("h2", "", "Creator index");
+  title.append(node("p", "eyebrow", "Discover & compare"), boardTitle);
+  const selectLabel = node("label", "creator-sort");
+  selectLabel.append(node("span", "creator-sort-caption", "Sort by"));
   const select = node("select");
+  select.setAttribute("aria-label", "Sort by");
   select.addEventListener("change", () => {
     if (mode === "public") { directorySort = select.value as typeof directorySort; directoryPageNumber = 1; }
     else sort = select.value;
@@ -445,10 +457,19 @@ function renderBoard(): void {
   researchSelect.value = researchFilter;
   researchSelect.addEventListener("change", () => { researchFilter = researchSelect.value; directoryPageNumber = 1; renderRows(); });
   researchLabel.append(researchSelect);
-  directoryTools.append(directoryInput, coverageLabel, researchLabel);
+  const refine = node("details", "creator-refine");
+  refine.open = productsOnly || researchFilter !== "all";
+  const refineSummary = node("summary", "", "Research filters");
+  const refineOptions = node("div", "creator-refine-options");
+  refineOptions.append(coverageLabel, researchLabel);
+  refine.append(refineSummary, refineOptions);
+  directoryTools.append(directoryInput, refine);
   const list = node("ol", "creator-ranking");
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
+  const votingGuide = node("div", "creator-voting-guide");
+  votingGuide.append(node("span", "", "Your take on the score"), node("span", "", "↑ Seems fair"), node("span", "", "↓ Needs review"));
+  votingGuide.title = "One choice per browser. Click your selected vote again to undo.";
   const pagination = node("nav", "creator-pagination");
   pagination.setAttribute("aria-label", "Creator directory pages");
   const empty = node("div", "creator-directory-empty");
@@ -456,22 +477,28 @@ function renderBoard(): void {
     category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; researchFilter = "all"; researchSelect.value = "all"; directoryPageNumber = 1; renderRows();
   }));
   function renderRows(): void {
-    select.replaceChildren(...(mode === "public" ? [["evidence", "Highest evidence score"], ["evidence-low", "Lowest evidence score"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
+    const activeResearchFilters = Number(productsOnly) + Number(researchFilter !== "all");
+    refineSummary.textContent = `Research filters${activeResearchFilters ? ` · ${activeResearchFilters} active` : ""}`;
+    select.replaceChildren(...(mode === "public" ? [["evidence", "Highest score"], ["evidence-low", "Lowest score"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
       const option = node("option", "", text); option.value = value!; return option;
     }));
     select.value = mode === "public" ? directorySort : sort;
     const categories = ["All", ...new Set((mode === "public" ? PUBLIC_CREATORS : EXAMPLES).map((item) => item.category))];
     filters.replaceChildren(...categories.map((name) => {
-      const button = action(name, () => { category = name; directoryPageNumber = 1; renderRows(); }, "creator-filter");
+      const button = action(name, () => {
+        category = name; directoryPageNumber = 1; renderRows();
+        filters.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus({ preventScroll: true });
+      }, "creator-filter");
       button.setAttribute("aria-pressed", String(name === category));
       return button;
     }));
     directoryTools.hidden = mode !== "public";
+    votingGuide.hidden = mode !== "public";
     const exampleKey = board.querySelector<HTMLElement>(".creator-grade-key");
     if (exampleKey) exampleKey.hidden = mode === "public";
     pagination.hidden = mode !== "public";
     empty.hidden = true;
-    boardTitle.textContent = mode === "public" ? "The leaderboard" : "The leaderboard · examples";
+    boardTitle.textContent = mode === "public" ? "Creator index" : "Scoring examples";
     if (mode === "public") {
       const profiles = PUBLIC_CREATORS.filter((item) => researchFilter === "all"
         || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
@@ -484,7 +511,7 @@ function renderBoard(): void {
         const link = node("a", "creator-rank-row creator-public-row");
         link.href = `#creator/${encodeURIComponent(`@${item.handle}`)}`;
         const identity = node("div", "creator-identity");
-        identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers · Snapshot` : `${item.category} · Followers not collected`));
+        identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers` : `${item.category} · Followers not collected`));
         const evidence = evidenceScoreFor(item.handle)!;
         const value = node("div", "creator-list-score creator-evidence-score");
         value.append(node("strong", "", formatEvidenceScore(evidence.total)), node("span", "", "Evidence /100"));
@@ -506,8 +533,8 @@ function renderBoard(): void {
         li.append(link, renderCreatorFeedback(item.handle, true));
         return li;
       }));
-      const order = directorySort === "followers" ? "Directory follower order" : directorySort === "name" ? "Alphabetical order" : "Preliminary evidence coverage order";
-      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} profiles · ${order}` : "0 matching profiles";
+      const order = directorySort === "followers" ? "Most followers first" : directorySort === "name" ? "Alphabetical order" : directorySort === "evidence-low" ? "Lowest evidence first" : "Highest evidence first";
+      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} · ${order}` : "0 matching profiles";
       empty.hidden = result.total > 0;
       pagination.replaceChildren();
       pagination.hidden = result.pageCount <= 1;
@@ -552,7 +579,7 @@ function renderBoard(): void {
     count.textContent = `${items.length} fictional creators · Ranks reflect the full example list · No live accounts have been rated`;
   }
   renderRows();
-  board.append(header, modes, directoryTools, filters, count, empty, list, pagination);
+  board.append(header, modes, directoryTools, filters, count, votingGuide, empty, list, pagination);
   const key = node("div", "creator-grade-key");
   key.hidden = mode === "public";
   key.append(node("span", "", "Example tiers"));
@@ -569,7 +596,9 @@ function renderBoard(): void {
   }
   const collection = node("details", "creator-collection-note");
   collection.append(node("summary", "", "Evidence Score · Beta — measures report coverage. Low scores mean limited research."), node("p", "", EVIDENCE_SCORE_SCOPE), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
-  root.replaceChildren(hero, coverage, collection, layout, evidenceMethodology());
+  const masthead = node("div", "creator-masthead");
+  masthead.append(hero, coverage);
+  root.replaceChildren(masthead, collection, layout, evidenceMethodology());
 }
 
 function backLink(): HTMLElement {

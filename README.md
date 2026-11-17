@@ -16,6 +16,13 @@ breakdown, products/earnings and profile sources; copying a report link copies
 the current URL without publishing anything. The warm Onion Head visual identity
 and mascot are retained.
 
+Frontend changes follow the project-specific self-review prompt in
+[`docs/frontend-self-review.md`](docs/frontend-self-review.md), referenced by
+`AGENTS.md`. It uses a fixed rubric and a 9/10 target, with screenshots and real
+interaction checks. The [latest review](docs/frontend-review-2026-11-17.md)
+records the iterations, measured improvements and testing limits. Mobile lookup
+and research filters use disclosures to bring searchable creator rows forward.
+
 The launch directory includes **500 public TikTok creator profiles**, all with
 locally stored portraits and searchable names/handles. It retains Glamzilla,
 Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
