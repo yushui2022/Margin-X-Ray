@@ -1,49 +1,71 @@
-# Preliminary Evidence Score · evidence-v1
+# Preliminary Evidence Score · evidence-v2
 
-Introduced 2026-11-17 after the request to put a score on as many profiles as
-possible. All 500 known profiles now display a calculated research-coverage score.
-It is separate from the proposed transparency Onion Score used by fictional
-examples. The directory's raw `score: null` and `reviewStatus: not-reviewed`
-remain the state of the verified transparency review, not the displayed evidence
-score. Unknown user-entered handles receive no score.
+Updated 2026-11-17. All 500 known profiles display a calculated research-coverage
+score. It is separate from the fictional transparency Onion Score. Raw roster
+`score: null` and `reviewStatus: not-reviewed` still describe the unassigned
+verified transparency rating. Unknown handles receive no score.
 
-## Rubric
+## Ten checks, 100 possible points
 
-| Dimension | Points | Basis |
-| --- | ---: | --- |
-| Public caption sample | 20 | At least one usable caption from a matching public account |
-| Selected commercial sources | 30 | 10 per distinct manually selected source URL, capped at three |
-| Sourced reference prices | 30 | 15 per accepted priced product record, capped at two |
-| Verified financial evidence | 20 reserved | None available; always zero in this version |
+| Group | Check | Maximum | Rule |
+| --- | --- | ---: | --- |
+| Public sample | Account-matched sample | 10 | Returned handle matches; at least one non-empty caption |
+| Public sample | Caption sample depth | 10 | 1 per distinct non-empty caption ID, capped at 10; matched account required |
+| Commercial trail | Selected commercial leads | 15 | 5 per distinct manually selected source URL, capped at 3 |
+| Commercial trail | Product-to-post links | 10 | 5 per distinct TikTok post linked to an accepted sourced product, capped at 2 |
+| Product & price | Sourced product records | 10 | 5 per named product record with a resolvable source, capped at 2 |
+| Product & price | Variant documentation | 10 | 5 per sourced product with a variant description, capped at 2 |
+| Product & price | Reference price & currency | 10 | 5 per sourced product with a positive finite amount and three-letter currency, capped at 2 |
+| Product & price | Market & offer notes | 5 | Once, for a sourced priced record with market and condition notes |
+| Financial evidence | Compensation records | 10 reserved | No qualifying records; always zero in this version |
+| Financial evidence | Costs & profit records | 10 reserved | No qualifying records; always zero in this version |
 
-The first three dimensions are summed without a default or imputed value. An
-unavailable sample earns no sampling points but does not discard independent
-external evidence. The current data can reach at most 80/100. A future financial
-scoring rule requires verified records and a versioned methodology update; no
-financial points are awarded based on text patterns or user assumptions.
+Group weights: 20 + 25 + 35 + 20 = 100. Financial points require reviewed primary
+records and a versioned rule update. Current maximum is 80. Unknown earnings are
+not zero earnings. Calculator inputs, follower counts and keyword cues add no points.
 
-The caps and weights are editorial coverage choices, not empirically calibrated
-reliability probabilities. Different source URLs about one brand can count, as
-can separately priced pack variants. The score does not express the share of all
-products or promotions researched. The same evidence may support a selected lead
-and a separately matched product price; those represent different collection tasks.
+Product IDs, caption IDs, selected URLs and linked post URLs are deduplicated
+within their respective checks. Two variants linked to one post earn linkage
+points only once. Separately sourced variants can count as different products.
+Independent commercial and product evidence can earn points even if TikTok sample
+access fails. Sampling requires an identity match and usable captions; blank
+captions and duplicate IDs do not increase depth.
 
-No usable evidence: 0. Initial evidence: 1–29. Partial evidence: 30–59. Broader
-evidence: 60–100. There are no S–D creator grades for this metric. Scores are
-computed from the dated local data, not live TikTok content. Removing or correcting
-records may lower a score; more researcher effort can raise one without any
-change in the creator's conduct.
+## What the checks establish
 
-## Interpretation and interface
+This is documentation coverage, not a creator trust or product-quality rating.
+“Collected” means the rubric's capped criterion has been met; “Partial” means some
+points are supported; “Missing evidence” means this dataset cannot award points.
+Full points do not mean a complete promotion history or a fully verified offer.
 
-This is a score of the report's available evidence. A low value means incomplete
-research, not dishonesty, undisclosed advertising, a poor product, excessive profit
-or zero earnings. No creator trust score or factual profit estimate is produced.
-Followers and popularity do not participate in the formula or break score ties.
-Keyword cues do not award points. Reference-price access limitations and unresolved
-relationships remain visible in Products & earnings.
+The same product can earn points for its name, variant, reference price and
+context. These are separate documentation fields, not independent corroboration.
+Condition notes can explicitly state that stock, shipping, tax or returns remain
+unknown. Their presence does not verify those terms. Product-linked posts can
+identify a line without matching the exact shade, pack or quoted reference price.
+Each check links supporting sources; all extracts and access qualifications remain
+in Products & earnings. Source lists can include multiple references supporting
+the product record, rather than a one-to-one field-level attribution.
 
-Directory default order is descending evidence score, with name/handle ties.
-Users can sort ascending, by followers, or by name. Reports show four dimension
-bars, the exact point sum, observation date, version, source links and unknown
-financial evidence. Existing hypothetical calculators cannot change the score.
+Weights and caps are editorial choices, not calibrated confidence probabilities.
+Platform-selected captions are not a representative sample. Indexed references can
+be stale. Company revenue, margins or founder status do not establish personal
+profit, sole ownership or current distributions.
+
+Coverage labels: no usable evidence (0), initial (1–29), partial (30–59), broader
+(60–100). They measure research collected, not behavior. More work can raise a
+score; corrections or removals can lower it. Default order is descending score,
+then name and handle, without follower tie-breaking.
+
+## Version change
+
+V1 used four coarse checks: public sample 20; selected URLs 10 each up to 30;
+accepted priced products 15 each up to 30; financial evidence 20 reserved. V2
+replaces those rules with ten checks, finer caption depth and explicit product
+documentation and post linkage. Scores across versions are not directly comparable;
+a changed score can reflect the rubric alone, with no new research or change in
+creator conduct. No new source collection was performed for this revision.
+
+The UI shows the version and observation date, group totals, all ten point values,
+expandable calculations, sources and next research steps. Directory mini-bars use
+the same four group colors. The financial group remains visibly incomplete.

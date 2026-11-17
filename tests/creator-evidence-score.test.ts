@@ -1,18 +1,38 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { evidencePoints, evidenceScoreFor, EVIDENCE_SCORES } from "../src/shared/creator-evidence-score";
+import { evidencePoints, evidenceScoreFor, EVIDENCE_SCORES, type EvidenceInput } from "../src/shared/creator-evidence-score";
 import { directoryPage, PUBLIC_CREATORS } from "../src/shared/creator-directory";
 import { brandLeadsFor, screeningFor } from "../src/shared/creator-screening";
 import research from "../research/creator-products.json";
 
-test("evidence rubric counts distinct sources, caps volume, and never assumes financial proof", () => {
-  assert.deepEqual(evidencePoints({ hasPublicSample: false, commercialUrls: [], productIds: [] }), { sample: 0, commercial: 0, prices: 0, financial: 0, total: 0 });
-  assert.equal(evidencePoints({ hasPublicSample: true, commercialUrls: [], productIds: [] }).total, 20);
-  assert.equal(evidencePoints({ hasPublicSample: true, commercialUrls: ["a", "a"], productIds: ["p", "p"] }).total, 45);
-  const capped = evidencePoints({ hasPublicSample: true, commercialUrls: ["a", "b", "c", "d"], productIds: ["p", "q", "r"] });
+const empty: EvidenceInput = { matchedSample: false, captionIds: [], commercialUrls: [], products: [] };
+
+test("granular evidence rubric deduplicates records and posts, caps volume, and reserves financial proof", () => {
+  assert.equal(evidencePoints(empty).total, 0);
+  assert.equal(evidencePoints({ ...empty, matchedSample: true, captionIds: ["1", "1", "", "2"] }).total, 12);
+  const full = { matchedSample: true, captionIds: Array.from({ length: 20 }, (_, i) => String(i)), commercialUrls: ["a", "b", "c", "d"], products: research.products };
+  const capped = evidencePoints(full);
   assert.equal(capped.total, 80);
-  assert.equal(capped.financial, 0);
-  assert.equal(evidencePoints({ hasPublicSample: false, commercialUrls: ["a"], productIds: ["p"] }).total, 25, "Unavailable TikTok access must not discard independent evidence");
+  assert.equal(capped.compensation + capped.costs, 0);
+  const product = research.products.find(product => product.postUrl)!;
+  const one = { ...empty, commercialUrls: ["a"], products: [product] };
+  assert.equal(evidencePoints(one).total, 30, "Unavailable TikTok access must not discard independent evidence");
+  assert.deepEqual(evidencePoints({ ...one, commercialUrls: ["a", "a"], products: [product, product] }), evidencePoints(one));
+  assert.equal(evidencePoints({ ...one, products: [product, { ...product, id: "other-variant" }] }).linkage, 5, "Two variants from one post only earn one linkage award");
+  assert.equal(evidencePoints({ ...empty, captionIds: ["1", "2"] }).captions, 0, "Mismatched accounts cannot earn sampling points");
+});
+
+test("missing product metadata earns no corresponding points and unknown condition notes are only documentation", () => {
+  const product = research.products[0]!;
+  const incomplete = { ...product, variant: "", price: { ...product.price, amount: 0, market: "", conditions: "" } };
+  const result = evidencePoints({ ...empty, products: [incomplete] });
+  assert.equal(result.products, 5);
+  assert.equal(result.variants + result.prices + result.context, 0);
+  assert.equal(evidencePoints({ ...empty, products: [{ ...product, sources: ["unresolved-source"] }] }).total, 0);
+  assert.equal(evidencePoints({ ...empty, products: [{ ...product, price: { ...product.price, amount: Number.NaN } }] }).prices, 0);
+  const unknown = evidencePoints({ ...empty, products: [{ ...product, price: { ...product.price, conditions: "Shipping, tax and stock unknown." } }] });
+  assert.equal(unknown.context, 5);
+  assert.equal(unknown.compensation + unknown.costs, 0);
 });
 
 test("all 500 scores reconcile to dated source evidence and preserve unknown trust ratings", () => {
@@ -23,10 +43,14 @@ test("all 500 scores reconcile to dated source evidence and preserve unknown tru
     assert.ok(Number.isInteger(result.total) && result.total >= 0 && result.total <= 80);
     assert.equal(result.total, result.dimensions.reduce((sum, dimension) => sum + dimension.points, 0));
     assert.equal(result.observedAt, sample.observedAt);
-    assert.equal(result.sample, sample.status === "sampled" && sample.posts.length ? 20 : 0);
-    assert.equal(result.commercial, Math.min(3, new Set(brandLeadsFor(profile.handle).map(lead => lead.url)).size) * 10);
-    assert.equal(result.prices, Math.min(2, research.products.filter(product => product.handle === profile.handle).length) * 15);
-    assert.equal(result.financial, 0);
+    assert.equal(result.dimensions.length, 10);
+    assert.equal(result.dimensions.reduce((sum, dimension) => sum + dimension.maximum, 0), 100);
+    assert.equal(result.groups.reduce((sum, group) => sum + group.points, 0), result.total);
+    assert.equal(result.identity, sample.status === "sampled" && sample.platformHandle === profile.handle && sample.posts.some(post => post.caption.trim()) ? 10 : 0);
+    assert.equal(result.captions, result.identity ? Math.min(10, new Set(sample.posts.filter(post => post.caption.trim()).map(post => post.id)).size) : 0);
+    assert.equal(result.leads, Math.min(3, new Set(brandLeadsFor(profile.handle).map(lead => lead.url)).size) * 5);
+    assert.equal(result.prices, Math.min(2, research.products.filter(product => product.handle === profile.handle).length) * 5);
+    assert.equal(result.compensation + result.costs, 0);
     assert.equal(profile.score, null, "Research coverage is not a verified transparency rating");
     for (const dimension of result.dimensions) {
       assert.ok(dimension.points >= 0 && dimension.points <= dimension.maximum);

@@ -10,7 +10,7 @@ sourcing workspace remain available through the navigation.
 The creator entry follows a compact rating flow: username input beside the
 leaderboard, then a scorecard with a large score, an example S–D tier, a short
 verdict and weighted dimension bars. Real profiles display a preliminary Evidence
-Score with four sourced coverage dimensions. Transparency-scoring examples remain explicitly fictional and can
+Score with ten sourced coverage checks in four groups. Transparency-scoring examples remain explicitly fictional and can
 be sorted highest/lowest or by name. Report controls switch between the score
 breakdown, products/earnings and profile sources; copying a report link copies
 the current URL without publishing anything. The warm Onion Head visual identity
@@ -38,12 +38,15 @@ Provenance is in `assets/creators/sources.json` and
 The separate Scoring examples view contains six fictional ranked identities,
 post counts and scores. Unknown TikTok handles also show **Not rated**;
 no creator retrieval service is connected and no lookup is queued.
-The real-profile Evidence Score awards 20 points for a usable public sample,
-10 per selected commercial source URL (up to 30), and 15 per accepted reference-price
-record (up to 30). The remaining 20 points are reserved for verified financial
-evidence; none is available, so that dimension is zero for everyone. Low scores
-mean incomplete research, not negative findings about a creator. Each report shows
-the calculation and its sources. See `research/creator-score-notes.md`.
+The real-profile Evidence Score uses the `evidence-v2` rubric: public sample (20),
+commercial trail (25), product and price documentation (35), and financial evidence
+(20 reserved). Ten checks cover account matching, caption depth, selected leads,
+product-to-post links, named products, variants, reference prices, market/condition
+notes, compensation records and cost/profit records. Financial checks remain zero.
+Low scores mean incomplete research, not negative findings about a creator. Each
+check shows its calculation, sources and next research step. Documentation of an
+unknown purchase condition does not verify that condition. V2 replaces v1; changed
+scores can reflect the rubric alone. See `research/creator-score-notes.md`.
 
 The proposed transparency Onion Score, used only in fictional examples, weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
