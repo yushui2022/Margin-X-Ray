@@ -1,22 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { onionIndex, ONION_BANDS, UNRATED_ONION } from "../src/shared/onion-index";
+import { onionScore, ONION_BANDS, UNRATED_ONION } from "../src/shared/onion-index";
 
-test("rotten index is inverse evidence confidence with exact visual boundaries", () => {
-  for (const [value, expected] of [[0, "fresh"], [19.9, "fresh"], [20, "spotted"], [39.9, "spotted"], [40, "bruised"], [59.9, "bruised"], [60, "spoiled"], [79.9, "spoiled"], [80, "rotten"], [100, "rotten"]] as const) {
-    const result = onionIndex(100 - value)!;
+test("one Onion Score preserves confidence and becomes fresher at higher boundaries", () => {
+  for (const [value, expected] of [[0, "rotten"], [19.9, "rotten"], [20, "spoiled"], [39.9, "spoiled"], [40, "bruised"], [59.9, "bruised"], [60, "spotted"], [79.9, "spotted"], [80, "fresh"], [100, "fresh"]] as const) {
+    const result = onionScore(value)!;
     assert.equal(result.band.id, expected);
     assert.equal(result.value, value);
   }
-  assert.equal(onionIndex(62.9)!.value, 37.1);
-  assert.equal(onionIndex(80.04)!.band.id, "spotted", "Band follows the displayed rounded value of 20.0");
+  assert.equal(onionScore(62.9)!.value, 62.9);
+  assert.equal(onionScore(79.96)!.band.id, "fresh", "Band follows the displayed rounded value of 80.0");
 });
 
 test("pending and invalid confidence stay neutral; eligible zero remains a real score", () => {
-  for (const confidence of [null, undefined, -1, 100.1, NaN, Infinity]) assert.equal(onionIndex(confidence), null);
-  assert.equal(onionIndex(0)!.value, 100);
-  assert.equal(onionIndex(100)!.value, 0);
+  for (const confidence of [null, undefined, -1, 100.1, NaN, Infinity]) assert.equal(onionScore(confidence), null);
+  assert.equal(onionScore(0)!.value, 0);
+  assert.equal(onionScore(100)!.value, 100);
 });
 
 test("every onion state uses a distinct local scalable illustration", () => {

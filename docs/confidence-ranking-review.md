@@ -1,5 +1,10 @@
 # Evidence confidence ranking
 
+Historical review of the confidence calculation launch. The user subsequently
+requested a single high-is-fresh Onion Score; `single-onion-score-review.md`
+documents removal of the complementary inverse index. Confidence weights and
+eligibility remain as described here.
+
 The user clarified that the onion should follow evidence confidence and the
 leaderboard, not agreement votes, and selected an evidence-confidence leaderboard
 over a verified-risk leaderboard. `confidence-v1` replaces the old vote-share

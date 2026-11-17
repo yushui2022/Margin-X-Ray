@@ -101,11 +101,12 @@ does not navigate and no buttons are nested inside links. They share the report'
 API, selection rules and error recovery. The client establishes the anonymous
 cookie before concurrent row reads to avoid competing first-visit sessions.
 
-### Rotten Onion Index
+### Onion Score
 
-The user selected an evidence-confidence leaderboard. The current index is
-`round((100 - confidence) × 10) / 10`, replacing the original vote-share metric.
-It describes confidence in collected evidence, not wrongdoing. The separate
+The user selected an evidence-confidence leaderboard, then requested a single
+score with higher values meaning fresher onions. The Onion Score now displays
+the confidence total directly; the inverse `100 - confidence` metric has been
+removed. It describes confidence in collected evidence, not wrongdoing. The separate
 `confidence-v1` methodology combines source reliability (40), `evidence-v3`
 coverage scaled to 40, and reviewed corroboration (20). Confidence is editorial,
 not a calibrated probability. The old evidence rubric and vote scope stay intact.
@@ -121,8 +122,8 @@ offer). No current record earns exact-offer corroboration. Two records earn
 partial product-line points, with variant, stock and offer conflicts retained.
 Same-brand pages, company-issued releases copied elsewhere and indexed originals
 do not automatically count as independent validation. Per-component rounding to
-tenths precedes the exact sum; Nikkie is 34.7 + 24.9 + 3.3 = 62.9 confidence,
-giving index 37.1. Weights and provenance factors are editorial choices.
+tenths precedes the exact sum; Nikkie is 34.7 + 24.9 + 3.3 = 62.9 Onion Score.
+Weights and provenance factors are editorial choices.
 
 Eligibility requires a usable account-matched public sample, at least one accepted
 priced product and an explicit assessment for every accepted product. Currently
@@ -132,11 +133,12 @@ share competition rank, and pending reports follow rated reports in either
 confidence direction. Filtering does not change global ranks. Ranking is an
 output of confidence, not another input that double-counts the same evidence.
 
-The displayed rounded value selects the illustration: Fresh [0,20), Spotted
-[20,40), Bruised [40,60), Spoiled [60,80), Rotten [80,100]. The UI calls these
-visual states of the index, not a verified rating of the person. They use different
+The displayed rounded score selects the illustration: Fresh [80,100], Spotted
+[60,80), Bruised [40,60), Spoiled [20,40), Rotten [0,20). At exact boundaries,
+the higher band applies. The UI calls these visual states of the evidence-based
+score, not a verified rating of the person. They use different
 sprouts, expressions, patches and colors in six local SVGs (including gray unrated).
-Vote totals, selections, unavailable feedback and retries never affect the index.
+Vote totals, selections, unavailable feedback and retries never affect the score.
 There is no vote-based Early label. All counts remain anonymous browser feedback
 on the coverage score, scoped to `evidence-v3`, so existing votes retain their
 original meaning and storage. Reports expose confidence and its source assessment

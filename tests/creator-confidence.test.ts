@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { confidencePoints, confidenceFor, confidenceRank, CONFIDENCE_SCORES, type ConfidenceInput } from "../src/shared/creator-confidence";
 import { PUBLIC_CREATORS, directoryPage } from "../src/shared/creator-directory";
-import { onionIndex } from "../src/shared/onion-index";
+import { onionScore } from "../src/shared/onion-index";
 import data from "../research/creator-products.json";
 import assessments from "../research/creator-confidence-assessments.json";
 
@@ -22,7 +22,7 @@ test("confidence uses weakest source provenance, capped coverage and reviewed cr
   assert.equal(secondary.corroboration, 0, "Two sources do not automatically prove corroboration");
 });
 
-test("incomplete or unreviewed research has no numeric confidence or rotten index", () => {
+test("incomplete or unreviewed research has no numeric Onion Score", () => {
   for (const override of [{ matchedSample: false }, { completeReview: false }, { products: [] }, { coverage: NaN }, { coverage: -1 }, { coverage: 101 }]) {
     assert.equal(confidencePoints({ ...input, ...override }), null);
   }
@@ -30,7 +30,7 @@ test("incomplete or unreviewed research has no numeric confidence or rotten inde
     const report = confidenceFor(creator.handle)!;
     if (!report.points) {
       assert.equal(confidenceRank(creator.handle), null);
-      assert.equal(onionIndex(CONFIDENCE_SCORES.get(creator.handle)), null);
+      assert.equal(onionScore(CONFIDENCE_SCORES.get(creator.handle)), null);
     }
   }
 });
@@ -54,7 +54,7 @@ test("all accepted products have explicit traceable assessments and reconciled r
     if (report.points) {
       const { sources, coverage, corroboration, total } = report.points;
       assert.equal(Math.round(sources * 10) + Math.round(coverage * 10) + Math.round(corroboration * 10), Math.round(total * 10));
-      assert.equal(Math.round(total * 10) + Math.round(onionIndex(total)!.value * 10), 1000);
+      assert.equal(onionScore(total)!.value, total);
       assert.equal(confidenceRank(creator.handle), 1 + [...CONFIDENCE_SCORES.values()].filter(score => score > total).length);
     }
   }

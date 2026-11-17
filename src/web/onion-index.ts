@@ -1,4 +1,4 @@
-import { ONION_BANDS, UNRATED_ONION, onionIndex } from "../shared/onion-index";
+import { ONION_BANDS, UNRATED_ONION, onionScore } from "../shared/onion-index";
 import { CONFIDENCE_RUBRIC, CONFIDENCE_VERSION, confidenceFor, confidenceRank } from "../shared/creator-confidence";
 
 export function createOnionIndicator(handle: string, compact: boolean) {
@@ -9,17 +9,17 @@ export function createOnionIndicator(handle: string, compact: boolean) {
   const label = element.querySelector<HTMLElement>(".onion-index-label")!;
   const value = element.querySelector<HTMLElement>(".onion-index-value")!;
   const state = element.querySelector<HTMLElement>(".onion-index-state")!;
-  label.textContent = compact ? "Rotten index" : "Rotten Onion Index";
+  label.textContent = "Onion Score";
   const report = confidenceFor(handle);
-  const index = onionIndex(report?.points?.total);
+  const index = onionScore(report?.points?.total);
   const band = index?.band ?? UNRATED_ONION;
   element.dataset.band = band.id;
   image.src = band.image;
   image.alt = `${band.label} onion`;
   value.textContent = index ? index.value.toFixed(1) : "—";
-  state.textContent = index ? band.label : "Pending review";
-  const detail = index ? `${index.value.toFixed(1)}/100 · ${band.label}. 100 − evidence confidence ${report!.points!.total.toFixed(1)}. Global confidence rank #${confidenceRank(handle)}.` : report?.reason ?? "Source review needed";
-  element.title = `Rotten Onion Index: ${detail} ${CONFIDENCE_VERSION}. Evidence confidence, not creator misconduct. Votes do not affect this index.`;
+  state.textContent = index ? `${band.label} · #${confidenceRank(handle)}` : "Pending review";
+  const detail = index ? `${index.value.toFixed(1)}/100 · ${band.label}. Global rank #${confidenceRank(handle)}. Higher is fresher.` : report?.reason ?? "Source review needed";
+  element.title = `Onion Score: ${detail} ${CONFIDENCE_VERSION}. Based on evidence confidence. Votes do not affect the score or rank.`;
   element.setAttribute("aria-label", element.title);
   return element;
 }
@@ -29,9 +29,9 @@ export function renderOnionScale(): HTMLDetailsElement {
   details.className = "onion-scale";
   const summary = document.createElement("summary");
   summary.textContent = "Onion scale";
-  summary.setAttribute("aria-label", "Rotten Onion Index scale and meaning");
+  summary.setAttribute("aria-label", "Onion Score scale and meaning");
   const explanation = document.createElement("p");
-  explanation.textContent = "Rotten Onion Index = 100 − Evidence Confidence. Higher confidence means a fresher onion and a higher default rank. Confidence uses source reliability (40), report completeness (40) and cross-checks (20). Votes do not affect scores, onions or ranks.";
+  explanation.textContent = "Onion Score runs from 0 to 100. Higher is fresher and ranks higher by default. The score uses source reliability (40), report completeness (40) and cross-checks (20). Votes do not affect scores, onions or ranks.";
   const grid = document.createElement("div");
   grid.className = "onion-scale-grid";
   for (const band of ONION_BANDS) {
@@ -43,7 +43,7 @@ export function renderOnionScale(): HTMLDetailsElement {
     item.append(image, label, range); grid.append(item);
   }
   const note = document.createElement("p");
-  note.textContent = "Gray onion: pending a sourced product review, with no numeric index or rank. These bands describe confidence in collected evidence, not a creator’s character or product quality. Confidence is an editorial score, not a statistical probability. Open a report for its sources and calculation.";
+  note.textContent = "Gray onion: pending a sourced product review, with no score or rank. The score describes confidence in collected evidence, not a creator’s character or product quality. It is an editorial score, not a statistical probability. Open a report for its sources and calculation.";
   details.append(summary, explanation, grid, note);
   return details;
 }
@@ -53,17 +53,17 @@ export function renderConfidenceReport(handle: string): HTMLElement {
   const section = document.createElement("section");
   section.className = "creator-confidence-report";
   const heading = document.createElement("h2");
-  heading.textContent = "Evidence confidence";
+  heading.textContent = "Behind the Onion Score";
   const description = document.createElement("p");
   description.textContent = `${CONFIDENCE_VERSION} · Reviewed ${report.observedAt}. ${CONFIDENCE_RUBRIC.scope}`;
   const summary = document.createElement("p");
   summary.className = "creator-confidence-summary";
-  summary.textContent = report.points ? `${report.points.total.toFixed(1)} / 100 confidence · Global rank #${confidenceRank(handle)} · Rotten index ${(100 - report.points.total).toFixed(1)}` : `Pending review · ${report.reason}. No numeric confidence, onion index or rank yet.`;
-  section.append(heading, description, summary, createOnionIndicator(handle, false), renderOnionScale());
+  summary.textContent = report.points ? "Higher is fresher. Explore the three scoring components and their sources below." : `Pending review · ${report.reason}. No score or rank yet.`;
+  section.append(heading, description, summary, renderOnionScale());
   const calculation = document.createElement("details");
   calculation.className = "creator-method";
   const title = document.createElement("summary");
-  title.textContent = "Confidence calculation & sources";
+  title.textContent = "Score calculation & sources";
   calculation.append(title);
   for (const [key, label, rule] of [
     ["sources", "Source reliability", CONFIDENCE_RUBRIC.sourceRule],
