@@ -54,7 +54,9 @@ leads cover 153 creators; 488 still have no accepted priced product. See
 `creator-screening-notes.md` for sampling limits and reproduction. Product
 coverage is derived from `creator-products.json`; the `collection` marker in the
 portrait file records roster provenance, not current research status. All real
-scores remain null. The six fictional scoring examples remain in their separate view.
+verified transparency scores remain null in the roster. The UI computes a separate
+preliminary Evidence Score for all 500 profiles; see `creator-score-notes.md`.
+The six fictional transparency-scoring examples remain in their separate view.
 
 ## Recollection
 

@@ -9,8 +9,8 @@ sourcing workspace remain available through the navigation.
 
 The creator entry follows a compact rating flow: username input beside the
 leaderboard, then a scorecard with a large score, an example S–D tier, a short
-verdict and weighted dimension bars. Real profiles display an unrated scorecard
-with unknown dimensions. Scoring examples remain explicitly fictional and can
+verdict and weighted dimension bars. Real profiles display a preliminary Evidence
+Score with four sourced coverage dimensions. Transparency-scoring examples remain explicitly fictional and can
 be sorted highest/lowest or by name. Report controls switch between the score
 breakdown, products/earnings and profile sources; copying a report link copies
 the current URL without publishing anything. The warm Onion Head visual identity
@@ -19,9 +19,10 @@ and mascot are retained.
 The launch directory includes **500 public TikTok creator profiles**, all with
 locally stored portraits and searchable names/handles. It retains Glamzilla,
 Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
-Famadex's public TikTok people ranking. All are **Not rated**. The default sort is
-descending directory follower count, with unknown counts last; it is not an
-Onion Score ranking. Browse 20 records per page, search the full collection,
+Famadex's public TikTok people ranking. All 500 now display a **preliminary Evidence
+Score**, measuring report coverage rather than creator trustworthiness. The
+default sort is descending evidence score, with name/handle ties. Verified creator
+transparency ratings remain unassigned. Browse 20 records per page, search the full collection,
 sort by name, filter by collected category, or show the twelve profiles with
 priced product evidence. Research filters also select sampled accounts, sourced
 follow-up leads or unavailable samples. Summary counts separate these from ratings.
@@ -37,7 +38,14 @@ Provenance is in `assets/creators/sources.json` and
 The separate Scoring examples view contains six fictional ranked identities,
 post counts and scores. Unknown TikTok handles also show **Not rated**;
 no creator retrieval service is connected and no lookup is queued.
-The proposed Onion Score weights price transparency (40%), commercial disclosure
+The real-profile Evidence Score awards 20 points for a usable public sample,
+10 per selected commercial source URL (up to 30), and 15 per accepted reference-price
+record (up to 30). The remaining 20 points are reserved for verified financial
+evidence; none is available, so that dimension is zero for everyone. Low scores
+mean incomplete research, not negative findings about a creator. Each report shows
+the calculation and its sources. See `research/creator-score-notes.md`.
+
+The proposed transparency Onion Score, used only in fictional examples, weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
 interface and is not a validated measure of personal integrity. Fictional product
 cards do not support real creator scores. Live scoring

@@ -1,6 +1,7 @@
 import { PUBLIC_CREATORS, directoryPage, type CreatorProfile } from "../shared/creator-directory";
 import { productCount, renderCreatorProducts } from "./creator-products";
 import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
+import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor } from "../shared/creator-evidence-score";
 
 type PublicCreator = CreatorProfile;
 
@@ -32,7 +33,7 @@ let root: HTMLElement;
 let category = "All";
 let sort = "score";
 let mode: "public" | "examples" = "public";
-let directorySort: "followers" | "name" = "followers";
+let directorySort: "followers" | "name" | "evidence" | "evidence-low" = "evidence";
 let directoryQuery = "";
 let directoryPageNumber = 1;
 let productsOnly = false;
@@ -80,10 +81,11 @@ function gradeBadge(value: number | null): HTMLElement {
   return badge;
 }
 
-function scoreDisplay(value: number | null): HTMLElement {
+function scoreDisplay(value: number | null, evidence = false): HTMLElement {
   const display = node("div", `creator-score-display${value === null ? " is-pending" : ""}`);
-  display.append(node("span", "eyebrow", value === null ? "Onion Score" : "Example Onion Score"), node("strong", "creator-score-number", value === null ? "—" : String(value)), node("span", "creator-score-denominator", "/ 100"));
-  display.setAttribute("aria-label", value === null ? "Onion Score: not rated" : `Example Onion Score: ${value} out of 100`);
+  const title = evidence ? "Evidence Score · Beta" : value === null ? "Onion Score" : "Example Onion Score";
+  display.append(node("span", "eyebrow", title), node("strong", "creator-score-number", value === null ? "—" : String(value)), node("span", "creator-score-denominator", "/ 100"));
+  display.setAttribute("aria-label", value === null ? "Onion Score: not rated" : `${title}: ${value} out of 100`);
   return display;
 }
 
@@ -199,6 +201,7 @@ function renderPublicProfile(item: PublicCreator): void {
   const hasProducts = productCount(item.handle) > 0;
   const sample = screeningFor(item.handle);
   const leads = brandLeadsFor(item.handle);
+  const evidence = evidenceScoreFor(item.handle)!;
   const header = node("header", "creator-scorecard");
   const main = node("div", "creator-scorecard-main");
   const identity = node("div", "creator-public-identity");
@@ -206,13 +209,13 @@ function renderPublicProfile(item: PublicCreator): void {
   text.append(node("p", "eyebrow", `${item.category} / Public profile`), node("h1", "", item.name), node("p", "", `@${item.handle}`));
   identity.append(portrait(item), text);
   const verdict = node("div", "creator-verdict-line");
-  verdict.append(gradeBadge(null), node("div", "", "Not rated · Evidence review pending"));
-  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "The receipts are coming together." : sample?.status === "sampled" ? "First look collected. More to verify." : "Research started. More sources needed."), node("p", "creator-scorecard-note", hasProducts ? "Products and relationships are collected. Comparable promotion sampling and a scoring review are still needed." : sample?.status === "sampled" ? "A limited public caption sample is available. Product offers and commercial relationships need further verification before any rating." : "A public sample was requested but usable content was unavailable. Product research remains incomplete; no score has been assigned."));
+  verdict.append(node("span", "creator-grade evidence-grade", "E"), node("div", "", `${evidence.level} · Preliminary`));
+  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "The receipts are coming together." : sample?.status === "sampled" ? "First look collected. More to verify." : "Research started. More sources needed."), node("p", "creator-scorecard-note", EVIDENCE_SCORE_SCOPE));
   const strip = node("div", "creator-scorecard-strip");
   strip.append(node("span", "", item.followersLabel ? `${item.followersLabel} followers · Directory snapshot` : "Follower count not collected"), node("span", "", `${productCount(item.handle)} priced records · ${leads.length} follow-up leads`), node("span", "", screeningLabel(item.handle)));
-  header.append(main, scoreDisplay(null), strip);
+  header.append(main, scoreDisplay(evidence.total, true), strip);
   const details = node("section", "card creator-evidence");
-  details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", hasProducts ? "This profile includes product listings and promotion evidence with sources and access limitations. Coverage is incomplete and has not undergone a scoring review, so no Onion Score or rank is assigned." : "Account name, handle and portrait were collected from a public creator directory. This is a discovery record, with no completed product research or scoring review."));
+  details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", "The preliminary Evidence Score measures this report's collected sources. Creator transparency, product quality and personal earnings have not received a verified rating."));
   const links = node("div", "creator-profile-links");
   links.append(externalLink("Open TikTok profile ↗", `https://www.tiktok.com/@${item.handle}`), externalLink("Profile & portrait source ↗", item.source));
   details.append(links, node("p", "", `Portrait retrieved ${item.retrievedAt}. ${item.note}`));
@@ -223,7 +226,7 @@ function renderPublicProfile(item: PublicCreator): void {
   if (item.country) details.append(node("p", "", `Directory country label: ${item.country}. Not independently verified.`));
   if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products & earnings for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
   const scorePanel = node("div");
-  scorePanel.append(breakdown(), methodology());
+  scorePanel.append(evidenceBreakdown(item.handle), evidenceMethodology());
   root.replaceChildren(reportToolbar(), header, reportSections([
     { label: "Score breakdown", content: scorePanel },
     { label: `Products & earnings (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
@@ -277,6 +280,48 @@ function parseHandle(raw: string): string | null {
   return /^[a-zA-Z0-9_][a-zA-Z0-9_.]{0,23}$/.test(value) && !value.endsWith(".") ? value.toLowerCase() : null;
 }
 
+function evidenceBreakdown(handle: string): HTMLElement {
+  const evidence = evidenceScoreFor(handle)!;
+  const section = node("section", "creator-breakdown creator-evidence-breakdown");
+  section.append(node("p", "eyebrow", `Evidence coverage · ${evidence.observedAt} · ${EVIDENCE_SCORE_VERSION}`), node("h2", "", "Where the points come from."), node("p", "", "Points reflect available research. Missing points show work still needed; they do not establish poor behavior or zero income."));
+  for (const dimension of evidence.dimensions) {
+    const row = node("div", "creator-dimension-row");
+    const label = node("div", "creator-dimension-label");
+    label.append(node("strong", "", dimension.name), node("span", "", `${dimension.maximum} points available`));
+    const track = node("div", "creator-dimension-track");
+    const fill = node("span");
+    fill.style.width = `${100 * dimension.points / dimension.maximum}%`;
+    track.append(fill);
+    track.setAttribute("role", "meter");
+    track.setAttribute("aria-label", dimension.name);
+    track.setAttribute("aria-valuemin", "0");
+    track.setAttribute("aria-valuemax", String(dimension.maximum));
+    track.setAttribute("aria-valuenow", String(dimension.points));
+    row.append(label, track, node("strong", "creator-dimension-number", `${dimension.points}/${dimension.maximum}`), node("p", "", dimension.explanation));
+    if (dimension.sources.length) {
+      const sources = node("details", "creator-score-sources");
+      sources.append(node("summary", "", `Inspect evidence (${dimension.sources.length})`));
+      const list = node("ul");
+      for (const source of dimension.sources) {
+        const item = node("li");
+        item.append(externalLink(source.label, source.url));
+        list.append(item);
+      }
+      sources.append(list);
+      row.append(sources);
+    }
+    section.append(row);
+  }
+  section.append(node("p", "creator-report-footnote", `Total: ${evidence.sample} + ${evidence.commercial} + ${evidence.prices} + ${evidence.financial} = ${evidence.total}/100. Preliminary research score; not a statistical confidence percentage. Full captions, extracts and access notes are in Products & earnings.`));
+  return section;
+}
+
+function evidenceMethodology(): HTMLElement {
+  const details = node("details", "creator-method");
+  details.append(node("summary", "", "How the Evidence Score works"), node("p", "", `${EVIDENCE_SCORE_VERSION} · Preliminary rubric. ${EVIDENCE_SCORE_SCOPE}`), node("p", "", "Public sample: 20 points for at least one public caption from a matching account. Selected commercial sources: 10 points per distinct manually selected source URL, capped at 30. Reference prices: 15 points per accepted product record, capped at 30. Verified financial evidence: 20 points reserved; none has been verified, so every profile currently receives 0 in this dimension."), node("p", "", "Scores range from 0–100; the current dataset can reach at most 80. No usable evidence: 0. Initial evidence: 1–29. Partial evidence: 30–59. Broader evidence: 60–100. These labels describe research coverage. More research can raise the score without any change in a creator's behavior; scores can fall if evidence is removed or corrected."), node("p", "", "Multiple sources about the same brand and separate priced variants can count. This is not the share of all promotions reviewed. Sampling is platform-selected, publication dates may be unknown, and indexed prices may be stale. The weights and caps are editorial choices, not a validated trust model. Earnings scenarios never change the score."));
+  return details;
+}
+
 function methodology(): HTMLElement {
   const details = node("details", "creator-method");
   details.append(node("summary", "", "How the Onion Score works"));
@@ -308,7 +353,7 @@ function renderBoard(): void {
     link.href = `#creator/${encodeURIComponent(`@${handle}`)}`;
     quick.append(link);
   }
-  formCard.append(quick, node("p", "creator-entry-note", `${PUBLIC_CREATORS.length} collected profiles. Search any included handle to open its scorecard. Live lookup is not connected; unreviewed accounts remain unrated.`));
+  formCard.append(quick, node("p", "creator-entry-note", `${PUBLIC_CREATORS.length} profiles with preliminary evidence scores. Search a handle to see its points and sources. Scores measure collected research, not creator trustworthiness. Live lookup is not connected.`));
   const preview = node("a", "creator-score-preview");
   preview.href = "#creator/demo-01";
   const previewCopy = node("div");
@@ -324,7 +369,7 @@ function renderBoard(): void {
   const selectLabel = node("label", "creator-sort", "Sort by ");
   const select = node("select");
   select.addEventListener("change", () => {
-    if (mode === "public") { directorySort = select.value === "name" ? "name" : "followers"; directoryPageNumber = 1; }
+    if (mode === "public") { directorySort = select.value as typeof directorySort; directoryPageNumber = 1; }
     else sort = select.value;
     renderRows();
   });
@@ -377,7 +422,7 @@ function renderBoard(): void {
     category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; researchFilter = "all"; researchSelect.value = "all"; directoryPageNumber = 1; renderRows();
   }));
   function renderRows(): void {
-    select.replaceChildren(...(mode === "public" ? [["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
+    select.replaceChildren(...(mode === "public" ? [["evidence", "Highest evidence score"], ["evidence-low", "Lowest evidence score"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
       const option = node("option", "", text); option.value = value!; return option;
     }));
     select.value = mode === "public" ? directorySort : sort;
@@ -388,6 +433,8 @@ function renderBoard(): void {
       return button;
     }));
     directoryTools.hidden = mode !== "public";
+    const exampleKey = board.querySelector<HTMLElement>(".creator-grade-key");
+    if (exampleKey) exampleKey.hidden = mode === "public";
     pagination.hidden = mode !== "public";
     empty.hidden = true;
     boardTitle.textContent = mode === "public" ? "The leaderboard" : "The leaderboard · examples";
@@ -396,7 +443,7 @@ function renderBoard(): void {
         || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
         || (researchFilter === "unavailable" && screeningFor(item.handle)?.status === "unavailable")
         || (researchFilter === "leads" && brandLeadsFor(item.handle).length > 0));
-      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined }, profiles);
+      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES }, profiles);
       directoryPageNumber = result.page;
       list.replaceChildren(...result.items.map((item) => {
         const li = node("li");
@@ -404,17 +451,22 @@ function renderBoard(): void {
         link.href = `#creator/${encodeURIComponent(`@${item.handle}`)}`;
         const identity = node("div", "creator-identity");
         identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers · Snapshot` : `${item.category} · Followers not collected`));
-        const value = node("div", "creator-list-score is-pending");
-        value.append(node("strong", "", "—"), node("span", "", "Not rated"));
+        const evidence = evidenceScoreFor(item.handle)!;
+        const value = node("div", "creator-list-score creator-evidence-score");
+        value.append(node("strong", "", String(evidence.total)), node("span", "", "Evidence /100"));
+        value.setAttribute("aria-label", `Preliminary evidence score: ${evidence.total} out of 100. ${evidence.level}`);
         const total = productCount(item.handle);
         const leads = brandLeadsFor(item.handle).length;
         const status = node("span", "creator-row-status", total ? `${total} priced ${total === 1 ? "product" : "products"} · Review pending` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Offer unverified` : screeningLabel(item.handle));
         identity.append(status);
-        link.append(gradeBadge(null), portrait(item), identity, value, node("span", "creator-arrow", "↗"));
+        const badge = node("span", "creator-grade evidence-grade", "E");
+        badge.setAttribute("aria-label", "Evidence coverage, preliminary");
+        link.append(badge, portrait(item), identity, value, node("span", "creator-arrow", "↗"));
         li.append(link);
         return li;
       }));
-      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} profiles · ${directorySort === "followers" ? "Directory follower order, not score rank" : "Alphabetical order"}` : "0 matching profiles";
+      const order = directorySort === "followers" ? "Directory follower order" : directorySort === "name" ? "Alphabetical order" : "Preliminary evidence coverage order";
+      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} profiles · ${order}` : "0 matching profiles";
       empty.hidden = result.total > 0;
       pagination.replaceChildren();
       pagination.hidden = result.pageCount <= 1;
@@ -461,6 +513,7 @@ function renderBoard(): void {
   renderRows();
   board.append(header, modes, directoryTools, filters, count, empty, list, pagination);
   const key = node("div", "creator-grade-key");
+  key.hidden = mode === "public";
   key.append(node("span", "", "Example tiers"));
   for (const [letter, threshold] of [["S", "90+"], ["A", "80+"], ["B", "70+"], ["C", "60+"], ["D", "<60"]]) {
     const item = node("span", `creator-key-item grade-${letter!.toLowerCase()}`);
@@ -470,11 +523,12 @@ function renderBoard(): void {
   board.append(key);
   layout.append(entry, board);
   const coverage = node("div", "creator-launch-stats");
-  for (const [value, label] of [[String(PUBLIC_CREATORS.length), "Collected profiles"], [String(SCREENING_TOTALS.sampled), "Public samples collected"], [String(PRODUCT_HANDLES.size), "With priced products"], ["0", "Rated creators"]]) {
+  for (const [value, label] of [[String(PUBLIC_CREATORS.length), "Collected profiles"], [String(SCREENING_TOTALS.sampled), "Public samples collected"], [String(PRODUCT_HANDLES.size), "With priced products"], [String(EVIDENCE_SCORES.size), "Preliminary evidence scores"]]) {
     const stat = node("div"); stat.append(node("strong", "", value), node("span", "", label)); coverage.append(stat);
   }
   const samplingNote = node("p", "creator-sampling-summary", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions collected · ${SCREENING_TOTALS.unavailable} ${SCREENING_TOTALS.unavailable === 1 ? "sample" : "samples"} unavailable · ${SCREENING_TOTALS.brandLeads} creators with sourced follow-up leads. Initial sampling is not a complete product investigation.`);
-  root.replaceChildren(hero, coverage, samplingNote, layout, methodology());
+  const scoreNote = node("p", "creator-evidence-notice", `Evidence Score · Beta. ${EVIDENCE_SCORE_SCOPE}`);
+  root.replaceChildren(hero, coverage, scoreNote, samplingNote, layout, evidenceMethodology());
 }
 
 function backLink(): HTMLElement {

@@ -39,7 +39,8 @@ further review beyond the selected leads.
 Financial contracts, creator ownership percentages, settlements, costs and
 personal distributions remain unknown. Public founder/partner statements are
 attributed statements, not audited ownership or verified income. All 500 real
-profiles remain unrated.
+profiles have no verified transparency rating. They now display a separate
+preliminary Evidence Score for research coverage; see `creator-score-notes.md`.
 
 ## Recollection and provenance
 

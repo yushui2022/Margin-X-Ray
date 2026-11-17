@@ -123,7 +123,9 @@ unit. Gross profit subtracts COGS from net revenue; contribution also subtracts
 variable costs. Fixed overhead, financing and income tax remain excluded.
 Affiliate commission is gross commission before reversals, agency share, creator
 expenses and tax. No assumed financial value is persisted, added to this dataset,
-or used in the Onion Score. No scores are assigned to these real creators.
+or used in a score. Real profiles now have a separate preliminary Evidence Score
+for collected research coverage; verified creator transparency ratings remain
+unassigned. See `creator-score-notes.md`.
 
 Correction history: initial collection and app integration, 2026-11-17. Indexed
 Nudestix sale evidence was added explicitly after the direct-page discrepancy.
