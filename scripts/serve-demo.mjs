@@ -1,12 +1,19 @@
 #!/usr/bin/env node
 import http from "node:http";
-import { createReadStream } from "node:fs";
+import { createReadStream, readFileSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createCreatorFeedback } from "../server/creator-feedback.mjs";
 
 const root = resolve(fileURLToPath(new URL("../web", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
+const profiles = JSON.parse(readFileSync(new URL("../assets/creators/sources.json", import.meta.url), "utf8"));
+const rubric = JSON.parse(readFileSync(new URL("../research/creator-score-rubric.json", import.meta.url), "utf8"));
+const feedback = createCreatorFeedback({
+  databasePath: process.env.CREATOR_FEEDBACK_DB || fileURLToPath(new URL("../data/creator-feedback.sqlite", import.meta.url)),
+  handles: new Set(profiles.map(profile => profile.handle)), version: rubric.version,
+});
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -29,6 +36,7 @@ function safePath(urlPath) {
 
 const server = http.createServer((req, res) => {
   void (async () => {
+    if (await feedback.handle(req, res)) return;
     let filePath = safePath(req.url || "/");
 
     try {
@@ -51,6 +59,7 @@ const server = http.createServer((req, res) => {
     }
   })();
 });
+server.on("close", () => feedback.close());
 
 server.listen(port, () => {
   console.log(`\n  Onion Head agent web: http://localhost:${port}/\n`);

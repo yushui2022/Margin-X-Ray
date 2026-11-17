@@ -1,0 +1,4 @@
+{
+  "version": "evidence-v3",
+  "targets": { "captions": 20, "leads": 4, "linkage": 3, "products": 3, "variants": 3, "prices": 3, "context": 3 }
+}

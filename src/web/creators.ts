@@ -1,7 +1,8 @@
 import { PUBLIC_CREATORS, directoryPage, type CreatorProfile } from "../shared/creator-directory";
 import { productCount, renderCreatorProducts } from "./creator-products";
 import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
-import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor } from "../shared/creator-evidence-score";
+import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor, formatEvidenceScore } from "../shared/creator-evidence-score";
+import { renderCreatorFeedback } from "./creator-feedback";
 
 type PublicCreator = CreatorProfile;
 
@@ -84,7 +85,7 @@ function gradeBadge(value: number | null): HTMLElement {
 function scoreDisplay(value: number | null, evidence = false): HTMLElement {
   const display = node("div", `creator-score-display${value === null ? " is-pending" : ""}`);
   const title = evidence ? "Evidence Score · Beta" : value === null ? "Onion Score" : "Example Onion Score";
-  display.append(node("span", "eyebrow", title), node("strong", "creator-score-number", value === null ? "—" : String(value)), node("span", "creator-score-denominator", "/ 100"));
+  display.append(node("span", "eyebrow", title), node("strong", "creator-score-number", value === null ? "—" : evidence ? formatEvidenceScore(value) : String(value)), node("span", "creator-score-denominator", "/ 100"));
   display.setAttribute("aria-label", value === null ? "Onion Score: not rated" : `${title}: ${value} out of 100`);
   return display;
 }
@@ -229,7 +230,7 @@ function renderPublicProfile(item: PublicCreator): void {
   if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products & earnings for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
   const scorePanel = node("div");
   scorePanel.append(evidenceBreakdown(item.handle), evidenceMethodology());
-  root.replaceChildren(reportToolbar(), header, reportSections([
+  root.replaceChildren(reportToolbar(), header, renderCreatorFeedback(item.handle), reportSections([
     { label: "Score breakdown", content: scorePanel },
     { label: `Products & earnings (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
     { label: "Profile sources", content: details },
@@ -298,13 +299,13 @@ function evidenceBreakdown(handle: string): HTMLElement {
       target?.scrollIntoView({ block: "start", behavior: "instant" });
       target?.focus({ preventScroll: true });
     });
-    jump.append(node("span", "", group.name), node("strong", "", `${group.points}`), node("small", "", `/ ${group.maximum}`));
+    jump.append(node("span", "", group.name), node("strong", "", formatEvidenceScore(group.points)), node("small", "", `/ ${group.maximum}`));
     overview.append(jump);
     const panel = node("section", `creator-score-group group-${group.id}`);
     panel.id = `evidence-${group.id}`;
     panel.tabIndex = -1;
     const heading = node("div", "creator-group-heading");
-    heading.append(node("span", "eyebrow", `0${index + 1}`), node("h3", "", group.name), node("span", "", `${group.points} / ${group.maximum}`));
+    heading.append(node("span", "eyebrow", `0${index + 1}`), node("h3", "", group.name), node("span", "", `${formatEvidenceScore(group.points)} / ${group.maximum}`));
     panel.append(heading);
     for (const dimension of evidence.dimensions.filter(dimension => dimension.group === group.id)) {
       const row = node("details", `creator-check${dimension.points === 0 ? " is-missing" : ""}`);
@@ -320,7 +321,7 @@ function evidenceBreakdown(handle: string): HTMLElement {
       track.setAttribute("aria-valuemin", "0");
       track.setAttribute("aria-valuemax", String(dimension.maximum));
       track.setAttribute("aria-valuenow", String(dimension.points));
-      summary.append(label, node("strong", "creator-dimension-number", `${dimension.points}/${dimension.maximum}`), track, node("span", "creator-check-chevron", "+"));
+      summary.append(label, node("strong", "creator-dimension-number", `${formatEvidenceScore(dimension.points)}/${dimension.maximum}`), track, node("span", "creator-check-chevron", "+"));
       row.append(summary);
       const body = node("div", "creator-check-body");
       body.append(node("p", "creator-check-rule", dimension.rule), node("p", "", dimension.detail));
@@ -345,13 +346,13 @@ function evidenceBreakdown(handle: string): HTMLElement {
     grid.append(panel);
   }
   section.append(overview, grid);
-  section.append(node("p", "creator-report-footnote", `Total: ${evidence.groups.map(group => group.points).join(" + ")} = ${evidence.total}/100. Financial evidence: 0/20 reserved. Full extracts and access limitations are in Products & earnings.`));
+  section.append(node("p", "creator-report-footnote", `Total: ${evidence.groups.map(group => formatEvidenceScore(group.points)).join(" + ")} = ${formatEvidenceScore(evidence.total)}/100. Checks are rounded to one decimal, then summed exactly. Financial evidence: 0/20 reserved.`));
   return section;
 }
 
 function evidenceMethodology(): HTMLElement {
   const details = node("details", "creator-method");
-  details.append(node("summary", "", "How the Evidence Score works"), node("p", "", `${EVIDENCE_SCORE_VERSION} · ${EVIDENCE_SCORE_SCOPE}`), node("p", "", "Ten checks across four groups: public sample (20), commercial trail (25), product & price documentation (35), and financial evidence (20 reserved). A matched usable sample earns 10; each distinct caption adds 1 up to 10. Selected commercial URLs earn 5 each up to 15; distinct product-linked posts earn 5 each up to 10. Named sourced products, variant descriptions and reference prices each earn 5 per record up to 10 per check. Market and purchase-condition notes earn 5 once. Compensation and cost records currently earn 0."), node("p", "", "A record can satisfy several documentation checks. Notes that disclose unknown shipping, stock or returns count as documented context, not verified purchase terms. A linked post may mention a product line without identifying the listed variant. Financial criteria require primary evidence and a new methodology before points can be awarded."), node("p", "", "The current rubric can reach 80/100. Coverage labels: no usable evidence (0), initial (1–29), partial (30–59), broader (60–100). Scores are not confidence percentages. Editorial weights, platform-selected samples and separately priced variants limit comparisons. This v2 rubric replaces v1; score changes can reflect the method alone. Followers, keyword cues and calculator assumptions never add points."));
+  details.append(node("summary", "", "How the Evidence Score works"), node("p", "", `${EVIDENCE_SCORE_VERSION} · ${EVIDENCE_SCORE_SCOPE}`), node("p", "", "Each volume check = maximum points × collected count ÷ target, capped at its maximum and rounded to one decimal. Targets: 20 distinct usable captions, 4 selected commercial URLs, 3 product-linked posts, and 3 records each for named products, variants, prices and market/condition notes. A matched usable sample earns 10. Group weights remain 20 + 25 + 35 + 20; the two financial checks currently earn 0."), node("p", "", "The total is the exact sum of the displayed checks. For example, one selected URL earns 3.8/15 and two earn 7.5/15. Tenths express the calculation, not statistical confidence. Equal evidence receives equal scores. Targets and weights are editorial choices; v3 changes are not directly comparable with earlier versions."), node("p", "", "A record can satisfy several documentation checks. Notes that disclose unknown shipping, stock or returns count as documented context, not verified purchase terms. A linked post may mention a product line without identifying the listed variant. Financial criteria require primary evidence and a new methodology before points can be awarded."), node("p", "", "The current rubric can reach 80/100. Coverage labels: no usable evidence (0), initial (above 0 and below 30), partial (30 to below 60), broader (60–100). Platform-selected samples and separately priced variants limit comparisons. Followers, keyword cues, calculator assumptions and community votes never add evidence points. Community feedback records agreement with this rubric version, using one changeable choice per browser; it is not a verified-person survey."));
   return details;
 }
 
@@ -391,7 +392,7 @@ function renderBoard(): void {
   preview.href = "#creator/%40nikkietutorials";
   const previewCopy = node("div");
   previewCopy.append(node("p", "eyebrow", "Inside a report"), node("strong", "", "NikkieTutorials"), node("span", "", "Explore the points & sources ↗"));
-  preview.append(previewCopy, node("strong", "creator-preview-number", String(evidenceScoreFor("nikkietutorials")!.total)));
+  preview.append(previewCopy, node("strong", "creator-preview-number", formatEvidenceScore(evidenceScoreFor("nikkietutorials")!.total)));
   entry.append(formCard, preview);
 
   const board = node("section", "creator-board");
@@ -486,7 +487,7 @@ function renderBoard(): void {
         identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers · Snapshot` : `${item.category} · Followers not collected`));
         const evidence = evidenceScoreFor(item.handle)!;
         const value = node("div", "creator-list-score creator-evidence-score");
-        value.append(node("strong", "", String(evidence.total)), node("span", "", "Evidence /100"));
+        value.append(node("strong", "", formatEvidenceScore(evidence.total)), node("span", "", "Evidence /100"));
         value.setAttribute("aria-label", `Preliminary evidence score: ${evidence.total} out of 100. ${evidence.level}`);
         const total = productCount(item.handle);
         const leads = brandLeadsFor(item.handle).length;

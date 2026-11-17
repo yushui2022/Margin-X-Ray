@@ -8,7 +8,7 @@
     "build": "node scripts/build.mjs",
     "watch": "node scripts/build.mjs --watch",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests/*.test.ts",
+    "test": "node --import tsx --test tests/*.test.*",
     "mock": "node server/mock-xray.mjs",
     "preview": "node scripts/serve-demo.mjs",
     "serve:demo": "node scripts/serve-demo.mjs",

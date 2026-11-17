@@ -38,15 +38,27 @@ Provenance is in `assets/creators/sources.json` and
 The separate Scoring examples view contains six fictional ranked identities,
 post counts and scores. Unknown TikTok handles also show **Not rated**;
 no creator retrieval service is connected and no lookup is queued.
-The real-profile Evidence Score uses the `evidence-v2` rubric: public sample (20),
+The real-profile Evidence Score uses the `evidence-v3` rubric: public sample (20),
 commercial trail (25), product and price documentation (35), and financial evidence
 (20 reserved). Ten checks cover account matching, caption depth, selected leads,
 product-to-post links, named products, variants, reference prices, market/condition
 notes, compensation records and cost/profit records. Financial checks remain zero.
 Low scores mean incomplete research, not negative findings about a creator. Each
 check shows its calculation, sources and next research step. Documentation of an
-unknown purchase condition does not verify that condition. V2 replaces v1; changed
-scores can reflect the rubric alone. See `research/creator-score-notes.md`.
+unknown purchase condition does not verify that condition. Volume checks now use
+proportional collection targets, rounded to one decimal before summing. V3 replaces
+v2; changed scores can reflect the rubric alone. See `research/creator-score-notes.md`.
+
+Reports also offer **↑ Seems fair / ↓ Needs review** feedback with shared counts,
+agreement percentage, switching and withdrawal. The web server requires **Node 22.13+
+or Node 24+** for built-in SQLite. `npm run serve:demo` serves the same-origin
+`/api/creator-feedback` endpoint and stores votes in `data/creator-feedback.sqlite`
+(ignored by Git). Set `CREATOR_FEEDBACK_DB` to choose a persistent storage location.
+Back up this database with its SQLite WAL state; do not put it in the static web root.
+Votes are scoped to creator and rubric version, with one choice per anonymous
+browser cookie, not one authenticated person. They never change evidence scores.
+Static-only hosting needs this API routed to the Node server; without it the UI
+shows unavailable feedback with Retry rather than inventing counts.
 
 The proposed transparency Onion Score, used only in fictional examples, weights price transparency (40%), commercial disclosure
 (35%) and linked-seller returns information (25%). The formula is visible in the
