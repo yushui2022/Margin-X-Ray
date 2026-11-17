@@ -38,6 +38,8 @@ export function initCreators(container: HTMLElement): void {
 
 export function renderCreatorRoute(): void {
   if (!root) return;
+  root.className = location.hash.startsWith("#creator/") ? "creator-report" : "creator-home";
+  window.scrollTo({ top: 0, behavior: "instant" });
   if (location.hash.startsWith("#creator/")) {
     let id: string;
     try { id = decodeURIComponent(location.hash.slice(9)); }
@@ -54,6 +56,93 @@ export function renderCreatorRoute(): void {
 
 function score(item: CreatorExample): number {
   return Math.round(DIMENSIONS.reduce((sum, dim, i) => sum + dim.weight * item.checks[i]! / item.posts, 0));
+}
+
+function grade(value: number): { letter: string; label: string } {
+  if (value >= 90) return { letter: "S", label: "Very clear" };
+  if (value >= 80) return { letter: "A", label: "Mostly clear" };
+  if (value >= 70) return { letter: "B", label: "Some gaps" };
+  if (value >= 60) return { letter: "C", label: "Many gaps" };
+  return { letter: "D", label: "Limited clarity" };
+}
+
+function gradeBadge(value: number | null): HTMLElement {
+  const tier = value === null ? { letter: "—", label: "Not rated" } : grade(value);
+  const badge = node("span", `creator-grade grade-${tier.letter.toLowerCase()}`, tier.letter);
+  badge.setAttribute("aria-label", value === null ? tier.label : `Example tier ${tier.letter}: ${tier.label}`);
+  return badge;
+}
+
+function scoreDisplay(value: number | null): HTMLElement {
+  const display = node("div", `creator-score-display${value === null ? " is-pending" : ""}`);
+  display.append(node("span", "eyebrow", value === null ? "Onion Score" : "Example Onion Score"), node("strong", "creator-score-number", value === null ? "—" : String(value)), node("span", "creator-score-denominator", "/ 100"));
+  display.setAttribute("aria-label", value === null ? "Onion Score: not rated" : `Example Onion Score: ${value} out of 100`);
+  return display;
+}
+
+function reportToolbar(): HTMLElement {
+  const bar = node("div", "creator-report-toolbar");
+  const status = node("span", "creator-copy-status");
+  status.setAttribute("role", "status");
+  const copy = action("Copy report link ↗", async () => {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      status.textContent = "Link copied";
+    } catch { status.textContent = "Copy the URL from your address bar."; }
+  });
+  bar.append(backLink(), status, copy);
+  return bar;
+}
+
+function reportSections(sections: { label: string; content: HTMLElement }[]): HTMLElement {
+  const wrapper = node("div", "creator-report-sections");
+  const navigation = node("nav", "creator-report-tabs");
+  navigation.setAttribute("aria-label", "Report sections");
+  const panels = sections.map(({ content }, i) => {
+    const panel = node("section", "creator-report-panel");
+    panel.id = `creator-report-panel-${i}`;
+    panel.hidden = i !== 0;
+    panel.append(content);
+    return panel;
+  });
+  const buttons = sections.map(({ label }, i) => {
+    const button = action(label, () => {
+      panels.forEach((panel, j) => { panel.hidden = i !== j; buttons[j]!.setAttribute("aria-pressed", String(i === j)); });
+    }, "creator-report-tab");
+    button.setAttribute("aria-pressed", String(i === 0));
+    button.setAttribute("aria-controls", panels[i]!.id);
+    return button;
+  });
+  navigation.append(...buttons);
+  wrapper.append(navigation, ...panels);
+  return wrapper;
+}
+
+function breakdown(example?: CreatorExample): HTMLElement {
+  const section = node("section", "creator-breakdown");
+  section.append(node("p", "eyebrow", "01 / The breakdown"), node("h2", "", "Every point needs a receipt."));
+  for (const [i, dim] of DIMENSIONS.entries()) {
+    const row = node("div", "creator-dimension-row");
+    const label = node("div", "creator-dimension-label");
+    label.append(node("strong", "", dim.name), node("span", "", `${dim.weight}% weight`));
+    const track = node("div", `creator-dimension-track${example ? "" : " is-pending"}`);
+    if (example) {
+      const value = example.checks[i]! / example.posts * 100;
+      const fill = node("span");
+      fill.style.width = `${value}%`;
+      track.append(fill);
+      track.setAttribute("role", "meter");
+      track.setAttribute("aria-label", `Example ${dim.name}`);
+      track.setAttribute("aria-valuemin", "0");
+      track.setAttribute("aria-valuemax", "100");
+      track.setAttribute("aria-valuenow", String(value));
+    } else track.setAttribute("aria-hidden", "true");
+    const value = node("strong", "creator-dimension-number", example ? `${Math.round(example.checks[i]! / example.posts * 100)}` : "—");
+    row.append(label, track, value, node("p", "", example ? `${example.checks[i]} / ${example.posts} fictional posts meet this check. ${dim.rule}` : `Not reviewed. ${dim.rule}`));
+    section.append(row);
+  }
+  section.append(node("p", "creator-report-footnote", example ? "Constructed sample · All posts are evaluable in each dimension. This demonstrates the scoring rules." : "Unreviewed means unknown. It is not a zero or a negative rating."));
+  return section;
 }
 
 function node<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text?: string): HTMLElementTagNameMap[K] {
@@ -98,18 +187,30 @@ function externalLink(label: string, url: string): HTMLAnchorElement {
 }
 
 function renderPublicProfile(item: PublicCreator): void {
-  const header = node("header", "creator-profile-head");
+  const header = node("header", "creator-scorecard");
+  const main = node("div", "creator-scorecard-main");
   const identity = node("div", "creator-public-identity");
   const text = node("div");
-  text.append(node("p", "eyebrow", `${item.category} creator`), node("h1", "", item.name), node("p", "", `@${item.handle}`));
+  text.append(node("p", "eyebrow", `${item.category} / Public profile`), node("h1", "", item.name), node("p", "", `@${item.handle}`));
   identity.append(portrait(item), text);
-  header.append(identity, node("span", "creator-unrated", "Not rated"));
+  const verdict = node("div", "creator-verdict-line");
+  verdict.append(gradeBadge(null), node("div", "", "Not rated · Evidence review pending"));
+  main.append(identity, verdict, node("p", "creator-verdict-copy", "The receipts are coming together."), node("p", "creator-scorecard-note", "Products and relationships are collected. Comparable promotion sampling and a scoring review are still needed."));
+  const strip = node("div", "creator-scorecard-strip");
+  strip.append(node("span", "", `${productCount(item.handle)} product records`), node("span", "", "Earnings unknown"), node("span", "", `Collected ${item.retrievedAt}`));
+  header.append(main, scoreDisplay(null), strip);
   const details = node("section", "card creator-evidence");
   details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", "This profile includes product listings and promotion evidence with sources and access limitations. Coverage is incomplete and has not undergone a scoring review, so no Onion Score or rank is assigned."));
   const links = node("div", "creator-profile-links");
   links.append(externalLink("Open TikTok profile ↗", `https://www.tiktok.com/@${item.handle}`), externalLink("Portrait source ↗", item.source));
   details.append(links, node("p", "", `Portrait retrieved ${item.retrievedAt}. ${item.note}`));
-  root.replaceChildren(backLink(), header, renderCreatorProducts(item.handle), details, searchForm());
+  const scorePanel = node("div");
+  scorePanel.append(breakdown(), methodology());
+  root.replaceChildren(reportToolbar(), header, reportSections([
+    { label: "Score breakdown", content: scorePanel },
+    { label: `Products & earnings (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
+    { label: "Profile sources", content: details },
+  ]));
 }
 
 function searchForm(): HTMLElement {
@@ -117,14 +218,14 @@ function searchForm(): HTMLElement {
   const form = node("form", "scan-form");
   const label = node("label", "scan-field");
   const input = node("input");
-  input.placeholder = "@username or a TikTok profile link";
+  input.placeholder = "username or TikTok profile URL";
   input.setAttribute("aria-label", "TikTok username or profile URL");
   input.autocomplete = "off";
   input.spellcheck = false;
   input.required = true;
   input.maxLength = 250;
   label.append(node("span", "creator-at", "@"), input);
-  const submit = node("button", "btn primary scan-btn", "Check creator");
+  const submit = node("button", "btn primary scan-btn", "Get scorecard →");
   submit.type = "submit";
   form.append(label, submit);
   const status = node("p", "creator-input-status");
@@ -164,30 +265,47 @@ function methodology(): HTMLElement {
   details.append(node("p", "", "Proposed scoring rules · v0.1. The score describes transparency in sampled shopping recommendations. It does not measure a person’s character or prove product quality."));
   for (const dim of DIMENSIONS) details.append(node("p", "", `${dim.name} · ${dim.weight}% — ${dim.rule}`));
   details.append(node("p", "", "Example score = 40 × price checks / posts + 35 × disclosure checks / posts + 25 × return checks / posts, rounded to a whole number. All 20 example posts are evaluable in each dimension. These are constructed examples, not collected evidence."));
+  details.append(node("p", "", "Example tiers: S = 90–100 (Very clear), A = 80–89 (Mostly clear), B = 70–79 (Some gaps), C = 60–69 (Many gaps), D = below 60 (Limited clarity). Tiers describe the example transparency score; unreviewed accounts receive no tier."));
   details.append(node("p", "", "For live reports, unavailable evidence must remain unknown. Publish a score only after coverage, comparable sampling and review thresholds are defined. Show observation dates, sources and a correction history. Returns describe the linked seller’s policy, not the creator’s fulfillment performance. Wholesale price differences alone cannot establish misconduct."));
   return details;
 }
 
 function renderBoard(): void {
-  const hero = node("header", "creator-hero");
-  const copy = node("div");
-  copy.append(node("p", "eyebrow", "The creator leaderboard"));
-  const heading = node("h1", "", "Who’s worth ");
-  heading.append(node("em", "", "your trust?"));
-  copy.append(heading, node("p", "lede", "Check the creator behind the recommendation. Explore their shopping transparency score, then look at the evidence behind it."), searchForm());
-  const mascot = node("img", "creator-mascot");
+  const hero = node("header", "creator-rating-intro");
+  hero.append(node("p", "eyebrow", "The internet has opinions. We look for receipts."));
+  const heading = node("h1", "", "Rate my ");
+  heading.append(node("em", "", "creator."));
+  hero.append(heading, node("p", "", "One scorecard. The products, the prices, the story behind the pitch."));
+  const layout = node("div", "creator-rating-layout");
+  const entry = node("aside", "creator-rating-entry");
+  const formCard = node("section", "creator-entry-card");
+  const mascot = node("img", "creator-entry-mascot");
   mascot.src = "assets/mascot/onion-kid.webp";
   mascot.alt = "";
-  hero.append(copy, mascot);
+  formCard.append(mascot, node("p", "eyebrow", "Put a creator under the lens"), node("h2", "", "Who's on your feed?"), node("p", "creator-field-caption", "TIKTOK USERNAME"), searchForm());
+  const quick = node("div", "creator-quick-picks");
+  quick.append(node("span", "", "Try"));
+  for (const handle of ["mikaylanogueira", "glamzilla"]) {
+    const link = node("a", "", `@${handle}`);
+    link.href = `#creator/${encodeURIComponent(`@${handle}`)}`;
+    quick.append(link);
+  }
+  formCard.append(quick, node("p", "creator-entry-note", "4 collected profiles. Live lookup is not connected; unreviewed accounts remain unrated."));
+  const preview = node("a", "creator-score-preview");
+  preview.href = "#creator/demo-01";
+  const previewCopy = node("div");
+  previewCopy.append(node("p", "eyebrow", "Fictional score preview"), node("strong", "", "What does a score look like?"), node("span", "", "Open a sample scorecard ↗"));
+  preview.append(previewCopy, node("strong", "creator-preview-number", String(score(EXAMPLES[0]!))));
+  entry.append(formCard, preview);
 
   const board = node("section", "creator-board");
   const header = node("div", "creator-board-head");
   const title = node("div");
-  const boardTitle = node("h2", "", "Explore creators");
-  title.append(node("p", "eyebrow", "Shopping transparency"), boardTitle);
+  const boardTitle = node("h2", "", "The leaderboard");
+  title.append(node("p", "eyebrow", "The Onion index"), boardTitle);
   const selectLabel = node("label", "creator-sort", "Sort by ");
   const select = node("select");
-  for (const [value, text] of [["score", "Highest score"], ["name", "Creator name"]]) {
+  for (const [value, text] of [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]) {
     const option = node("option", "", text);
     option.value = value!;
     select.append(option);
@@ -222,7 +340,7 @@ function renderBoard(): void {
   count.setAttribute("aria-live", "polite");
   function renderRows(): void {
     selectLabel.hidden = mode === "public";
-    boardTitle.textContent = mode === "public" ? "Explore creators" : "The Onion ranking · examples";
+    boardTitle.textContent = mode === "public" ? "The leaderboard" : "The leaderboard · examples";
     if (mode === "public") {
       const items = PUBLIC_CREATORS.filter((item) => category === "All" || item.category === category).sort((a, b) => a.name.localeCompare(b.name));
       list.replaceChildren(...items.map((item) => {
@@ -231,29 +349,32 @@ function renderBoard(): void {
         link.href = `#creator/${encodeURIComponent(`@${item.handle}`)}`;
         const identity = node("div", "creator-identity");
         identity.append(node("strong", "", item.name), node("span", "", `@${item.handle} · ${item.category}`));
-        const coverage = node("div", "creator-coverage");
-        coverage.append(node("strong", "", `${productCount(item.handle)} product records`), node("span", "", "Earnings unknown"));
-        link.append(portrait(item), identity, coverage, node("span", "creator-unrated", "Not rated"), node("span", "creator-arrow", "↗"));
+        const value = node("div", "creator-list-score is-pending");
+        value.append(node("strong", "", "—"), node("span", "", "Not rated"));
+        const total = productCount(item.handle);
+        const status = node("span", "creator-row-status", `${total} ${total === 1 ? "product" : "products"} · Review pending`);
+        identity.append(status);
+        link.append(gradeBadge(null), portrait(item), identity, value, node("span", "creator-arrow", "↗"));
         li.append(link);
         return li;
       }));
-      count.textContent = items.length ? `${items.length} public profiles · Alphabetical order · Scores pending evidence review` : "No public profiles in this category yet. Try Beauty or Tech, or enter a TikTok username above.";
+      count.textContent = items.length ? `${items.length} real creators · Alphabetical, awaiting rating` : "No collected profiles here yet. Try Beauty or Tech.";
       return;
     }
     const ranked = [...EXAMPLES].sort((a, b) => score(b) - score(a));
     const items = ranked.filter((item) => category === "All" || item.category === category);
     if (sort === "name") items.sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === "lowest") items.sort((a, b) => score(a) - score(b));
     list.replaceChildren(...items.map((item) => {
       const li = node("li");
       const link = node("a", "creator-rank-row");
       link.href = `#creator/${item.id}`;
       const identity = node("div", "creator-identity");
       identity.append(node("strong", "", item.name), node("span", "", `${item.category} · Fictional creator`));
-      const coverage = node("div", "creator-coverage");
-      coverage.append(node("strong", "", `${item.posts} sample posts`), node("span", "", "Illustrative evidence"));
-      const value = node("div", "creator-score");
+      identity.append(node("span", "creator-row-status", `${grade(score(item)).letter} tier · ${grade(score(item)).label}`));
+      const value = node("div", "creator-list-score creator-score");
       value.append(node("strong", "", String(score(item))), node("span", "", "/ 100 · sample"));
-      link.append(node("span", "creator-rank", String(ranked.indexOf(item) + 1).padStart(2, "0")), node("span", `creator-avatar tone-${item.category.toLowerCase()}`, item.initials), identity, coverage, value, node("span", "creator-arrow", "↗"));
+      link.append(node("span", "creator-rank", String(ranked.indexOf(item) + 1).padStart(2, "0")), node("span", `creator-avatar tone-${item.category.toLowerCase()}`, item.initials), identity, value, node("span", "creator-arrow", "↗"));
       li.append(link);
       return li;
     }));
@@ -261,7 +382,16 @@ function renderBoard(): void {
   }
   renderRows();
   board.append(header, modes, filters, count, list);
-  root.replaceChildren(hero, node("p", "creator-notice", "Public portraits are sourced from linked profile pages. Live TikTok lookup is not connected. Scoring examples use fictional identities only."), board, methodology());
+  const key = node("div", "creator-grade-key");
+  key.append(node("span", "", "Example tiers"));
+  for (const [letter, threshold] of [["S", "90+"], ["A", "80+"], ["B", "70+"], ["C", "60+"], ["D", "<60"]]) {
+    const item = node("span", `creator-key-item grade-${letter!.toLowerCase()}`);
+    item.append(node("strong", "", letter), node("small", "", threshold));
+    key.append(item);
+  }
+  board.append(key);
+  layout.append(entry, board);
+  root.replaceChildren(hero, layout, methodology());
 }
 
 function backLink(): HTMLElement {
@@ -271,25 +401,19 @@ function backLink(): HTMLElement {
 }
 
 function renderProfile(item: CreatorExample): void {
-  const header = node("header", "creator-profile-head");
-  const identity = node("div");
-  identity.append(node("p", "eyebrow", "Fictional creator report"), node("h1", "", item.name), node("p", "", `${item.category} · ${item.posts} constructed sample posts · No TikTok account linked`));
-  const value = node("div", "creator-profile-score");
-  value.append(node("strong", "", String(score(item))), node("span", "", "Onion Score / 100"), node("small", "", "Illustrative score"));
-  header.append(identity, value);
-  const grid = node("div", "creator-dimensions");
-  DIMENSIONS.forEach((dim, i) => {
-    const passed = item.checks[i]!;
-    const card = node("section", "card");
-    card.append(node("p", "eyebrow", `${dim.weight}% of score`), node("h2", "", dim.name), node("strong", "dimension-value", `${passed} / ${item.posts}`), node("p", "", "Sample posts meeting the check"));
-    const meter = node("meter");
-    meter.min = 0;
-    meter.max = item.posts;
-    meter.value = passed;
-    meter.setAttribute("aria-label", dim.name);
-    card.append(meter, node("p", "", dim.rule));
-    grid.append(card);
-  });
+  const header = node("header", "creator-scorecard is-example");
+  const main = node("div", "creator-scorecard-main");
+  const identity = node("div", "creator-public-identity");
+  const text = node("div");
+  text.append(node("p", "eyebrow", `${item.category} / Fictional creator`), node("h1", "", item.name), node("p", "", "Scoring demonstration · No real account"));
+  identity.append(node("span", `creator-avatar creator-example-avatar tone-${item.category.toLowerCase()}`, item.initials), text);
+  const verdict = node("div", "creator-verdict-line");
+  verdict.append(gradeBadge(score(item)), node("div", "", `${grade(score(item)).label} · Example tier ${grade(score(item)).letter}`));
+  main.append(identity, verdict, node("p", "creator-verdict-copy", score(item) >= 80 ? "More clarity. Less guesswork." : "There are layers left to peel."), node("p", "creator-scorecard-note", "A constructed example of how price, promotion disclosure and returns information contribute to a score."));
+  const rank = [...EXAMPLES].sort((a, b) => score(b) - score(a)).indexOf(item) + 1;
+  const strip = node("div", "creator-scorecard-strip");
+  strip.append(node("span", "", `#${String(rank).padStart(2, "0")} of ${EXAMPLES.length} examples`), node("span", "", `${item.posts} fictional posts`), node("span", "", "Method v0.1"));
+  header.append(main, scoreDisplay(score(item)), strip);
   const evidence = node("section", "card creator-evidence");
   evidence.append(node("h2", "", "Behind the recommendations"), node("p", "", "Example product cards show the review workflow. They are not evidence for the illustrative score above."));
   for (const product of item.products) {
@@ -297,7 +421,12 @@ function renderProfile(item: CreatorExample): void {
     detail.append(node("summary", "", product), node("p", "", "Source video: unavailable · Observation date: unavailable · Retail price: not collected"), node("p", "", "Comparable listings: not matched. Size, material, shipping, warranty and seller terms must be checked before interpreting a price difference."), node("p", "", "Promotion disclosure and return policy: not reviewed for this product card."));
     evidence.append(detail);
   }
-  root.replaceChildren(backLink(), sampleNotice(), header, grid, evidence, methodology());
+  const scorePanel = node("div");
+  scorePanel.append(breakdown(item), methodology());
+  root.replaceChildren(reportToolbar(), sampleNotice(), header, reportSections([
+    { label: "Score breakdown", content: scorePanel },
+    { label: "Example products", content: evidence },
+  ]));
 }
 
 function renderUnavailable(raw: string): void {

@@ -7,6 +7,15 @@ web interface supports category filtering, score/name sorting, fictional creator
 reports, and TikTok username/profile-link input. Product scanning and the Pro
 sourcing workspace remain available through the navigation.
 
+The creator entry follows a compact rating flow: username input beside the
+leaderboard, then a scorecard with a large score, an example S–D tier, a short
+verdict and weighted dimension bars. Real profiles display an unrated scorecard
+with unknown dimensions. Scoring examples remain explicitly fictional and can
+be sorted highest/lowest or by name. Report controls switch between the score
+breakdown, products/earnings and profile sources; copying a report link copies
+the current URL without publishing anything. The warm Onion Head visual identity
+and mascot are retained.
+
 The default creator list includes four public profiles with locally stored
 portraits: Glamzilla, Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials.
 All four are **Not rated**, listed alphabetically, with TikTok links and portrait
