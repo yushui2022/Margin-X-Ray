@@ -515,11 +515,11 @@ function renderBoard(): void {
         identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers` : `${item.category} · Followers not collected`));
         const evidence = evidenceScoreFor(item.handle)!;
         const value = node("div", "creator-list-score creator-evidence-score");
-        value.append(node("strong", "", formatEvidenceScore(evidence.total)), node("span", "", "Evidence /100"));
+        value.append(node("span", "creator-evidence-label", "Evidence"), node("strong", "", formatEvidenceScore(evidence.total)), node("span", "creator-evidence-total", "out of 100"));
         value.setAttribute("aria-label", `Preliminary evidence score: ${evidence.total} out of 100. ${evidence.level}`);
         const total = productCount(item.handle);
         const leads = brandLeadsFor(item.handle).length;
-        const status = node("span", "creator-row-status", total ? `${total} priced ${total === 1 ? "product" : "products"} · Review pending` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Offer unverified` : screeningLabel(item.handle));
+        const status = node("span", "creator-row-status", total ? `${total} priced ${total === 1 ? "product" : "products"}` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Unverified` : screeningLabel(item.handle));
         identity.append(status);
         const mini = node("span", "creator-mini-score");
         mini.setAttribute("aria-hidden", "true");

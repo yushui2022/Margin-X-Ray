@@ -21,7 +21,7 @@ export function renderCreatorFeedback(handle: string, compact = false): HTMLElem
   section.className = `creator-feedback${compact ? " creator-feedback-compact" : ""}`;
   section.setAttribute("aria-label", `Score feedback for @${handle}`);
   section.innerHTML = `${compact ? '<p class="creator-feedback-prompt">Score fair?</p>' : '<div class="creator-feedback-copy"><p class="eyebrow">Community check</p><h2>Does this score seem fair?</h2><p>Vote on the score’s reasoning. Your feedback helps flag reports for review.</p></div>'}
-    <div class="creator-feedback-controls"><div class="creator-vote-buttons"><button type="button" data-vote="up" aria-pressed="false">↑${compact ? "" : " Seems fair"} <span>—</span></button><button type="button" data-vote="down" aria-pressed="false">↓${compact ? "" : " Needs review"} <span>—</span></button></div><p class="creator-vote-result" role="status" aria-live="polite">${compact ? "Loading…" : "Loading community feedback…"}</p><button type="button" class="creator-feedback-retry" hidden>Retry feedback</button>${compact ? "" : '<p class="creator-vote-note">Anonymous browser votes · Tap again to undo. Votes do not change the evidence score.</p>'}</div>`;
+    <div class="creator-feedback-controls">${compact ? '<span class="creator-vote-label">Your take</span>' : ""}<div class="creator-vote-buttons"><button type="button" data-vote="up" aria-pressed="false">↑${compact ? "" : " Seems fair"} <span>—</span></button><button type="button" data-vote="down" aria-pressed="false">↓${compact ? "" : " Needs review"} <span>—</span></button></div><p class="creator-vote-result" role="status" aria-live="polite">${compact ? "Loading…" : "Loading community feedback…"}</p><button type="button" class="creator-feedback-retry" hidden>Retry feedback</button>${compact ? "" : '<p class="creator-vote-note">Anonymous browser votes · Tap again to undo. Votes do not change the evidence score.</p>'}</div>`;
   const indicator = createOnionIndicator(compact);
   if (compact) section.querySelector(".creator-feedback-prompt")!.replaceWith(indicator.element);
   else {
@@ -55,7 +55,7 @@ export function renderCreatorFeedback(handle: string, compact = false): HTMLElem
     const total = state.up + state.down;
     indicator.update(state.up, state.down);
     result.textContent = compact
-      ? total ? `${Math.round(state.up / total * 100)}% agree${state.yourVote ? " · Saved" : ""}` : "No votes yet"
+      ? state.yourVote ? "Vote saved" : `${total.toLocaleString("en-US")} ${total === 1 ? "vote" : "votes"}`
       : total ? `${Math.round(state.up / total * 100)}% agree · ${total.toLocaleString("en-US")} ${total === 1 ? "vote" : "votes"}${state.yourVote ? " · Your vote is saved" : ""}` : "No votes yet. Be the first to review this score.";
   };
   async function request(vote?: Vote) {
