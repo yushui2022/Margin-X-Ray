@@ -1,5 +1,7 @@
 import RESEARCH from "../../research/creator-products.json";
 import { brandScenario, commissionScenario, scenarioNumber } from "../shared/creator-economics";
+import { renderScreening } from "./creator-screening";
+import { screeningFor, brandLeadsFor } from "../shared/creator-screening";
 
 type Product = (typeof RESEARCH.products)[number];
 
@@ -124,10 +126,15 @@ function productCard(product: Product): HTMLElement {
 
 export function renderCreatorProducts(handle: string): HTMLElement {
   const wrapper = node("div", "creator-products");
+  wrapper.append(renderScreening(handle));
   const creator = RESEARCH.creators.find((item) => item.handle === handle);
   if (!creator) {
     const empty = node("section", "card creator-product-overview");
-    empty.append(node("p", "eyebrow", "Research not started"), node("h2", "", "Products & earnings"), node("p", "", "This creator is in the launch directory. Product recommendations, brand relationships, prices and financial evidence have not been collected yet."), node("p", "", "0 product records · Earnings unknown · No research request is queued. This does not mean the creator has no products or brand."));
+    const sample = screeningFor(handle);
+    const leads = brandLeadsFor(handle);
+    empty.append(node("p", "eyebrow", sample ? "Initial research · Offer verification pending" : "Research not started"), node("h2", "", "Products & earnings"), node("p", "", sample
+      ? `No priced product record has been accepted for this creator. ${leads.length ? `${leads.length} sourced follow-up leads are available above.` : "No product or brand lead has been selected for this report yet."} Exact products, current seller offers and financial terms need verification.`
+      : "Product research has not started for this account."), node("p", "", "0 priced product records · Earnings unknown. A limited sample does not establish that the creator has no products, brand or commercial relationships."));
     wrapper.append(empty);
     return wrapper;
   }

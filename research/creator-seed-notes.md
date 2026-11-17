@@ -23,7 +23,9 @@ The roster includes celebrities and large creators across the global directory.
 It is not asserted to be the definitive global top 500, a list of verified
 TikTok Shop affiliates, or a representative sample of shopping recommendations.
 Name/handle associations and newly collected portraits come from a secondary
-directory; individual TikTok accounts were not independently retrieved.
+directory. A subsequent official public-embed pass returned matching handles for
+499 accounts; one remained unavailable. Portraits and follower observations still
+come from the original directory sources, not the embed.
 
 497 profiles have a rounded directory follower observation. Three retained
 profiles (Glamzilla, Mrwhosetheboss and NikkieTutorials) were outside this source
@@ -45,9 +47,11 @@ pagination. All 500 known handles resolve locally to their own report routes.
 Unknown handles remain unsupported by live retrieval. Images load lazily.
 
 At initial seeding, four researched profiles retained their eight product records.
-The first research expansion adds six creators and ten records, bringing coverage
-to ten creators and eighteen priced records, with three unresolved leads. The
-remaining 490 profiles show "Research not started" in Products & earnings. Product
+Subsequent research brings coverage to twelve creators and twenty-one priced
+records, with three unresolved baseline leads. All 500 profiles have a public
+sampling outcome: 499 usable samples and one HTTP 400 failure. Selected follow-up
+leads cover 153 creators; 488 still have no accepted priced product. See
+`creator-screening-notes.md` for sampling limits and reproduction. Product
 coverage is derived from `creator-products.json`; the `collection` marker in the
 portrait file records roster provenance, not current research status. All real
 scores remain null. The six fictional scoring examples remain in their separate view.

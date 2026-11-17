@@ -1,9 +1,12 @@
 # Creator products collection · 2026-11-17
 
-The application imports `creator-products.json` directly. It contains eighteen
-priced product records across ten public creator profiles and three unresolved
-leads, with forty source entries. 490 of the 500 directory profiles still await
-product research. This is partial evidence coverage, not completed investigations.
+The application imports `creator-products.json` directly. It contains twenty-one
+priced product records across twelve public creator profiles and three unresolved
+leads, with forty-eight source entries. All 500 directory profiles now have an
+initial public-sampling outcome; 488 still lack an accepted priced product record.
+The separate sampling files contain 173 follow-up leads across 153 creators.
+See `creator-screening-notes.md` for scope. This is partial evidence coverage,
+not completed investigations.
 All source entries share the top-level observation date. Publication dates, where
 known, describe historical posts/articles and must not be confused with price
 observation dates. Extracts are condensed notes from the retrieved or indexed
@@ -12,15 +15,39 @@ content, not archived full pages. Source content can change.
 | Creator | Third-party evidence | Brand / collaboration evidence | Main gap |
 | --- | --- | --- | --- |
 | Mikayla Nogueira | L’Oréal Telescopic Lift historical paid partnership | POV Drench It and Glaze It; founder-associated brand | Commission/fee, costs, ownership share, settlements |
-| NikkieTutorials | MISSHA title only; excluded from matched products | Nimya cream and setting spray; founder confirmed | Exact third-party SKU, costs, net revenue, distributions |
+| NikkieTutorials | Biodance mist caption and official reference; MISSHA unresolved | Nimya cream and setting spray; founder confirmed | Amazon offer/pack, costs, net revenue, distributions |
 | Glamzilla | Magic Root Cover Up mention; paid relationship unknown | Dirty 30 kit collaboration; 2022 equity report | Current stake, royalty terms, commission, costs |
 | Mrwhosetheboss | Sony WF-1000XM6 #ad caption on secondary directory | No founder-brand product established in this search | Original video, fee/commission, own-brand coverage |
-| MrBeast | Not sampled in this batch | Feastables, 10 standard bars USD 20.99 and 10 king-size bars USD 29.99 | Pack sizes must remain separate; checkout, costs, personal stake |
-| Selena Gomez | Not sampled in this batch | Rare Beauty, Hope full-size blush USD 25 and Intrigue mini USD 16 | Exact volumes absent from retained extracts; checkout and costs |
-| Hailey Bieber | Not sampled in this batch | rhode, Unscented Peptide Lip Treatment 10 mL USD 20 | Acquired by e.l.f.; stock unresolved; four-scent set price conflict |
-| Kylie Jenner | Not sampled in this batch | Kylie Cosmetics, Bare Matte and Bare Velvet kits, USD 35 each | Coty majority transaction is historical; current personal stake unknown |
-| Ariana Grande | Not sampled in this batch | r.e.m. beauty, Fembot gloss USD 22 and Cosmo balm USD 20 | Outside investors; mixed stock text; ownership and unit economics |
-| Dwayne Johnson | Not sampled in this batch | PAPATUI, Cedar Sport body wash reference USD 8 | Retailer offer not checked; tattoo stick lacks accepted variant price |
+| MrBeast | Limited caption sample; Shopify disclosed lead | Feastables, 10 standard bars USD 20.99 and 10 king-size bars USD 29.99 | Pack sizes must remain separate; checkout, costs, personal stake |
+| Selena Gomez | Limited caption sample; no priced third-party record | Rare Beauty, Hope full-size blush USD 25 and Intrigue mini USD 16 | Exact volumes absent from retained extracts; checkout and costs |
+| Hailey Bieber | Limited caption sample; no priced third-party record | rhode, Unscented Peptide Lip Treatment 10 mL USD 20 | Acquired by e.l.f.; stock unresolved; four-scent set price conflict |
+| Kylie Jenner | Limited caption sample; no priced third-party record | Kylie Cosmetics, Bare Matte and Bare Velvet kits, USD 35 each | Coty majority transaction is historical; current personal stake unknown |
+| Ariana Grande | Limited caption sample; no priced third-party record | r.e.m. beauty, Fembot gloss USD 22 and Cosmo balm USD 20 | Outside investors; mixed stock text; ownership and unit economics |
+| Dwayne Johnson | Limited caption sample; ZOA/cologne follow-up | PAPATUI, Cedar Sport body wash reference USD 8 | Retailer offer not checked; tattoo stick lacks accepted variant price |
+| James Charles | Lancôme calendar review lead; sponsorship unverified | Painted Basic Canvas Palette, 24 shades, 39 g, USD 55 | Checkout, current personal ownership and costs |
+| Lady Gaga | Limited caption sample; no priced third-party record | Haus Labs Sun Dipped Bronzing Veil, Suede, 7 mL, USD 32 | Caption shade not specified; stock, checkout and costs |
+
+## Full-roster sampling expansion
+
+The public-embed collection adds all 500 sampling outcomes, 5,212 captions and
+selected follow-up leads (see `creator-screening-notes.md`). Two additional founder
+brands and one third-party product now have reference-price records. Painted's
+company profile explicitly names James Charles as founder; its official product
+page carries the brand attribution and palette specification. Haus Labs identifies
+Lady Gaga as founder; her caption names the bronzer line without specifying the
+selected Suede shade. Both product pages returned HTTP 429 directly, so their
+prices are indexed observations and do not verify live checkout or stock.
+
+Nikkie's caption names Biodance Collagen Peptide Jelly Serum Mist and a USD 13.30
+Amazon promotion. The separate indexed official store reference is USD 16.99
+versus USD 19. The product resource specifies 50 mL but retains a not-yet-listed
+statement; the store URL slug says caviar-pdrn while its displayed title says
+Collagen. These inconsistencies, unknown Amazon pack/seller and access limitations
+remain explicit. The record does not assert that the Amazon promotion was verified.
+
+Logan Paul's PRIME association, IShowSpeed's PRIME bottle and Gordon Ramsay's
+HexClad partnership are sourced follow-up leads. HexClad's USD 143/179/152 indexed
+offers have not been reconciled, so the pan has no accepted price or calculator.
 
 ## First directory research expansion
 
@@ -63,9 +90,9 @@ financial figures are converted into personal proceeds or SKU margins.
 
 Next research priorities: retailer reconciliation for PAPATUI, unresolved rhode
 offers, exact package volumes, seller return policies, and original TikTok posts
-with matching SKUs and commercial disclosures. Additional roster candidates
-include James Charles, Logan Paul, Charli/Dixie D'Amelio and Addison Rae; their
-potential brand associations are not yet accepted evidence in this collection.
+with matching SKUs and commercial disclosures. Follow-up includes PRIME pack
+offers, HexClad price reconciliation and the historical Charli/Addison brand
+campaigns; the initial caption pass does not complete their product histories.
 
 ## Original collection and financial boundaries
 

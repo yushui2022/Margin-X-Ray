@@ -15,6 +15,14 @@
     "contributionMarginPct": null
   },
   "sources": [
+    { "id": "painted-founder", "label": "Painted · Company profile", "url": "https://linkedin.com/company/painted-co", "access": "Company profile via search index", "excerpt": "A global beauty brand founded by James Charles with a mission to create pro formulas at affordable prices. Website painted.co.", "publishedAt": null },
+    { "id": "painted-basic", "label": "Painted · Basic Canvas Palette", "url": "https://painted.co/en-us/products/basic-canvas-palette", "access": "Official US page via search index; direct request returned HTTP 429", "excerpt": "Basic Canvas Palette; Face & Eye Palette; 1.37 OZ / 39G; 24 shades; $55.00 USD; Free US Standard Shipping on orders over $40. Painted by James Charles.", "publishedAt": null },
+    { "id": "haus-founder", "label": "Haus Labs · Icons Set", "url": "https://www.hauslabs.com/products/icons-set", "access": "Official page via search index; used only for founder attribution", "excerpt": "Discover the clean, skincare-infused innovations our founder Lady Gaga uses to create her daily looks. Currency: United States (USD).", "publishedAt": null },
+    { "id": "haus-bronzer", "label": "Haus Labs · Sun Dipped Bronzing Veil, Suede", "url": "https://www.hauslabs.com/products/sun-dipped-bronzing-veil?variant=44227405021272", "access": "Official page via search index; direct request returned HTTP 429", "excerpt": "Sun Dipped Bronzing Veil; Suede; Toasted warm bronze; $32; Fill Weight: 7 mL / 0.25 fl oz; Free Returns + Exchanges. Add to Bag and out-of-stock notification text both appear.", "publishedAt": null },
+    { "id": "gaga-bronzer-caption", "label": "TikTok · Lady Gaga bronzer announcement", "url": "https://www.tiktok.com/@ladygaga/video/7693264531493080334", "access": "Caption from direct public creator embed; video not reviewed; snapshot hash in creator-screening.json", "excerpt": "Introducing the new @Haus Labs Sun Dipped Bronzing Veil. 11 Shades are available now at HausLabs.com and @Sephora.", "publishedAt": null },
+    { "id": "biodance-mist", "label": "Biodance · Collagen Peptides Jelly Serum Mist", "url": "https://biodance.com/products/caviar-pdrn-jelly-serum-mist-copy", "access": "Official page via search index; direct request returned HTTP 429", "excerpt": "Displayed product title: Collagen Peptides Jelly Serum Mist; $16.99, struck-through $19.00; Add to Cart • $16.99. URL slug retains caviar-pdrn despite the displayed Collagen product title.", "publishedAt": null },
+    { "id": "biodance-mist-spec", "label": "Biodance · Collagen Peptide Jelly Serum Mist product reference", "url": "https://biodance.com/pages/collagen-peptide-jelly-serum-mist", "access": "Official product resource via search index; contains conflicting availability wording", "excerpt": "Product: Biodance Collagen Peptide Jelly Serum Mist; Volume: 50 ml; Amazon US 1.69 fl.oz. The page also says pricing has not been announced and the product is not yet listed, conflicting with the indexed store listing.", "publishedAt": null },
+    { "id": "nikkie-biodance-caption", "label": "TikTok · Nikkie's Biodance mist caption", "url": "https://www.tiktok.com/@nikkietutorials/video/7708812710728748319", "access": "Caption from direct public creator embed; video not reviewed; snapshot hash in creator-screening.json", "excerpt": "@Biodance Store US Collagen Peptide Jelly Serum Mist, available on Amazon … 30% OFF on Amazon for Black Friday for $13.30 … #biodancepartner", "publishedAt": null },
     { "id": "pov-founder", "label": "POV · About It", "url": "https://povbeauty.com/pages/about-it", "access": "Direct page", "excerpt": "a note from Mikayla … So, I decided to create it myself.", "publishedAt": null },
     { "id": "pov-drench", "label": "POV · Drench It", "url": "https://povbeauty.com/products/drench-it-hydrating-priming-milk-toner", "access": "Direct page", "excerpt": "150 mL / 5.07 fl. oz; one-time purchase $34; $23.80; 30% off first 3 orders; 15% off future orders.", "publishedAt": null },
     { "id": "pov-glaze", "label": "POV · Glaze It", "url": "https://povbeauty.com/products/glaze-it", "access": "Direct page", "excerpt": "50 mL / 1.69 fl. oz; one-time purchase $28; $19.60; 30% off first 3 orders; 15% off future orders.", "publishedAt": null },
@@ -82,7 +90,7 @@
       "handle": "nikkietutorials",
       "brandNote": "Nimya explicitly names NikkieTutorials as founder. Ownership percentage and personal distributions are unknown. These are brand-store listings; a corresponding TikTok Shop sale has not been verified.",
       "brandSources": ["nimya-founder"],
-      "thirdPartyNote": "No third-party SKU matched with sufficient evidence in this collection. The MISSHA lead below is excluded from product counts and calculations.",
+      "thirdPartyNote": "A public embed caption names Biodance Collagen Peptide Jelly Serum Mist and #biodancepartner. The brand-store reference is distinct from the caption's unverified Amazon offer. The MISSHA lead remains unresolved.",
       "leads": [{ "title": "MISSHA mention · SKU unresolved", "note": "The indexed title names MISSHA, but the exact product, shade, price and commercial relationship could not be verified. Search snippets include unrelated content; no candidate retail price has been attached.", "sources": ["nikkie-missha-lead"] }]
     },
     {
@@ -124,11 +132,43 @@
       "handle": "therock",
       "brandNote": "PAPATUI's official story names Dwayne The Rock Johnson as founder. The website directs shoppers to retailers; its reference price does not verify a direct checkout offer or any retailer's current price. Ownership percentage and personal distributions are unknown.",
       "brandSources": ["papatui-founder"],
-      "thirdPartyNote": "This batch researched PAPATUI. Other brands and third-party promotions have not been sampled; no TikTok Shop affiliation or attributed sales were verified.",
+      "thirdPartyNote": "PAPATUI listings and a limited public caption sample were collected, including ZOA and PAPATUI cologne follow-up leads above. No TikTok Shop affiliation or attributed sales were verified.",
       "leads": [{ "title": "PAPATUI Enhancing Tattoo Stick · Price unresolved", "note": "The official product extract identifies Unscented and Coconut Woods variants and retailer links, but did not yield a usable price for the selected Unscented variant. A generic homepage price is insufficient to establish that offer; no price or calculator is attached.", "sources": ["papatui-stick-lead"] }]
+    },
+    {
+      "handle": "jamescharles",
+      "brandNote": "Painted's company profile identifies James Charles as founder and its store carries the Painted by James Charles attribution. Current ownership percentage, costs and personal distributions have not been independently verified.",
+      "brandSources": ["painted-founder", "painted-basic"],
+      "thirdPartyNote": "A limited caption sample includes a Lancôme advent-calendar review. Reviewing a product does not establish sponsorship, and the edition/offer remains unresolved.",
+      "leads": []
+    },
+    {
+      "handle": "ladygaga",
+      "brandNote": "Haus Labs explicitly describes Lady Gaga as founder. Her sampled caption announces Sun Dipped Bronzing Veil; the selected Suede store variant is a reference offer, not a matched video shade. Ownership percentage and personal distributions are unknown.",
+      "brandSources": ["haus-founder", "gaga-bronzer-caption"],
+      "thirdPartyNote": "A limited public caption sample was collected. No third-party priced product has been accepted for this profile; this does not establish absence of other promotions.",
+      "leads": []
     }
   ],
   "products": [
+    {
+      "id": "painted-basic", "handle": "jamescharles", "kind": "founder-brand", "name": "Painted Basic Canvas Palette", "variant": "24 shades · Face & Eye Palette · 39 g / 1.37 oz",
+      "relationship": "Founder-associated brand · Painted", "confidence": "Company founder attribution and official indexed listing; checkout and economics unverified", "promotionDate": null, "postUrl": null,
+      "price": { "amount": 55, "currency": "USD", "market": "United States", "conditions": "Official US indexed reference price. Free US standard shipping over USD 40 advertised. Tax, current stock, returns and final checkout total were not verified. This product was not matched to the creator's sampled makeup video." },
+      "sources": ["painted-basic", "painted-founder"], "shopStatus": "Brand-store reference; TikTok Shop listing and attributed sales unverified"
+    },
+    {
+      "id": "haus-bronzer", "handle": "ladygaga", "kind": "founder-brand", "name": "Haus Labs Sun Dipped Bronzing Veil", "variant": "Suede · toasted warm bronze · 7 mL / 0.25 fl oz · variant 44227405021272",
+      "relationship": "Founder-associated brand · Haus Labs", "confidence": "Official founder evidence and creator caption name the product; indexed variant price; checkout unverified", "promotionDate": null, "postUrl": "https://www.tiktok.com/@ladygaga/video/7693264531493080334",
+      "price": { "amount": 32, "currency": "USD", "market": "United States", "conditions": "Indexed official US reference for Suede; caption announces the line without selecting this shade. Free returns/exchanges advertised, full conditions unreviewed. Purchase and out-of-stock controls coexist, so stock is unresolved. Shipping, tax and checkout total not verified." },
+      "sources": ["haus-bronzer", "haus-founder", "gaga-bronzer-caption"], "shopStatus": "Brand-store reference; TikTok Shop listing and attributed sales unverified"
+    },
+    {
+      "id": "nikkie-biodance-mist", "handle": "nikkietutorials", "kind": "third-party", "name": "Biodance Collagen Peptides Jelly Serum Mist", "variant": "Collagen mist · product resource specifies 50 mL; promoted Amazon pack not independently matched",
+      "relationship": "#biodancepartner in public creator caption", "confidence": "Caption names product; official indexed reference price; channel, availability and URL-title inconsistencies retained", "promotionDate": null, "postUrl": "https://www.tiktok.com/@nikkietutorials/video/7708812710728748319",
+      "price": { "amount": 16.99, "currency": "USD", "market": "United States reference", "conditions": "Official indexed Collagen mist listing shows USD 16.99 versus USD 19. The URL slug says caviar-pdrn but the displayed title says Collagen; a separate official resource supplies 50 mL but still says not yet listed. This brand-store observation does not verify the caption's USD 13.30 Amazon promotion. Stock, seller pack, tax, shipping, returns and checkout price remain unresolved." },
+      "sources": ["nikkie-biodance-caption", "biodance-mist", "biodance-mist-spec"], "shopStatus": "Official reference only; Amazon promotion, TikTok Shop anchor and attributed sales unverified"
+    },
     {
       "id": "mikayla-telescopic", "handle": "mikaylanogueira", "kind": "third-party", "name": "L’Oréal Telescopic Lift Mascara", "variant": "Washable reference listing; exact video shade unverified",
       "relationship": "Paid partnership disclosed in indexed TikTok post", "confidence": "Moderate · indexed post; historical promotion", "promotionDate": "2023-01-24",

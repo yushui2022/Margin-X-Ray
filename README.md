@@ -22,8 +22,9 @@ Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
 Famadex's public TikTok people ranking. All are **Not rated**. The default sort is
 descending directory follower count, with unknown counts last; it is not an
 Onion Score ranking. Browse 20 records per page, search the full collection,
-sort by name, filter by collected category, or show the ten profiles with
-product evidence. Summary counts keep profile coverage separate from ratings.
+sort by name, filter by collected category, or show the twelve profiles with
+priced product evidence. Research filters also select sampled accounts, sourced
+follow-up leads or unavailable samples. Summary counts separate these from ratings.
 
 Follower counts are rounded secondary-source observations collected 2026-11-17,
 not live platform counts. Broad source labels do not establish product niches;
@@ -42,15 +43,23 @@ interface and is not a validated measure of personal integrity. Fictional produc
 cards do not support real creator scores. Live scoring
 requires source observations, dates, coverage thresholds and review rules.
 
-Real creator profiles now include **18 public product records across 10 creators**
-observed on 2026-11-17: 3 third-party promotions/mentions, 14 founder-associated
+All **500 accounts have an initial public-sampling outcome**: 499 successful
+TikTok embed samples with 5,212 captions, and one HTTP 400 failure (`yahia_x`,
+also retried). Reports show returned identities, bios, original post links,
+captions and access limits. There are 173 selected follow-up leads across 153
+creators (157 caption reviews and 16 external findings). This is a limited
+collection pass, not 500 completed product investigations or a full video review.
+See `research/creator-screening-notes.md` for scope and reproduction.
+
+Real creator profiles now include **21 public product records across 12 creators**
+observed on 2026-11-17: 4 third-party promotions/mentions, 16 founder-associated
 brand products (POV, Nimya, Feastables, Rare Beauty, rhode, Kylie Cosmetics,
-r.e.m. beauty and PAPATUI), and 1 Nudestix collaboration. Founder association
+r.e.m. beauty, PAPATUI, Painted and Haus Labs), and 1 Nudestix collaboration. Founder association
 includes acquired brands; rhode's e.l.f. acquisition and Coty's historical Kylie
 partnership are documented without assigning product profit to the creator.
 Three unresolved leads (MISSHA, a rhode set and a PAPATUI tattoo stick) are kept
-without prices or calculators. 490 directory profiles still have no product
-research. `research/creator-products.json` stores
+without prices or calculators. 488 directory profiles have no accepted priced
+product record yet. `research/creator-products.json` stores
 source URLs, extracts, access methods, historical post dates, variants, currencies,
 purchase conditions and relationship confidence. Search-index observations are
 explicitly distinguished from directly retrieved pages. These are reference

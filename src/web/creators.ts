@@ -1,5 +1,6 @@
 import { PUBLIC_CREATORS, directoryPage, type CreatorProfile } from "../shared/creator-directory";
 import { productCount, renderCreatorProducts } from "./creator-products";
+import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
 
 type PublicCreator = CreatorProfile;
 
@@ -35,6 +36,7 @@ let directorySort: "followers" | "name" = "followers";
 let directoryQuery = "";
 let directoryPageNumber = 1;
 let productsOnly = false;
+let researchFilter = "all";
 const PRODUCT_HANDLES = new Set(PUBLIC_CREATORS.filter((item) => productCount(item.handle) > 0).map((item) => item.handle));
 
 export function initCreators(container: HTMLElement): void {
@@ -195,6 +197,8 @@ function externalLink(label: string, url: string): HTMLAnchorElement {
 
 function renderPublicProfile(item: PublicCreator): void {
   const hasProducts = productCount(item.handle) > 0;
+  const sample = screeningFor(item.handle);
+  const leads = brandLeadsFor(item.handle);
   const header = node("header", "creator-scorecard");
   const main = node("div", "creator-scorecard-main");
   const identity = node("div", "creator-public-identity");
@@ -203,9 +207,9 @@ function renderPublicProfile(item: PublicCreator): void {
   identity.append(portrait(item), text);
   const verdict = node("div", "creator-verdict-line");
   verdict.append(gradeBadge(null), node("div", "", "Not rated · Evidence review pending"));
-  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts ? "The receipts are coming together." : "On the radar. Ready for research."), node("p", "creator-scorecard-note", hasProducts ? "Products and relationships are collected. Comparable promotion sampling and a scoring review are still needed." : "This account is included in the launch directory. Product research and promotion sampling have not started; no score has been assigned."));
+  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "The receipts are coming together." : sample?.status === "sampled" ? "First look collected. More to verify." : "Research started. More sources needed."), node("p", "creator-scorecard-note", hasProducts ? "Products and relationships are collected. Comparable promotion sampling and a scoring review are still needed." : sample?.status === "sampled" ? "A limited public caption sample is available. Product offers and commercial relationships need further verification before any rating." : "A public sample was requested but usable content was unavailable. Product research remains incomplete; no score has been assigned."));
   const strip = node("div", "creator-scorecard-strip");
-  strip.append(node("span", "", item.followersLabel ? `${item.followersLabel} followers · Directory snapshot` : "Follower count not collected"), node("span", "", `${productCount(item.handle)} product records`), node("span", "", `Collected ${item.retrievedAt}`));
+  strip.append(node("span", "", item.followersLabel ? `${item.followersLabel} followers · Directory snapshot` : "Follower count not collected"), node("span", "", `${productCount(item.handle)} priced records · ${leads.length} follow-up leads`), node("span", "", screeningLabel(item.handle)));
   header.append(main, scoreDisplay(null), strip);
   const details = node("section", "card creator-evidence");
   details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", hasProducts ? "This profile includes product listings and promotion evidence with sources and access limitations. Coverage is incomplete and has not undergone a scoring review, so no Onion Score or rank is assigned." : "Account name, handle and portrait were collected from a public creator directory. This is a discovery record, with no completed product research or scoring review."));
@@ -217,6 +221,7 @@ function renderPublicProfile(item: PublicCreator): void {
   }
   if (item.sourceCategory) details.append(node("p", "", `Directory category: ${item.sourceCategory}. ${item.category === "Uncategorized" ? "A product niche has not been established." : ""}`));
   if (item.country) details.append(node("p", "", `Directory country label: ${item.country}. Not independently verified.`));
+  if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products & earnings for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
   const scorePanel = node("div");
   scorePanel.append(breakdown(), methodology());
   root.replaceChildren(reportToolbar(), header, reportSections([
@@ -351,8 +356,17 @@ function renderBoard(): void {
   coverageInput.type = "checkbox";
   coverageInput.checked = productsOnly;
   coverageInput.addEventListener("change", () => { productsOnly = coverageInput.checked; directoryPageNumber = 1; renderRows(); });
-  coverageLabel.append(coverageInput, node("span", "", `With product evidence (${PRODUCT_HANDLES.size})`));
-  directoryTools.append(directoryInput, coverageLabel);
+  coverageLabel.append(coverageInput, node("span", "", `With priced products (${PRODUCT_HANDLES.size})`));
+  const researchLabel = node("label", "creator-coverage-filter", "Research status ");
+  const researchSelect = node("select");
+  researchSelect.setAttribute("aria-label", "Research status");
+  for (const [value, text] of [["all", "All research states"], ["sampled", "Public sample collected"], ["leads", "Sourced follow-up leads"], ["unavailable", "Public sample unavailable"]]) {
+    const option = node("option", "", text); option.value = value!; researchSelect.append(option);
+  }
+  researchSelect.value = researchFilter;
+  researchSelect.addEventListener("change", () => { researchFilter = researchSelect.value; directoryPageNumber = 1; renderRows(); });
+  researchLabel.append(researchSelect);
+  directoryTools.append(directoryInput, coverageLabel, researchLabel);
   const list = node("ol", "creator-ranking");
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
@@ -360,7 +374,7 @@ function renderBoard(): void {
   pagination.setAttribute("aria-label", "Creator directory pages");
   const empty = node("div", "creator-directory-empty");
   empty.append(node("p", "", "No creators match these filters."), action("Reset filters", () => {
-    category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; directoryPageNumber = 1; renderRows();
+    category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; researchFilter = "all"; researchSelect.value = "all"; directoryPageNumber = 1; renderRows();
   }));
   function renderRows(): void {
     select.replaceChildren(...(mode === "public" ? [["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Creator name"]]).map(([value, text]) => {
@@ -378,7 +392,11 @@ function renderBoard(): void {
     empty.hidden = true;
     boardTitle.textContent = mode === "public" ? "The leaderboard" : "The leaderboard · examples";
     if (mode === "public") {
-      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined });
+      const profiles = PUBLIC_CREATORS.filter((item) => researchFilter === "all"
+        || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
+        || (researchFilter === "unavailable" && screeningFor(item.handle)?.status === "unavailable")
+        || (researchFilter === "leads" && brandLeadsFor(item.handle).length > 0));
+      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined }, profiles);
       directoryPageNumber = result.page;
       list.replaceChildren(...result.items.map((item) => {
         const li = node("li");
@@ -389,7 +407,8 @@ function renderBoard(): void {
         const value = node("div", "creator-list-score is-pending");
         value.append(node("strong", "", "—"), node("span", "", "Not rated"));
         const total = productCount(item.handle);
-        const status = node("span", "creator-row-status", total ? `${total} ${total === 1 ? "product" : "products"} · Review pending` : "Profile collected · Products not researched");
+        const leads = brandLeadsFor(item.handle).length;
+        const status = node("span", "creator-row-status", total ? `${total} priced ${total === 1 ? "product" : "products"} · Review pending` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Offer unverified` : screeningLabel(item.handle));
         identity.append(status);
         link.append(gradeBadge(null), portrait(item), identity, value, node("span", "creator-arrow", "↗"));
         li.append(link);
@@ -451,10 +470,11 @@ function renderBoard(): void {
   board.append(key);
   layout.append(entry, board);
   const coverage = node("div", "creator-launch-stats");
-  for (const [value, label] of [[String(PUBLIC_CREATORS.length), "Collected profiles"], [String(PRODUCT_HANDLES.size), "With product evidence"], ["0", "Rated creators"]]) {
+  for (const [value, label] of [[String(PUBLIC_CREATORS.length), "Collected profiles"], [String(SCREENING_TOTALS.sampled), "Public samples collected"], [String(PRODUCT_HANDLES.size), "With priced products"], ["0", "Rated creators"]]) {
     const stat = node("div"); stat.append(node("strong", "", value), node("span", "", label)); coverage.append(stat);
   }
-  root.replaceChildren(hero, coverage, layout, methodology());
+  const samplingNote = node("p", "creator-sampling-summary", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions collected · ${SCREENING_TOTALS.unavailable} ${SCREENING_TOTALS.unavailable === 1 ? "sample" : "samples"} unavailable · ${SCREENING_TOTALS.brandLeads} creators with sourced follow-up leads. Initial sampling is not a complete product investigation.`);
+  root.replaceChildren(hero, coverage, samplingNote, layout, methodology());
 }
 
 function backLink(): HTMLElement {
