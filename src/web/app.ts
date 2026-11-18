@@ -18,6 +18,8 @@ import { EXTENSION_VERSION } from "../shared/version";
 import { downloadPoster, renderPosterBlob } from "../content/ui/poster";
 import { renderProWorkspace } from "./pro";
 import { initCreators, renderCreatorRoute } from "./creators";
+import { renderMarkup } from "./markup";
+import { markupHref } from "../shared/markup-records";
 import type {
   Confidence,
   CostWaterfall,
@@ -79,6 +81,7 @@ const els = {
   toast: byId<HTMLElement>("toast"),
   proView: byId<HTMLElement>("proView"),
   creatorsView: byId<HTMLElement>("creatorsView"),
+  markupView: byId<HTMLElement>("markupView"),
 };
 
 let apiBase = normalizeBase(localStorage.getItem(STORAGE_KEY) || DEFAULT_API);
@@ -126,12 +129,6 @@ function boot(): void {
     void refreshHealth();
     toast("Backend saved.");
   });
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-example]")) {
-    button.addEventListener("click", () => {
-      els.urlInput.value = button.dataset.example ?? "";
-      els.urlInput.focus();
-    });
-  }
   initCreators(els.creatorsView);
   window.addEventListener("hashchange", routeView);
   routeView();
@@ -139,24 +136,35 @@ function boot(): void {
 }
 
 function routeView(): void {
+  if (/^#markup(?:\/|$)/.test(location.hash)) {
+    showView("markup");
+    return;
+  }
   showView(location.hash === "#pro" ? "pro" : location.hash === "#scan" ? "scan" : "creators");
 }
 
-function showView(view: "scan" | "pro" | "creators"): void {
+function showView(view: "scan" | "pro" | "creators" | "markup"): void {
   const pro = view === "pro";
   els.proView.hidden = !pro;
   els.creatorsView.hidden = view !== "creators";
+  els.markupView.hidden = view !== "markup";
   els.hero.hidden = view !== "scan" || scanStarted;
   els.workspace.hidden = view !== "scan" || !scanStarted;
   document.body.dataset.view = view;
   for (const link of document.querySelectorAll<HTMLAnchorElement>(".topnav [data-view]")) {
-    const active = link.dataset.view === view;
+    const active = link.dataset.view === (view === "markup" ? "scan" : view);
     link.classList.toggle("active", active);
     if (active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   }
-  const title = location.hash === "#prices" ? "Price archive" : { creators: "Creator research", scan: "Product scan", pro: "Pricing workspace" }[view];
+  const title = location.hash === "#prices" ? "Price archive" : { creators: "Creator research", scan: "Product scan", pro: "Pricing workspace", markup: "Product markup check" }[view];
   document.title = `${title} · Onion Head`;
+  if (view === "markup") {
+    const route = location.hash.replace(/^#markup\/?/, "");
+    els.markupView.replaceChildren(renderMarkup(route, result ?? undefined));
+    window.scrollTo({ top: 0, behavior: "instant" });
+    return;
+  }
   if (pro) {
     renderProWorkspace();
   }
@@ -268,6 +276,12 @@ async function submitScan(): Promise<void> {
         return;
       }
       scanContext = buildLinkContext(raw);
+      const check = markupHref(raw);
+      const publicStorefront = /\/products\/[\w%-]+\/?$/.test(new URL(raw).pathname);
+      if (!check.startsWith("#markup/item?") || (publicStorefront && !els.agentStatus.classList.contains("online"))) {
+        location.hash = check;
+        return;
+      }
     }
   } catch (error) {
     toast(error instanceof Error ? error.message : "That input was not readable.");
@@ -420,6 +434,8 @@ function abortScan(): void {
 
 function resetToHero(): void {
   abortScan();
+  context = null;
+  result = null;
   scanStarted = false;
   showView("scan");
   els.workspace.hidden = true;
@@ -600,6 +616,9 @@ function renderReport(scan: ScanResult, scanContext: PageContext): void {
     ]),
   );
   nodes.push(card);
+  const check = el("a", { class: "btn secondary", text: "Compare a supplier quote per item" });
+  check.href = scan.dataSource === "api" ? "#markup/scan" : markupHref(scanContext.extractedBy === "url-input" ? scanContext.url : "");
+  card.querySelector(".verdict-actions")?.append(check);
 
   nodes.push(renderFair(scan, verdict, assumptions));
   if (waterfall) nodes.push(renderCosts(waterfall));
@@ -857,6 +876,8 @@ function renderSources(scan: ScanResult, scanContext: PageContext): HTMLElement 
 }
 
 function renderError(message: string): void {
+  const check = el("a", { class: "btn secondary", text: "Compare pack prices" });
+  check.href = markupHref(context?.extractedBy === "url-input" ? context.url : "");
   els.report.replaceChildren(
     el("section", { class: "error-card" }, [
       el("p", { class: "eyebrow", text: "Scan failed" }),
@@ -868,6 +889,7 @@ function renderError(message: string): void {
           void runScan(context);
         }),
         button("Backend settings", "btn secondary", () => els.backendBtn.click()),
+        check,
       ]),
       el("p", {
         class: "fine-print",

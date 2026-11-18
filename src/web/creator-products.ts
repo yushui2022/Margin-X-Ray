@@ -136,6 +136,11 @@ function productCard(product: Product, standalone = false): HTMLElement {
     reading.append(file);
   }
   reading.append(node("p", "", product.price.conditions), node("p", "creator-product-status", product.shopStatus));
+  if (standalone) {
+    const compare = node("a", "btn secondary", "Check product markup →");
+    compare.href = `#markup/${product.id}`;
+    reading.append(compare);
+  }
   const evidence = node("details", "creator-product-evidence");
   evidence.append(node("summary", "", "Relationship & financial gaps"), node("p", "", `Evidence confidence: ${product.confidence}.`));
   if (product.postUrl) evidence.append(link("Open source TikTok post", product.postUrl), node("p", "", `Promotion date: ${product.promotionDate ?? "not established"}. Original video content was not directly retrieved.`));

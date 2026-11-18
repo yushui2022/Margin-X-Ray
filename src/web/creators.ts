@@ -722,6 +722,11 @@ function renderUnavailable(raw: string): void {
   card.append(node("p", "eyebrow", "Creator lookup"), node("h1", "", handle ? `@${handle}` : "Invalid creator address"), node("span", "creator-unrated", "Not rated"), node("p", "lede", handle ? "Your username is ready for lookup. Live TikTok retrieval is not connected, so we have not verified this account or retrieved its posts." : "Enter a valid TikTok username to prepare a lookup."));
   const steps = node("ol", "creator-pending");
   for (const text of ["Resolve the public TikTok profile", "Collect recent shopping recommendations", "Check products, disclosures and seller policies", "Review evidence coverage before scoring"]) steps.append(node("li", "", `${text} — not started`));
+  if (handle) {
+    const lookup = node("a", "btn secondary", "Check a product from this creator →");
+    lookup.href = "#markup";
+    card.append(lookup);
+  }
   card.append(steps, node("p", "", "No score has been generated and no background request has been queued."), searchForm(), action("Explore a fictional sample report", () => { location.hash = "#creator/demo-01"; }));
   root.replaceChildren(backLink(), card);
 }

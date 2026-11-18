@@ -2469,3 +2469,41 @@ body[data-view="creators"] .page { padding-top: 24px; }
 .product-issue-check li p { margin: 3px 0; }
 .product-issue-check li small { display: block; font-size: 12px; font-weight: 600; }
 .product-issue-check a, .issue-sample a { text-decoration: underline; text-underline-offset: 2px; }
+
+.markup-page { max-width: 980px; margin: 0 auto; }
+.markup-page > a, .markup-evidence a, .markup-page nav a { color: var(--mx-accent-strong); text-decoration: underline; text-underline-offset: 3px; }
+.markup-page h1 { margin: 18px 0 4px; font: 550 clamp(36px, 5vw, 62px)/1.07 var(--mx-font-display); letter-spacing: -.04em; }
+.markup-page > p { color: var(--mx-muted); }
+.markup-page > .fine-print { font-size: 13px; }
+.markup-page :is(a,button,input,select,summary):focus-visible { outline: 3px solid var(--mx-accent); outline-offset: 3px; }
+.markup-page a { color: var(--mx-accent-strong); }
+.markup-lookup { display: flex; flex-wrap: wrap; gap: 8px; }
+.markup-lookup input { min-width: 0; flex: 1 1 200px; min-height: 44px; padding: 8px 12px; background: var(--mx-panel); border: 1px solid var(--mx-line-strong); border-radius: 6px; font: inherit; }
+.markup-form > div:not(.markup-fields) { margin-top: 14px; }
+.markup-offer { padding: 12px 16px; border-left: 3px solid #80627a; background: var(--mx-panel); overflow-wrap: anywhere; }
+.markup-offer select { display: block; min-height: 44px; max-width: 100%; }
+.markup-offer p { margin: 6px 0; }
+.markup-grid { display: grid; grid-template-columns: 1.2fr 1fr; align-items: start; gap: 16px; margin-top: 22px; }
+.markup-page .card { padding: clamp(16px, 2.2vw, 28px); min-width: 0; overflow-wrap: anywhere; }
+.markup-page h2 { margin: 0 0 8px; font: 550 24px/1.14 var(--mx-font-display); }
+.markup-page .card p { margin: 6px 0 12px; font-size: 14px; }
+.markup-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.markup-form label { display: grid; align-content: start; gap: 5px; font-size: 13px; font-weight: 600; }
+.markup-form :is(input,select) { width: 100%; min-width: 0; min-height: 44px; padding: 8px; border-radius: 6px; border: 1px solid var(--mx-line-strong); background: var(--mx-paper); color: var(--mx-ink); font: inherit; }
+.markup-form > label { margin-top: 12px; }
+.markup-result { border-top: 3px solid #77576e; background: #f6eff3; }
+.markup-result[data-high="true"] { border-color: var(--mx-accent); background: #fbede2; }
+.markup-result > strong { font: 600 42px/1.2 var(--mx-font-display); }
+.markup-result a { text-decoration: underline; text-underline-offset: 3px; }
+.markup-output small { display: block; margin: 6px 0 0 4px; font-size: 12px; color: var(--mx-muted); }
+.markup-form summary { padding-top: 12px; color: var(--mx-accent-strong); cursor: pointer; }
+.markup-form details label { margin-top: 8px; }
+.markup-evidence { margin: 16px 0; }
+.markup-page nav { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-size: 13px; }
+@media (max-width: 720px) {
+  .markup-grid { grid-template-columns: minmax(0,1fr); }
+  .markup-observation .markup-output { grid-row: 1; }
+}
+@media (max-width: 440px) {
+  .markup-fields > :nth-last-child(-n+2) { grid-column: 1 / -1; }
+}

@@ -1,0 +1,56 @@
+{
+  "observedAt": "2026-11-18",
+  "records": [
+    {
+      "productId": "winco-msp-4p",
+      "barcode": "812944006815",
+      "retailListing": {
+        "name": "Winco measuring spoon set",
+        "label": "Amazon US · single four-piece set",
+        "url": "https://www.amazon.com/Winco-4-Piece-Stainless-Steel-Measuring/dp/B001VZEPBS",
+        "alias": "https://www.amazon.com/dp/B001VZEPBS",
+        "amount": 5.82,
+        "market": "United States",
+        "conditions": "Indexed one-time purchase price for the selected Spoons option, one complete set. The two-pack is listed separately. Shipping, tax and the checkout total depend on the order."
+      },
+      "match": "same",
+      "retailUnits": 1,
+      "quoteUnits": 1,
+      "quoteAmount": 1.58,
+      "currency": "USD",
+      "unit": "set",
+      "quoteUrl": "https://fordstl.com/winco-msp-4p-measuring-spoon-4-set-stainless-steel/",
+      "quoteLabel": "Ford Hotel Supply · single set",
+      "matchUrl": "https://www.wincous.com/products/msp-4p",
+      "matchNote": "Both US listings identify Winco MSP-4P and UPC 812944006815. Ford lists a new four-spoon set at $1.58 per set. One set is the unit on both sides. These advertised prices exclude checkout adjustments."
+    },
+    {
+      "productId": "feastables-king",
+      "barcode": "850027880129",
+      "match": "same",
+      "retailUnits": 10,
+      "quoteUnits": 24,
+      "quoteAmount": 154.20,
+      "currency": "USD",
+      "unit": "bar",
+      "quoteUrl": "https://www.boxncase.com/products/mr-beast-feastables-bar-milk-chocolate-2-11oz",
+      "quoteLabel": "BoxNCase · 24-count box",
+      "matchUrl": "https://mrbeast.store/products/feastables-milk-chocolate-10-pack",
+      "matchNote": "The US brand page specifies plain milk chocolate, two 30 g servings per King Size bar. The BoxNCase item is plain milk chocolate, 2.11 oz (about 60 g), unit UPC 850027880129. The public product page displayed $154.20 with the 24-count box selected. Other flavors, smaller bars and pallet tiers are excluded. Prices are listed merchandise amounts before delivery and checkout adjustments."
+    },
+    {
+      "productId": "nikkie-biodance-mist",
+      "barcode": "8809891186570",
+      "match": "unresolved",
+      "retailUnits": 1,
+      "quoteUnits": 80,
+      "quoteAmount": null,
+      "currency": "USD",
+      "unit": "bottle",
+      "quoteUrl": "https://wholesale.q-depot.com/product/biodance-collagen-peptide-jelly-serum-mist-50ml",
+      "quoteLabel": "Q-Depot · 80-bottle box",
+      "matchUrl": "https://biodance.com/pages/collagen-peptide-jelly-serum-mist",
+      "matchNote": "The indexed distributor listing names the 50 mL Collagen mist, barcode 8809891186570, 80 units per box. Wholesale pricing requires login. The displayed $19.00 is suggested retail. The brand lists a 50 mL US reference bottle. The exact pack in the creator's promotion is unresolved."
+    }
+  ]
+}

@@ -30,6 +30,7 @@
 
     <main class="page">
       <section id="creatorsView" aria-label="Creator scores"></section>
+      <div id="markupView" hidden></div>
       <section class="hero" id="hero" hidden>
         <div class="hero-grid">
           <div class="hero-copy">
@@ -39,8 +40,7 @@
         </p>
 
         <div class="backend-offline" id="offlineNote" hidden>
-          Agent backend is not connected. Start <code>npm run mock</code> or set a
-          backend URL. Scans will fail until then.
+          Connect a scan backend to look up a new listing. You can also compare pack prices below.
         </div>
 
         <form class="scan-form" id="scanForm">
@@ -65,10 +65,8 @@
         <div class="scan-secondary">
           <button class="btn secondary" id="uploadBtn" type="button">Upload image</button>
           <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
-          <span class="or">or try</span>
-          <button class="chip-link" data-example="https://www.tiktok.com/@demo/video/7350810998023949599" type="button">a TikTok video</button>
-          <button class="chip-link" data-example="https://www.amazon.com/dp/B0EXAMPLE" type="button">an Amazon listing</button>
-          <button class="chip-link" data-example="https://shop.example.com/products/neck-fan" type="button">a Shopify product</button>
+          <a class="btn secondary" href="#markup">Check product markup</a>
+          <a class="chip-link" href="#markup/winco-msp-4p">See a high price gap →</a>
         </div>
         <div class="image-ready" id="imageReady" hidden>
           <img id="imageThumb" alt="" />
@@ -85,7 +83,7 @@
           <li><span>01</span><strong>Source</strong><em>Link, image or page</em></li>
           <li><span>02</span><strong>Identify</strong><em>Product + retail price</em></li>
           <li><span>03</span><strong>Match</strong><em>1688 image search</em></li>
-          <li><span>04</span><strong>Verdict</strong><em>Cost + fair range</em></li>
+          <li><span>04</span><strong>Compare</strong><em>Retail vs supplier price</em></li>
         </ol>
       </section>
 
