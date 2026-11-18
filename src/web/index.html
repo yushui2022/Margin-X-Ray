@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Onion Head — Creator leaderboard</title>
+    <title>Creator research · Onion Head</title>
     <link rel="icon" href="assets/mascot/onion-head.webp" />
     <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="tokens.css" />
@@ -11,17 +11,16 @@
   </head>
   <body class="mx-theme">
     <header class="topbar">
-      <a class="brand" href="/">
+      <a class="brand" href="#creators" aria-label="Onion Head home">
         <img class="brand-mark" src="assets/mascot/onion-head.webp" alt="" />
         <span class="brand-text">
           <strong>Onion Head</strong>
-          <span>Don't be the onion head</span>
         </span>
       </a>
-      <nav class="topnav" aria-label="Product area">
-        <button class="topnav-btn active" data-view="creators" type="button">Creator scores</button>
-        <button class="topnav-btn" data-view="scan" type="button">Product scan</button>
-        <button class="topnav-btn" data-view="pro" type="button">Pro workspace</button>
+      <nav class="topnav" aria-label="Research tools">
+        <a class="topnav-btn active" data-view="creators" href="#creators">Creators</a>
+        <a class="topnav-btn" data-view="scan" href="#scan">Product scan</a>
+        <a class="topnav-btn" data-view="pro" href="#pro">Pro workspace</a>
       </nav>
       <div class="topbar-right">
         <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
@@ -34,12 +33,9 @@
       <section class="hero" id="hero" hidden>
         <div class="hero-grid">
           <div class="hero-copy">
-        <p class="eyebrow">Agent scan</p>
-        <h1>Paste a link.<br /><em>See the real cost.</em></h1>
+        <h1>Scan a <em>product.</em></h1>
         <p class="lede">
-          The agent reads the video or product page, pulls a clean product image,
-          searches 1688 for near-identical listings, and models what a fair price
-          should look like — before you pay.
+          Compare a listing with supplier offers and explore the estimated cost breakdown.
         </p>
 
         <div class="backend-offline" id="offlineNote" hidden>
@@ -53,7 +49,8 @@
               <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg>
             </span>
             <input
-              id="urlInput"
+               id="urlInput"
+               aria-label="Video or product URL"
               type="url"
               placeholder="Paste a TikTok, Amazon or Shopify link"
               autocomplete="off"
@@ -61,7 +58,7 @@
             />
           </label>
           <button class="btn primary scan-btn" id="scanBtn" type="submit">
-            Run agent
+            Scan product
           </button>
         </form>
 
@@ -116,11 +113,9 @@
       <section class="pro" id="proView" hidden>
         <header class="pro-head">
           <div>
-            <p class="eyebrow">Pro workspace</p>
-            <h1>Price it. Source it. Quote it.</h1>
+            <h1>Pricing workspace</h1>
             <p class="lede">
-              The seller view of the same scan: a live net-profit model, a masked
-              supplier shortlist, and a factory evidence request.
+              Choose a product to model profit, compare suppliers and prepare a quote request.
             </p>
           </div>
           <span class="mock-badge">Sample workspace data</span>

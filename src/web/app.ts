@@ -132,12 +132,6 @@ function boot(): void {
       els.urlInput.focus();
     });
   }
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-view]")) {
-    button.addEventListener("click", () => {
-      const view = button.dataset.view === "pro" ? "pro" : button.dataset.view === "scan" ? "scan" : "creators";
-      showView(view);
-    });
-  }
   initCreators(els.creatorsView);
   window.addEventListener("hashchange", routeView);
   routeView();
@@ -155,16 +149,20 @@ function showView(view: "scan" | "pro" | "creators"): void {
   els.hero.hidden = view !== "scan" || scanStarted;
   els.workspace.hidden = view !== "scan" || !scanStarted;
   document.body.dataset.view = view;
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-view]")) {
-    button.classList.toggle("active", button.dataset.view === view);
-    button.setAttribute("aria-pressed", String(button.dataset.view === view));
+  for (const link of document.querySelectorAll<HTMLAnchorElement>(".topnav [data-view]")) {
+    const active = link.dataset.view === view;
+    link.classList.toggle("active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
   }
+  document.title = `${{ creators: "Creator research", scan: "Product scan", pro: "Pricing workspace" }[view]} · Onion Head`;
   if (pro) {
     renderProWorkspace();
   }
   const hash = view === "creators" && location.hash.startsWith("#creator/") ? location.hash : `#${view}`;
   if (location.hash !== hash) location.hash = hash;
   if (view === "creators") renderCreatorRoute();
+  else window.scrollTo({ top: 0, behavior: "instant" });
 }
 
 function byId<T extends HTMLElement>(id: string): T {

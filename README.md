@@ -35,7 +35,9 @@ the directory opens in name order and labels the profiles unranked. The score
 sort options appear when the first eligible review is available.
 Browse 20 records per page, search the full collection,
 sort by name, filter by collected category, or show the twelve profiles with
-priced product evidence using the checkbox beside search. These filtered results
+priced product evidence using the directory toolbar. The main search accepts a
+name, handle or TikTok profile URL. Press Enter on a matching handle to open its
+report. The desktop sidebar also links to three collected product reports. Priced results
 open the product cards directly. Each card has a source disclosure next to the
 observed price. Share a section with `#creator/%40nikkietutorials/products` or
 `#creator/%40nikkietutorials/sources`. Research filters also select sampled accounts, sourced

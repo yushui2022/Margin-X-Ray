@@ -50,11 +50,6 @@ function reportHref(handle: string, section = 0): string {
 
 export function initCreators(container: HTMLElement): void {
   root = container;
-  const compact = window.matchMedia("(max-width: 760px)");
-  compact.addEventListener("change", () => {
-    const lookup = root.querySelector<HTMLDetailsElement>(".creator-lookup");
-    if (lookup) lookup.open = !compact.matches;
-  });
 }
 
 export function renderCreatorRoute(): void {
@@ -394,36 +389,33 @@ function renderBoard(): void {
   if (saved) {
     ({ category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter } = saved);
   }
-  const hero = node("header", "creator-rating-intro");
-  const heading = node("h1", "", "Rate my ");
+  const hero = node("header", "research-hero");
+  const heading = node("h1", "", "Find a ");
   heading.append(node("em", "", "creator."));
-  hero.append(heading, node("p", "", "Find a creator, check a product price and read the original sources."));
-  const layout = node("div", "creator-rating-layout");
-  const entry = node("aside", "creator-rating-entry");
-  const formCard = node("section", "creator-entry-card");
-  const mascot = node("img", "creator-entry-mascot");
+  const intro = node("div", "research-intro");
+  intro.append(heading, node("p", "", `Explore product prices, source posts and Onion Scores across ${PUBLIC_CREATORS.length} creator reports.`));
+  const visual = node("div", "research-visual");
+  const mascot = node("img");
   mascot.src = "assets/mascot/onion-kid.webp";
   mascot.alt = "";
-  formCard.append(mascot, node("p", "eyebrow", "Put a creator under the lens"), node("h2", "", "Who's on your feed?"), node("p", "creator-field-caption", "TIKTOK USERNAME"), searchForm());
-  const quick = node("div", "creator-quick-picks");
-  quick.append(node("span", "", "Try"));
-  for (const handle of ["mikaylanogueira", "glamzilla"]) {
-    const link = node("a", "", `@${handle}`);
-    link.href = `#creator/${encodeURIComponent(`@${handle}`)}`;
-    quick.append(link);
+  visual.append(mascot);
+  hero.append(intro, visual);
+  const layout = node("div", "research-layout");
+  const rail = node("aside", "research-rail");
+  const picks = node("section", "research-picks");
+  picks.append(node("h2", "", "Explore product reports"));
+  for (const handle of ["nikkietutorials", "glamzilla", "mikaylanogueira"]) {
+    const profile = PUBLIC_CREATORS.find(item => item.handle === handle);
+    if (!profile || !productCount(handle)) continue;
+    const link = node("a", "research-pick");
+    link.href = reportHref(handle, 1);
+    const copy = node("span");
+    const quantity = productCount(handle);
+    copy.append(node("strong", "", profile.name), node("small", "", `${quantity} priced ${quantity === 1 ? "product" : "products"}`));
+    link.append(portrait(profile), copy, node("span", "research-pick-arrow", "→"));
+    picks.append(link);
   }
-  formCard.append(quick, node("p", "creator-entry-note", `${PUBLIC_CREATORS.length} collected profiles. Ten evidence checks per report. Live lookup is not connected.`));
-  const preview = node("a", "creator-product-preview");
-  preview.href = reportHref("nikkietutorials", 1);
-  const previewCopy = node("div");
-  previewCopy.append(node("p", "eyebrow", "Inside a report"), node("strong", "", "NikkieTutorials"), node("span", "", `View ${productCount("nikkietutorials")} products & sources →`));
-  preview.append(previewCopy);
-  const lookup = node("details", "creator-lookup");
-  lookup.open = !window.matchMedia("(max-width: 760px)").matches;
-  const lookupSummary = node("summary");
-  lookupSummary.append(node("span", "", "Open a report by @handle"), node("span", "creator-lookup-icon", "+"));
-  lookup.append(lookupSummary, formCard, preview);
-  entry.append(lookup);
+  rail.append(picks);
 
   const board = node("section", "creator-board");
   const header = node("div", "creator-board-head");
@@ -440,28 +432,49 @@ function renderBoard(): void {
     renderRows();
   });
   selectLabel.append(select);
-  header.append(title, selectLabel);
-  const modes = node("div", "creator-filters creator-modes");
-  for (const [value, label] of [["public", "Public profiles"], ["examples", "Fictional examples"]] as const) {
-    const button = action(label, () => {
-      mode = value;
-      category = "All";
-      directoryPageNumber = 1;
-      for (const child of modes.querySelectorAll("button")) child.setAttribute("aria-pressed", String(child === button));
-      renderRows();
-    }, "creator-filter");
-    button.setAttribute("aria-pressed", String(mode === value));
-    modes.append(button);
+  header.append(title);
+  function switchMode(value: typeof mode) {
+    mode = value;
+    category = "All";
+    directoryPageNumber = 1;
+    renderRows();
   }
+  const modeSwitch = action("", () => switchMode(mode === "public" ? "examples" : "public"), "research-mode-switch");
   const filters = node("div", "creator-filters");
   filters.setAttribute("aria-label", "Filter creators by category");
   const directoryTools = node("div", "creator-directory-tools");
   const directoryInput = node("input");
   directoryInput.type = "search";
-  directoryInput.placeholder = `Search ${PUBLIC_CREATORS.length} names or @handles`;
+  directoryInput.placeholder = "Name, @handle or URL";
+  directoryInput.spellcheck = false;
+  directoryInput.autocomplete = "off";
   directoryInput.setAttribute("aria-label", "Search collected creators");
   directoryInput.value = directoryQuery;
-  directoryInput.addEventListener("input", () => { directoryQuery = directoryInput.value; directoryPageNumber = 1; renderRows(); });
+  const search = node("form", "research-search");
+  search.setAttribute("role", "search");
+  const submit = node("button", "btn primary", "Search");
+  submit.type = "submit";
+  search.append(directoryInput, submit);
+  intro.append(search);
+  directoryInput.addEventListener("input", () => {
+    directoryQuery = directoryInput.value;
+    directoryPageNumber = 1;
+    if (mode === "examples") switchMode("public");
+    else renderRows();
+  });
+  search.addEventListener("submit", event => {
+    event.preventDefault();
+    if (mode === "examples") switchMode("public");
+    const handle = parseHandle(directoryQuery);
+    const match = handle && list.querySelector<HTMLAnchorElement>(`a[href="${reportHref(handle, productsOnly ? 1 : 0)}"]`);
+    if (match) { match.click(); return; }
+    if (handle && /^(@|https?:\/\/|(?:www\.)?tiktok\.com\/)/i.test(directoryQuery.trim()) && !PUBLIC_CREATORS.some(item => item.handle === handle)) {
+      location.hash = reportHref(handle);
+      return;
+    }
+    count.focus({ preventScroll: true });
+    board.scrollIntoView({ block: "start" });
+  });
   const coverageLabel = node("label", "creator-priced-filter");
   const coverageInput = node("input");
   coverageInput.type = "checkbox";
@@ -483,19 +496,24 @@ function renderBoard(): void {
   const refineOptions = node("div", "creator-refine-options");
   refineOptions.append(researchLabel);
   refine.append(refineSummary, refineOptions);
-  directoryTools.append(directoryInput, coverageLabel, refine);
+  header.append(modeSwitch);
+  directoryTools.append(coverageLabel, refine, selectLabel);
   const exampleFilters = node("div");
   const list = node("ol", "creator-ranking");
   const count = node("p", "creator-list-note");
+  count.tabIndex = -1;
   count.setAttribute("aria-live", "polite");
   const votingGuide = node("div", "creator-voting-guide");
   votingGuide.append(node("span", "", "Higher score = more product problems"), renderOnionScale());
   const pagination = node("nav", "creator-pagination");
   pagination.setAttribute("aria-label", "Creator directory pages");
   const empty = node("div", "creator-directory-empty");
-  empty.append(node("p", "", "No creators match these filters."), action("Reset filters", () => {
+  const clear = action("Reset filters", () => {
     category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; researchFilter = "all"; researchSelect.value = "all"; directoryPageNumber = 1; renderRows(); directoryInput.focus();
-  }));
+  }, "research-clear");
+  const resultInfo = node("div", "research-result-info");
+  resultInfo.append(count, clear);
+  empty.append(node("strong", "", "No matching creators"), node("p", "", "Try another name or clear the current filters."));
   function renderRows(): void {
     const activeFilters = Number(category !== "All") + Number(researchFilter !== "all");
     refineSummary.textContent = `More filters${activeFilters ? ` (${activeFilters})` : ""}`;
@@ -513,7 +531,9 @@ function renderBoard(): void {
       button.setAttribute("aria-pressed", String(name === category));
       return button;
     }));
-    directoryTools.hidden = mode !== "public";
+    modeSwitch.textContent = mode === "public" ? "Fictional examples" : "Public profiles";
+    coverageLabel.hidden = refine.hidden = mode !== "public";
+    clear.hidden = mode !== "public" || !(activeFilters || productsOnly || directoryQuery);
     votingGuide.hidden = mode !== "public";
     (mode === "public" ? refineOptions : exampleFilters).prepend(filters);
     const exampleKey = board.querySelector<HTMLElement>(".creator-grade-key");
@@ -526,7 +546,8 @@ function renderBoard(): void {
         || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
         || (researchFilter === "unavailable" && screeningFor(item.handle)?.status === "unavailable")
         || (researchFilter === "leads" && brandLeadsFor(item.handle).length > 0));
-      const result = directoryPage({ query: directoryQuery, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES, issueScores: ISSUE_SCORES }, profiles);
+      const query = parseHandle(directoryQuery) ?? directoryQuery;
+      const result = directoryPage({ query, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES, issueScores: ISSUE_SCORES }, profiles);
       directoryPageNumber = result.page;
       list.replaceChildren(...result.items.map((item) => {
         const li = node("li", "creator-public-item");
@@ -537,8 +558,8 @@ function renderBoard(): void {
         const total = productCount(item.handle);
         const leads = brandLeadsFor(item.handle).length;
         const status = node("span", "creator-row-status", total ? `${productsOnly ? "View " : ""}${total} priced ${total === 1 ? "product" : "products"}${productsOnly ? " →" : ""}` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Unverified` : screeningLabel(item.handle));
-        identity.append(status);
-        link.append(portrait(item), identity, node("span", "creator-arrow", "↗"));
+        status.dataset.kind = total ? "priced" : leads ? "lead" : "sample";
+        link.append(portrait(item), identity, status);
         li.append(link, renderCreatorFeedback(item.handle, true));
         return li;
       }));
@@ -588,7 +609,7 @@ function renderBoard(): void {
     count.textContent = `${items.length} fictional creators · Ranks reflect the full example list · No live accounts have been rated`;
   }
   renderRows();
-  board.append(header, modes, directoryTools, exampleFilters, count, votingGuide, empty, list, pagination);
+  board.append(header, directoryTools, exampleFilters, resultInfo, votingGuide, empty, list, pagination);
   const key = node("div", "creator-grade-key");
   key.hidden = mode === "public";
   key.append(node("span", "", "Example tiers"));
@@ -598,16 +619,20 @@ function renderBoard(): void {
     key.append(item);
   }
   board.append(key);
-  layout.append(entry, board);
-  const coverage = node("div", "creator-launch-stats");
-  for (const [value, label] of [[String(PUBLIC_CREATORS.length), "Creator reports"], [String(SCREENING_TOTALS.sampled), "Public samples"], [String(PRODUCT_HANDLES.size), "With priced products"], ["10", "Scoring checks"]]) {
-    const stat = node("div"); stat.append(node("strong", "", value), node("span", "", label)); coverage.append(stat);
+  layout.append(board, rail);
+  const collectionPanel = node("section", "research-collection");
+  collectionPanel.append(node("h2", "", "Research collection"));
+  const stats = node("dl");
+  for (const [label, value] of [["Creator profiles", PUBLIC_CREATORS.length], ["Public post samples", SCREENING_TOTALS.sampled], ["Profiles with prices", PRODUCT_HANDLES.size], ["Ranked profiles", ISSUE_SCORES.size]] as const) {
+    const row = node("div");
+    row.append(node("dt", "", label), node("dd", "", String(value)));
+    stats.append(row);
   }
   const collection = node("details", "creator-collection-note");
   collection.append(node("summary", "", "About the research sample"), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
-  const masthead = node("div", "creator-masthead");
-  masthead.append(hero, coverage);
-  root.replaceChildren(masthead, layout, collection, evidenceMethodology());
+  collectionPanel.append(stats, collection);
+  rail.append(collectionPanel, evidenceMethodology());
+  root.replaceChildren(hero, layout);
   // Save the originating result on its history entry so Back works even after
   // the report is reloaded. New visits to the directory have their own entry.
   layout.addEventListener("click", event => {
@@ -615,12 +640,11 @@ function renderBoard(): void {
     if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     history.replaceState({ ...history.state, creatorDirectory: {
       category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter,
-      href: link.hash, linkClass: link.className, refineOpen: refine.open, lookupOpen: lookup.open,
+      href: link.hash, linkClass: link.className, refineOpen: refine.open,
     } }, "");
   });
   if (saved) {
     refine.open = saved.refineOpen;
-    lookup.open = saved.lookupOpen || !window.matchMedia("(max-width: 760px)").matches;
     const origin = Array.from(layout.querySelectorAll<HTMLAnchorElement>("a")).find(link => link.hash === saved.href && link.className === saved.linkClass);
     origin?.focus();
     history.replaceState({ ...history.state, creatorDirectory: null }, "");
