@@ -111,14 +111,14 @@ function productCard(product: Product): HTMLElement {
   const earnings = node("div");
   earnings.append(node("span", "", product.kind === "third-party" ? "Creator commission / fee" : "Brand gross / contribution margin"), node("strong", "", "Unknown"), node("small", "", product.kind === "third-party" ? "Rate, contract and settlement unavailable" : "Net revenue and costs unavailable"));
   facts.append(price, earnings);
-  card.append(facts, node("p", "", product.price.conditions), node("p", "creator-product-status", product.shopStatus));
+  card.append(facts, sources(product.sources), node("p", "", product.price.conditions), node("p", "creator-product-status", product.shopStatus));
   const evidence = node("details", "creator-product-evidence");
   evidence.append(node("summary", "", "Relationship & financial gaps"), node("p", "", `Evidence confidence: ${product.confidence}.`));
   if (product.postUrl) evidence.append(link("Open source TikTok post", product.postUrl), node("p", "", `Promotion date: ${product.promotionDate ?? "not established"}. Original video content was not directly retrieved.`));
   evidence.append(node("p", "", product.kind === "third-party"
     ? "Actual commission rate, sponsorship fee, sales, refunds and creator expenses are unknown. Merchant costs and product margins are also unknown. A paid post does not establish sales-based commission."
     : "Actual net revenue, manufacturing / landed costs, variable costs, sales volumes and creator distributions are unknown. A founder or collaboration relationship does not establish ownership percentage or personal earnings."));
-  card.append(evidence, sources(product.sources));
+  card.append(evidence);
   if (product.kind === "third-party") card.append(calculator(product, true));
   card.append(calculator(product, false));
   return card;
@@ -126,43 +126,28 @@ function productCard(product: Product): HTMLElement {
 
 export function renderCreatorProducts(handle: string): HTMLElement {
   const wrapper = node("div", "creator-products");
-  wrapper.append(renderScreening(handle));
   const creator = RESEARCH.creators.find((item) => item.handle === handle);
   if (!creator) {
     const empty = node("section", "card creator-product-overview");
     const sample = screeningFor(handle);
     const leads = brandLeadsFor(handle);
     empty.append(node("p", "eyebrow", sample ? "Initial research · Offer verification pending" : "Research not started"), node("h2", "", "Products & earnings"), node("p", "", sample
-      ? `No priced product record has been accepted for this creator. ${leads.length ? `${leads.length} sourced follow-up leads are available above.` : "No product or brand lead has been selected for this report yet."} Exact products, current seller offers and financial terms need verification.`
+      ? `No priced product record has been accepted for this creator. ${leads.length ? `See the ${leads.length} follow-up ${leads.length === 1 ? "lead" : "leads"} below.` : "No product or brand lead has been selected for this report yet."} Exact products, current seller offers and financial terms need verification.`
       : "Product research has not started for this account."), node("p", "", "0 priced product records · Earnings unknown. A limited sample does not establish that the creator has no products, brand or commercial relationships."));
-    wrapper.append(empty);
+    wrapper.append(empty, renderScreening(handle));
     return wrapper;
   }
   const products = RESEARCH.products.filter((item) => item.handle === handle);
   const overview = node("section", "card creator-product-overview");
-  overview.append(node("p", "eyebrow", `Public evidence · Collected ${RESEARCH.observedAt}`), node("h2", "", "Products & earnings"), node("p", "", `${products.length} product records · ${creator.leads.length} unresolved leads · 0 verified earnings records`), node("p", "", RESEARCH.scope), node("p", "creator-notice", "Actual creator income and product margins remain unknown. The calculators below use only assumptions you enter; they do not estimate a creator's real earnings."));
+  overview.append(node("p", "eyebrow", `@${handle} · ${RESEARCH.observedAt}`), node("h2", "", "Prices & sources"), node("p", "", `${products.length} priced ${products.length === 1 ? "product" : "products"} · Observed reference prices · Earnings unknown`));
   wrapper.append(overview);
-  const groups = [
-    { title: "Third-party promotions & mentions", kind: "third-party", note: creator.thirdPartyNote },
-    { title: "Founder-brand products", kind: "founder-brand", note: creator.brandNote },
-    { title: "Collaborations & equity relationships", kind: "collaboration", note: creator.brandNote },
-  ];
-  for (const group of groups) {
-    const items = products.filter((item) => item.kind === group.kind);
-    if (group.kind === "collaboration" && !items.length) continue;
-    const section = node("section", "creator-product-group");
-    section.append(node("h2", "", `${group.title} · ${items.length}`));
-    if (group.kind === "founder-brand" && products.some((item) => item.kind === "collaboration")) {
-      section.append(node("p", "", "No founder-brand product established in this collection. See the collaboration evidence below."));
-    } else {
-      section.append(node("p", "", group.note));
-      if (group.kind !== "third-party") section.append(sources(creator.brandSources));
-    }
-    const grid = node("div", "creator-product-grid");
-    for (const product of items) grid.append(productCard(product));
-    section.append(grid);
-    wrapper.append(section);
-  }
+  const grid = node("div", "creator-product-grid");
+  for (const product of products) grid.append(productCard(product));
+  wrapper.append(grid);
+  const scope = node("details", "creator-product-scope");
+  scope.append(node("summary", "", "Collection scope & brand relationships"), node("p", "", RESEARCH.scope), node("p", "", creator.thirdPartyNote), node("p", "", creator.brandNote));
+  if (creator.brandSources.length) scope.append(sources(creator.brandSources));
+  wrapper.append(scope);
   if (creator.leads.length) {
     const section = node("section", "creator-product-group creator-unresolved-leads");
     section.append(node("h2", "", `Unresolved product leads · ${creator.leads.length}`), node("p", "", "These leads need further verification and are excluded from product counts and calculators."));
@@ -173,5 +158,6 @@ export function renderCreatorProducts(handle: string): HTMLElement {
     }
     wrapper.append(section);
   }
+  wrapper.append(renderScreening(handle));
   return wrapper;
 }

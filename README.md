@@ -31,10 +31,14 @@ Score**, measuring report coverage rather than creator trustworthiness. The dire
 now supports one **Onion Score** for documented product problems: higher is worse,
 and higher scores sort first. Pending reports have no rank. Currently all 500
 profiles are pending because no completed product-problem sample has been accepted;
-the directory is explicitly unranked, with alphabetical ties in score-sort modes.
+the directory opens in name order and labels the profiles unranked. The score
+sort options appear when the first eligible review is available.
 Browse 20 records per page, search the full collection,
 sort by name, filter by collected category, or show the twelve profiles with
-priced product evidence. Research filters also select sampled accounts, sourced
+priced product evidence using the checkbox beside search. These filtered results
+open the product cards directly. Each card has a source disclosure next to the
+observed price. Share a section with `#creator/%40nikkietutorials/products` or
+`#creator/%40nikkietutorials/sources`. Research filters also select sampled accounts, sourced
 follow-up leads or unavailable samples. Summary counts separate these from ratings.
 
 Follower counts are rounded secondary-source observations collected 2026-11-17,
@@ -45,7 +49,7 @@ Famadex, Linktree, Linkme and Nutcake are not claimed to be current TikTok avata
 Provenance is in `assets/creators/sources.json` and
 `research/creator-seed-evidence.json`; collection rules are in
 `research/creator-seed-notes.md`.
-The separate Transparency examples view contains six fictional ranked identities,
+The separate Fictional examples view contains six ranked sample identities,
 post counts and scores. Unknown TikTok handles also show **Not rated**;
 no creator retrieval service is connected and no lookup is queued.
 The real-profile Evidence Score uses the `evidence-v3` rubric: public sample (20),

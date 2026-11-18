@@ -4,7 +4,7 @@ import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from ".
 import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor, formatEvidenceScore } from "../shared/creator-evidence-score";
 import { renderCreatorFeedback } from "./creator-feedback";
 import { createOnionIndicator, renderOnionScale, renderIssueReport } from "./onion-index";
-import { ISSUE_SCORES, issueFor } from "../shared/creator-issues";
+import { ISSUE_SCORES } from "../shared/creator-issues";
 
 type PublicCreator = CreatorProfile;
 
@@ -36,12 +36,17 @@ let root: HTMLElement;
 let category = "All";
 let sort = "score";
 let mode: "public" | "examples" = "public";
-let directorySort: "followers" | "name" | "evidence" | "evidence-low" | "issues" | "issues-low" = "issues";
+let directorySort: "followers" | "name" | "evidence" | "evidence-low" | "issues" | "issues-low" = ISSUE_SCORES.size ? "issues" : "name";
 let directoryQuery = "";
 let directoryPageNumber = 1;
 let productsOnly = false;
 let researchFilter = "all";
 const PRODUCT_HANDLES = new Set(PUBLIC_CREATORS.filter((item) => productCount(item.handle) > 0).map((item) => item.handle));
+const REPORT_PATHS = ["", "/products", "/sources"] as const;
+
+function reportHref(handle: string, section = 0): string {
+  return `#creator/${encodeURIComponent(`@${handle}`)}${REPORT_PATHS[section]}`;
+}
 
 export function initCreators(container: HTMLElement): void {
   root = container;
@@ -57,13 +62,15 @@ export function renderCreatorRoute(): void {
   root.className = location.hash.startsWith("#creator/") ? "creator-report" : "creator-home";
   window.scrollTo({ top: 0, behavior: "instant" });
   if (location.hash.startsWith("#creator/")) {
+    const [rawHandle, ...path] = location.hash.slice(9).split("/");
+    const section = REPORT_PATHS.findIndex(suffix => suffix === (path.length ? `/${path.join("/")}` : ""));
     let id: string;
-    try { id = decodeURIComponent(location.hash.slice(9)); }
+    try { id = decodeURIComponent(rawHandle!); }
     catch { renderUnavailable(""); return; }
     const profile = PUBLIC_CREATORS.find((item) => item.handle === parseHandle(id));
     const example = EXAMPLES.find((item) => item.id === id);
-    if (profile) renderPublicProfile(profile);
-    else if (example) renderProfile(example);
+    if (profile && section >= 0) renderPublicProfile(profile, section);
+    else if (example && section === 0) renderProfile(example);
     else renderUnavailable(id);
     return;
   }
@@ -111,22 +118,23 @@ function reportToolbar(): HTMLElement {
   return bar;
 }
 
-function reportSections(sections: { label: string; content: HTMLElement }[]): HTMLElement {
+function reportSections(sections: { label: string; content: HTMLElement }[], initial = 0, onSelect?: (index: number) => void): HTMLElement {
   const wrapper = node("div", "creator-report-sections");
   const navigation = node("nav", "creator-report-tabs");
   navigation.setAttribute("aria-label", "Report sections");
   const panels = sections.map(({ content }, i) => {
     const panel = node("section", "creator-report-panel");
     panel.id = `creator-report-panel-${i}`;
-    panel.hidden = i !== 0;
+    panel.hidden = i !== initial;
     panel.append(content);
     return panel;
   });
   const buttons = sections.map(({ label }, i) => {
     const button = action(label, () => {
       panels.forEach((panel, j) => { panel.hidden = i !== j; buttons[j]!.setAttribute("aria-pressed", String(i === j)); });
+      onSelect?.(i);
     }, "creator-report-tab");
-    button.setAttribute("aria-pressed", String(i === 0));
+    button.setAttribute("aria-pressed", String(i === initial));
     button.setAttribute("aria-controls", panels[i]!.id);
     return button;
   });
@@ -205,7 +213,7 @@ function externalLink(label: string, url: string): HTMLAnchorElement {
   return link;
 }
 
-function renderPublicProfile(item: PublicCreator): void {
+function renderPublicProfile(item: PublicCreator, section: number): void {
   const hasProducts = productCount(item.handle) > 0;
   const sample = screeningFor(item.handle);
   const leads = brandLeadsFor(item.handle);
@@ -234,14 +242,21 @@ function renderPublicProfile(item: PublicCreator): void {
   }
   if (item.sourceCategory) details.append(node("p", "", `Directory category: ${item.sourceCategory}. ${item.category === "Uncategorized" ? "A product niche has not been established." : ""}`));
   if (item.country) details.append(node("p", "", `Directory country label: ${item.country}. Not independently verified.`));
-  if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products & earnings for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
+  if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
   const scorePanel = node("div");
-  scorePanel.append(evidenceBreakdown(item.handle), evidenceMethodology());
-  root.replaceChildren(reportToolbar(), header, renderIssueReport(item.handle), renderCreatorFeedback(item.handle), reportSections([
-    { label: "Evidence coverage", content: scorePanel },
-    { label: `Products & earnings (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
+  scorePanel.append(renderIssueReport(item.handle), renderCreatorFeedback(item.handle), evidenceBreakdown(item.handle), evidenceMethodology());
+  const sections = reportSections([
+    { label: "Score & coverage", content: scorePanel },
+    { label: `Products (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
     { label: "Profile sources", content: details },
-  ]));
+  ], section, index => {
+    history.replaceState(history.state, "", reportHref(item.handle, index));
+  });
+  root.replaceChildren(reportToolbar(), header, sections);
+  if (section !== 0) {
+    sections.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus({ preventScroll: true });
+    sections.scrollIntoView({ block: "start", behavior: "instant" });
+  }
 }
 
 function searchForm(): HTMLElement {
@@ -375,11 +390,14 @@ function methodology(): HTMLElement {
 }
 
 function renderBoard(): void {
+  const saved = history.state?.creatorDirectory;
+  if (saved) {
+    ({ category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter } = saved);
+  }
   const hero = node("header", "creator-rating-intro");
-  hero.append(node("p", "eyebrow", "The internet has opinions. We look for receipts."));
   const heading = node("h1", "", "Rate my ");
   heading.append(node("em", "", "creator."));
-  hero.append(heading, node("p", "", "One scorecard. The products, the prices, the story behind the pitch."));
+  hero.append(heading, node("p", "", "Find a creator, check a product price and read the original sources."));
   const layout = node("div", "creator-rating-layout");
   const entry = node("aside", "creator-rating-entry");
   const formCard = node("section", "creator-entry-card");
@@ -395,12 +413,11 @@ function renderBoard(): void {
     quick.append(link);
   }
   formCard.append(quick, node("p", "creator-entry-note", `${PUBLIC_CREATORS.length} collected profiles. Ten evidence checks per report. Live lookup is not connected.`));
-  const preview = node("a", "creator-score-preview");
-  preview.href = "#creator/%40nikkietutorials";
+  const preview = node("a", "creator-product-preview");
+  preview.href = reportHref("nikkietutorials", 1);
   const previewCopy = node("div");
-  previewCopy.append(node("p", "eyebrow", "Onion Score"), node("strong", "", "NikkieTutorials"), node("span", "", "Explore the points & sources ↗"));
-  const previewScore = issueFor("nikkietutorials")?.points?.total;
-  preview.append(previewCopy, node("strong", "creator-preview-number", previewScore === undefined ? "—" : formatEvidenceScore(previewScore)));
+  previewCopy.append(node("p", "eyebrow", "Inside a report"), node("strong", "", "NikkieTutorials"), node("span", "", `View ${productCount("nikkietutorials")} products & sources →`));
+  preview.append(previewCopy);
   const lookup = node("details", "creator-lookup");
   lookup.open = !window.matchMedia("(max-width: 760px)").matches;
   const lookupSummary = node("summary");
@@ -412,7 +429,7 @@ function renderBoard(): void {
   const header = node("div", "creator-board-head");
   const title = node("div");
   const boardTitle = node("h2", "", "Creator index");
-  title.append(node("p", "eyebrow", "Discover & compare"), boardTitle);
+  title.append(boardTitle);
   const selectLabel = node("label", "creator-sort");
   selectLabel.append(node("span", "creator-sort-caption", "Sort by"));
   const select = node("select");
@@ -425,7 +442,7 @@ function renderBoard(): void {
   selectLabel.append(select);
   header.append(title, selectLabel);
   const modes = node("div", "creator-filters creator-modes");
-  for (const [value, label] of [["public", "Public profiles"], ["examples", "Transparency examples"]] as const) {
+  for (const [value, label] of [["public", "Public profiles"], ["examples", "Fictional examples"]] as const) {
     const button = action(label, () => {
       mode = value;
       category = "All";
@@ -445,12 +462,12 @@ function renderBoard(): void {
   directoryInput.setAttribute("aria-label", "Search collected creators");
   directoryInput.value = directoryQuery;
   directoryInput.addEventListener("input", () => { directoryQuery = directoryInput.value; directoryPageNumber = 1; renderRows(); });
-  const coverageLabel = node("label", "creator-coverage-filter");
+  const coverageLabel = node("label", "creator-priced-filter");
   const coverageInput = node("input");
   coverageInput.type = "checkbox";
   coverageInput.checked = productsOnly;
   coverageInput.addEventListener("change", () => { productsOnly = coverageInput.checked; directoryPageNumber = 1; renderRows(); });
-  coverageLabel.append(coverageInput, node("span", "", `With priced products (${PRODUCT_HANDLES.size})`));
+  coverageLabel.append(coverageInput, node("span", "", "With priced products"), node("strong", "", String(PRODUCT_HANDLES.size)));
   const researchLabel = node("label", "creator-coverage-filter", "Research status ");
   const researchSelect = node("select");
   researchSelect.setAttribute("aria-label", "Research status");
@@ -461,29 +478,29 @@ function renderBoard(): void {
   researchSelect.addEventListener("change", () => { researchFilter = researchSelect.value; directoryPageNumber = 1; renderRows(); });
   researchLabel.append(researchSelect);
   const refine = node("details", "creator-refine");
-  refine.open = productsOnly || researchFilter !== "all";
-  const refineSummary = node("summary", "", "Research filters");
+  refine.open = category !== "All" || researchFilter !== "all";
+  const refineSummary = node("summary");
   const refineOptions = node("div", "creator-refine-options");
-  refineOptions.append(coverageLabel, researchLabel);
+  refineOptions.append(researchLabel);
   refine.append(refineSummary, refineOptions);
-  directoryTools.append(directoryInput, refine);
+  directoryTools.append(directoryInput, coverageLabel, refine);
+  const exampleFilters = node("div");
   const list = node("ol", "creator-ranking");
   const count = node("p", "creator-list-note");
   count.setAttribute("aria-live", "polite");
   const votingGuide = node("div", "creator-voting-guide");
-  votingGuide.append(node("span", "", "Higher score. More product problems."), node("span", "", "↑ Coverage fair · ↓ Review"), renderOnionScale());
-  votingGuide.title = "Votes are feedback on the ten-check evidence coverage; they never change the Onion Score or rank. One choice per browser; click again to undo.";
+  votingGuide.append(node("span", "", "Higher score = more product problems"), renderOnionScale());
   const pagination = node("nav", "creator-pagination");
   pagination.setAttribute("aria-label", "Creator directory pages");
   const empty = node("div", "creator-directory-empty");
-  const rankingNote = node("p", "creator-ranking-note");
   empty.append(node("p", "", "No creators match these filters."), action("Reset filters", () => {
-    category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; researchFilter = "all"; researchSelect.value = "all"; directoryPageNumber = 1; renderRows();
+    category = "All"; directoryQuery = ""; directoryInput.value = ""; productsOnly = false; coverageInput.checked = false; researchFilter = "all"; researchSelect.value = "all"; directoryPageNumber = 1; renderRows(); directoryInput.focus();
   }));
   function renderRows(): void {
-    const activeResearchFilters = Number(productsOnly) + Number(researchFilter !== "all");
-    refineSummary.textContent = `Research filters${activeResearchFilters ? ` · ${activeResearchFilters} active` : ""}`;
-    select.replaceChildren(...(mode === "public" ? [["issues", "Highest problem score"], ["issues-low", "Lowest problem score"], ["evidence", "Most evidence"], ["evidence-low", "Least evidence"], ["followers", "Most followers"], ["name", "Creator name"]] : [["score", "Highest transparency"], ["lowest", "Lowest transparency"], ["name", "Creator name"]]).map(([value, text]) => {
+    const activeFilters = Number(category !== "All") + Number(researchFilter !== "all");
+    refineSummary.textContent = `More filters${activeFilters ? ` (${activeFilters})` : ""}`;
+    const scoreSorts = ISSUE_SCORES.size ? [["issues", "Highest score"], ["issues-low", "Lowest score"]] : [];
+    select.replaceChildren(...(mode === "public" ? [...scoreSorts, ["name", "Name A–Z"], ["evidence", "Most evidence"], ["evidence-low", "Least evidence"], ["followers", "Most followers"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Name A–Z"]]).map(([value, text]) => {
       const option = node("option", "", text); option.value = value!; return option;
     }));
     select.value = mode === "public" ? directorySort : sort;
@@ -498,13 +515,12 @@ function renderBoard(): void {
     }));
     directoryTools.hidden = mode !== "public";
     votingGuide.hidden = mode !== "public";
-    rankingNote.hidden = mode !== "public";
-    rankingNote.textContent = ISSUE_SCORES.size ? "Higher scores indicate more frequent or severe documented product problems in the reviewed sample. Pending profiles are unranked." : "No problem rankings published yet. The profiles below are an unranked research directory: existing price and caption records do not establish recurring product problems.";
+    (mode === "public" ? refineOptions : exampleFilters).prepend(filters);
     const exampleKey = board.querySelector<HTMLElement>(".creator-grade-key");
     if (exampleKey) exampleKey.hidden = mode === "public";
     pagination.hidden = mode !== "public";
     empty.hidden = true;
-    boardTitle.textContent = mode === "public" ? ISSUE_SCORES.size ? "Product problem leaderboard" : "Creator research directory" : "Transparency examples";
+    boardTitle.textContent = mode === "public" ? ISSUE_SCORES.size ? "Onion rankings" : "Creator directory" : "Transparency scores";
     if (mode === "public") {
       const profiles = PUBLIC_CREATORS.filter((item) => researchFilter === "all"
         || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
@@ -515,19 +531,19 @@ function renderBoard(): void {
       list.replaceChildren(...result.items.map((item) => {
         const li = node("li", "creator-public-item");
         const link = node("a", "creator-rank-row creator-public-row");
-        link.href = `#creator/${encodeURIComponent(`@${item.handle}`)}`;
+        link.href = reportHref(item.handle, productsOnly ? 1 : 0);
         const identity = node("div", "creator-identity");
         identity.append(node("strong", "", item.name), node("span", "", `@${item.handle}`), node("span", "creator-follower-count", item.followersLabel ? `${item.followersLabel} followers` : `${item.category} · Followers not collected`));
         const total = productCount(item.handle);
         const leads = brandLeadsFor(item.handle).length;
-        const status = node("span", "creator-row-status", total ? `${total} priced ${total === 1 ? "product" : "products"}` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Unverified` : screeningLabel(item.handle));
+        const status = node("span", "creator-row-status", total ? `${productsOnly ? "View " : ""}${total} priced ${total === 1 ? "product" : "products"}${productsOnly ? " →" : ""}` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Unverified` : screeningLabel(item.handle));
         identity.append(status);
         link.append(portrait(item), identity, node("span", "creator-arrow", "↗"));
         li.append(link, renderCreatorFeedback(item.handle, true));
         return li;
       }));
-      const order = directorySort === "followers" ? "Most followers first" : directorySort === "name" ? "Alphabetical order" : directorySort === "issues" || directorySort === "issues-low" ? !ISSUE_SCORES.size ? "Unranked · Alphabetical order" : directorySort === "issues" ? "Highest problem score first" : "Lowest problem score first" : directorySort === "evidence-low" ? "Lowest evidence first" : "Highest evidence first";
-      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} · ${order} · ${ISSUE_SCORES.size} rated overall` : "0 matching profiles";
+      const status = ISSUE_SCORES.size ? `${ISSUE_SCORES.size} ranked overall` : "Unranked · Issue reviews pending";
+      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} profiles · ${status}` : "0 matching profiles";
       empty.hidden = result.total > 0;
       pagination.replaceChildren();
       pagination.hidden = result.pageCount <= 1;
@@ -572,7 +588,7 @@ function renderBoard(): void {
     count.textContent = `${items.length} fictional creators · Ranks reflect the full example list · No live accounts have been rated`;
   }
   renderRows();
-  board.append(header, modes, directoryTools, filters, count, votingGuide, rankingNote, empty, list, pagination);
+  board.append(header, modes, directoryTools, exampleFilters, count, votingGuide, empty, list, pagination);
   const key = node("div", "creator-grade-key");
   key.hidden = mode === "public";
   key.append(node("span", "", "Example tiers"));
@@ -588,14 +604,31 @@ function renderBoard(): void {
     const stat = node("div"); stat.append(node("strong", "", value), node("span", "", label)); coverage.append(stat);
   }
   const collection = node("details", "creator-collection-note");
-  collection.append(node("summary", "", "Onion Score · Higher means more documented product problems."), node("p", "", "Only completed product-issue reviews receive a score or rank. Source confidence, missing research and community votes do not establish product problems."), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
+  collection.append(node("summary", "", "About the research sample"), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
   const masthead = node("div", "creator-masthead");
   masthead.append(hero, coverage);
-  root.replaceChildren(masthead, collection, layout, evidenceMethodology());
+  root.replaceChildren(masthead, layout, collection, evidenceMethodology());
+  // Save the originating result on its history entry so Back works even after
+  // the report is reloaded. New visits to the directory have their own entry.
+  layout.addEventListener("click", event => {
+    const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href^="#creator/"]') : null;
+    if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    history.replaceState({ ...history.state, creatorDirectory: {
+      category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter,
+      href: link.hash, linkClass: link.className, refineOpen: refine.open, lookupOpen: lookup.open,
+    } }, "");
+  });
+  if (saved) {
+    refine.open = saved.refineOpen;
+    lookup.open = saved.lookupOpen || !window.matchMedia("(max-width: 760px)").matches;
+    const origin = Array.from(layout.querySelectorAll<HTMLAnchorElement>("a")).find(link => link.hash === saved.href && link.className === saved.linkClass);
+    origin?.focus();
+    history.replaceState({ ...history.state, creatorDirectory: null }, "");
+  }
 }
 
 function backLink(): HTMLElement {
-  const back = node("a", "creator-back", "← Back to leaderboard");
+  const back = node("a", "creator-back", "← Back to directory");
   back.href = "#creators";
   return back;
 }
