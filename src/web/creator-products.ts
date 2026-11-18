@@ -2,6 +2,7 @@ import RESEARCH from "../../research/creator-products.json";
 import { brandScenario, commissionScenario, scenarioNumber } from "../shared/creator-economics";
 import { renderScreening } from "./creator-screening";
 import { screeningFor, brandLeadsFor } from "../shared/creator-screening";
+import { productScreening } from "./product-issue-screening";
 
 export type Product = (typeof RESEARCH.products)[number];
 export const PRODUCT_ARCHIVE = RESEARCH.products;
@@ -121,12 +122,19 @@ function productCard(product: Product, standalone = false): HTMLElement {
   const references = sources(product.sources);
   if (standalone) {
     card.append(reading);
+    const screening = productScreening(product);
+    if (screening) reading.append(screening);
     const sourcePanel = node("aside", "record-references");
     sourcePanel.append(node("h2", "", "Source documents"), references);
     references.open = true;
     card.append(sourcePanel);
     reading.append(node("h2", "", "Purchase conditions"));
-  } else reading.append(references);
+  } else {
+    reading.append(references);
+    const file = node("a", "", "Open product record & issue checks →");
+    file.href = `#creator/${encodeURIComponent(`@${product.handle}`)}/products/${product.id}`;
+    reading.append(file);
+  }
   reading.append(node("p", "", product.price.conditions), node("p", "creator-product-status", product.shopStatus));
   const evidence = node("details", "creator-product-evidence");
   evidence.append(node("summary", "", "Relationship & financial gaps"), node("p", "", `Evidence confidence: ${product.confidence}.`));

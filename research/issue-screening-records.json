@@ -1,0 +1,54 @@
+{
+  "sampleId": "priced-archive-2026-11-17",
+  "checkedAt": "2026-11-18",
+  "sources": {
+    "fda25": {"label":"FDA firm-issued notices, 2025 XML","url":"https://www.fda.gov/media/187526/download","result":"Searched brand, firm and product descriptions in announcements dated November 18 through December 26."},
+    "fda26": {"label":"FDA firm-issued notices, 2026 XML","url":"https://www.fda.gov/media/191968/download?attachment","result":"The 2026 file contains selected public announcements dated January 5 through November 13."},
+    "gold": {"label":"FDA · Gold Star distributor product list","url":"https://www.fda.gov/media/190382/download?attachment","result":"The December 26, 2025 notice covers products held at a specific facility. The 44-page SKU and UPC attachment yielded no matching search terms. Distribution and pack identifiers would be needed to attribute the notice."},
+    "cosmetics": {"label":"FDA cosmetic event reports · data download","url":"https://download.open.fda.gov/cosmetic/event/cosmetic-event-0001-of-0001.json.zip","result":"Coverage gap. Although the export was updated November 16, 2026, its latest initial receipt date was August 29, 2025. It supplies no in-window coverage on that date field."},
+    "food": {"label":"FDA food recall enforcement · data download","url":"https://download.open.fda.gov/food/enforcement/food-enforcement-0001-of-0001.json.zip","result":"The November 17 export was searched by recall initiation date, recalling firm and product description for the brand and creator aliases. Standard and King Size packs require separate SKU checks."},
+    "eu": {"label":"EU Safety Gate · weekly XML index","url":"https://ec.europa.eu/safety-gate-alerts/api/download/weeklyReport/list/xml/en","result":"Searched 51 weekly reports across all notifying countries through November 13. Alerts from the Rapid Alert System for dangerous non-food products, published free of charge on the Safety Gate website."},
+    "nvwa": {"label":"Netherlands NVWA · site search","url":"https://www.nvwa.nl/zoeken","result":"A search for Nimya across all dates returned zero results in the Dutch regulator’s website index."},
+    "cpsc": {"label":"U.S. CPSC · recall records in the window","url":"https://www.saferproducts.gov/RestWebServices/Recall?format=json&RecallDateStart=2025-11-18&RecallDateEnd=2026-11-17","result":"Searched model and company names across the returned recalls. A separate manufacturer search for Sony also returned zero results."},
+    "firmware": {"label":"Sony USA · WF-1000XM6 update 2.0.5","url":"https://www.sony.com/electronics/support/wireless-headphones-bluetooth-headphones/wf-1000xm6/software/00377141","result":"Indexed official note dated October 15, 2026. It names gaming audio support and general improvements. Direct access returned HTTP 403. The stated changes identify no specific product failure."},
+    "sonyHelp": {"label":"Sony USA · headphone troubleshooting","url":"https://www.sony.com/electronics/support/wireless-headphones-bluetooth-headphones/wf-1000xm6/articles/00264446","result":"Indexed July 16, 2026 guide lists several models and potential app-related causes. The instructions do not identify an affected production run or a verified defect in the archived unit."},
+    "biodancePack": {"label":"Biodance on Amazon US · ASIN B0GF86QJK7","url":"https://www.amazon.com/BIODANCE-Hydrating-Anti-Aging-Sprayable-Essentials/dp/B0GF86QJK7","result":"Indexed seller listing identifies one 1.69 fl oz (50 mL) Collagen mist. The archived caption identifies Amazon and the product line but supplies no ASIN."},
+    "povPump": {"label":"POV Beauty · product page and review summary","url":"https://povbeauty.com/products/glaze-it","result":"The indexed page mentions pump operation in an AI-generated summary of customer reviews. An attributable seller resolution or test identifying the failure and affected units is still needed."},
+    "lorealShades": {"label":"L’Oréal Paris USA · washable mascara shades","url":"https://www.lorealparisusa.com/makeup/eye/mascara/telescopic-lift-mascara-washable","result":"The indexed official listing offers five shades. The creator caption from January 24, 2023 identifies the line. Its date precedes the issue window and the promoted shade is unresolved."}
+  },
+  "checks": {
+    "US cosmetics": ["fda25","fda26","gold","cosmetics"],
+    "US food": ["fda25","fda26","gold","food"],
+    "NL cosmetics": ["eu","nvwa"],
+    "US electronics": ["cpsc","firmware","sonyHelp"]
+  },
+  "nextByMarket": {
+    "US cosmetics":"Check the full cosmetic enforcement records and dated seller resolutions for the recorded variant. The public FDA notice files end on November 13.",
+    "US food":"Verify the pack UPC and distribution chain against any relevant distributor schedule and confirm coverage through November 17.",
+    "NL cosmetics":"Check alerts published after the latest available weekly file for events through November 17 and review dated seller resolutions for the Dutch listing.",
+    "US electronics":"Match the promoted unit to the US listing and verify any specific service action against the model and applicable serial range."
+  },
+  "products": [
+    {"id":"painted-basic","group":"US cosmetics","aliases":["Painted","James Charles"],"terms":["Basic Canvas Palette"],"note":"The founder attribution and the 24-shade palette listing identify the brand relationship."},
+    {"id":"haus-bronzer","group":"US cosmetics","aliases":["Haus Labs","Haus Laboratories","Lady Gaga"],"terms":["Sun Dipped Bronzing Veil"],"note":"The caption supports the product line. Matching the Suede shade to the post remains open."},
+    {"id":"nikkie-biodance-mist","group":"US cosmetics","aliases":["Biodance","Beautyselection","Beauty Selection"],"terms":["Collagen Peptide Jelly Serum Mist","Collagen Peptides Jelly Serum Mist"],"extra":["biodancePack"],"note":"The US single-bottle listing supplies a candidate ASIN. The exact Amazon offer linked to the promotion remains open."},
+    {"id":"mikayla-telescopic","group":"US cosmetics","aliases":["L’Oréal","Loreal"],"terms":["Telescopic Lift","Telescopic Instant Lift"],"extra":["lorealShades"],"note":"The historical post links the creator to the mascara line. A primary source for the promoted shade and formula is still needed."},
+    {"id":"pov-drench","group":"US cosmetics","aliases":["POV","Point of View Beauty","Mikayla Nogueira"],"terms":["Drench It","Soothing Priming Milk"],"note":"The 150 mL priming milk and the 50 mL Glaze It primer are separately named products in the founder's store."},
+    {"id":"pov-glaze","group":"US cosmetics","aliases":["POV","Point of View Beauty","Mikayla Nogueira"],"terms":["Glaze It","Glowy Gripping Primer"],"extra":["povPump"],"note":"The brand identifies a 50 mL primer. Its product page supplies a pump-related lead for follow-up."},
+    {"id":"nimya-cream","group":"NL cosmetics","aliases":["Nimya","NikkieTutorials","Nikkie Tutorials"],"terms":["Where It All Starts"],"note":"The Dutch brand lists a 45 mL moisturizer and primer. This is a distinct formulation from the setting spray."},
+    {"id":"nimya-spray","group":"NL cosmetics","aliases":["Nimya","NikkieTutorials","Nikkie Tutorials"],"terms":["Set It Forget It","Set It and Forget It"],"note":"The Dutch brand lists a 90 mL setting spray separately from its 45 mL cream."},
+    {"id":"glamzilla-dirty30","group":"US cosmetics","aliases":["Nudestix","Glamzilla"],"terms":["Dirty 30"],"note":"The brand identifies a three-shade collaboration kit. The kit is one screening target."},
+    {"id":"glamzilla-root","group":"US cosmetics","aliases":["L’Oréal","Loreal"],"terms":["Magic Root Cover Up","Magic Root Coverup"],"note":"The 2024 post mentions the product line. Its shade and a matching unit are unresolved."},
+    {"id":"arun-sony","group":"US electronics","aliases":["Sony"],"terms":["WF-1000XM6","WF1000XM6","1000XM6"],"note":"The retained caption copy names the model. The reference is the US Platinum Silver /S unit. The promoted color and original video remain unverified."},
+    {"id":"feastables-standard","group":"US food","aliases":["Feastables","MrBeast","Mr Beast"],"terms":["Feastables Milk Chocolate"],"note":"The founder's brand lists a ten-bar standard pack. Standard and King Size remain in one product family pending a formulation decision."},
+    {"id":"feastables-king","group":"US food","aliases":["Feastables","MrBeast","Mr Beast"],"terms":["Feastables Milk Chocolate"],"note":"The King Size ten-pack has its own listing. A difference in pack size alone cannot add a second reviewed product."},
+    {"id":"rare-blush","group":"US cosmetics","aliases":["Rare Beauty","Selena Gomez"],"terms":["Soft Pinch Liquid Blush"],"note":"Hope is the full-size dewy blush. A product-family decision with the Intrigue mini remains open."},
+    {"id":"rare-mini","group":"US cosmetics","aliases":["Rare Beauty","Selena Gomez"],"terms":["Soft Pinch Liquid Blush"],"note":"Intrigue is the matte mini. Shade, finish and size must be matched before attributing any alert to either listing."},
+    {"id":"rhode-treatment","group":"US cosmetics","aliases":["rhode","HRBeauty","HR Beauty","e.l.f. Beauty"],"terms":["Peptide Lip Treatment"],"note":"Match the improved unscented 10 mL formula. Earlier formulas and tinted versions need separate evidence."},
+    {"id":"kylie-matte","group":"US cosmetics","aliases":["Kylie Cosmetics","Kylie Jenner","Coty"],"terms":["Matte Lip Kit"],"note":"The Bare matte kit has its own listing and variant identifier. Check the finish and affected component against any notice."},
+    {"id":"kylie-velvet","group":"US cosmetics","aliases":["Kylie Cosmetics","Kylie Jenner","Coty"],"terms":["Velvet Lip Kit"],"note":"The Bare velvet kit has a different formula and variant identifier from the matte kit. The shared shade name is insufficient for a match."},
+    {"id":"rem-gloss","group":"US cosmetics","aliases":["r.e.m. beauty","rem beauty","Ariana Grande"],"terms":["On Your Collar","Plumping Lip Gloss"],"note":"The archived gloss is Fembot. A brand or gloss-family mention still needs a shade and product match."},
+    {"id":"rem-balm","group":"US cosmetics","aliases":["r.e.m. beauty","rem beauty","Ariana Grande"],"terms":["Essential Drip"],"note":"The Cosmo glossy balm is a distinct line from the On Your Collar plumping gloss."},
+    {"id":"papatui-wash","group":"US cosmetics","aliases":["Papatui","Papa Tui","Dwayne Johnson"],"terms":["Refreshing Body Wash","Cedar Sport"],"note":"The archived scent is Cedar Sport. Bottle volume, batch and distribution need confirmation for a restricted notice."}
+  ]
+}

@@ -2460,3 +2460,12 @@ body[data-view="creators"] .page { padding-top: 24px; }
   .research-layout .creator-sort { margin-left: 0; }
   .research-layout .creator-public-item .creator-public-row { min-height: auto; }
 }
+.product-issue-check { padding: 14px 16px; border-left: 3px solid #80627a; background: #f5eff2; border-radius: 4px; overflow-wrap: anywhere; }
+.product-file .product-issue-check h2 { margin: 0 0 6px; }
+.product-issue-check > strong { color: #60445e; font-size: 13px; }
+.product-issue-check summary { cursor: pointer; padding: 10px 0; font-weight: 600; }
+.product-issue-check li + li, .issue-sample li + li { margin-top: 8px; }
+.product-issue-check ul, .issue-sample ul { padding-left: 18px; }
+.product-issue-check li p { margin: 3px 0; }
+.product-issue-check li small { display: block; font-size: 12px; font-weight: 600; }
+.product-issue-check a, .issue-sample a { text-decoration: underline; text-underline-offset: 2px; }

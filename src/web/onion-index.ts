@@ -1,5 +1,6 @@
 import { ONION_BANDS, UNRATED_ONION, onionScore } from "../shared/onion-index";
 import { ISSUE_RUBRIC, ISSUE_VERSION, issueFor, issueRank } from "../shared/creator-issues";
+import { screeningSampleLinks } from "./product-issue-screening";
 
 export function createOnionIndicator(handle: string, compact: boolean) {
   const element = document.createElement("div");
@@ -18,7 +19,8 @@ export function createOnionIndicator(handle: string, compact: boolean) {
   image.alt = `${band.label} onion`;
   value.textContent = index ? index.value.toFixed(1) : "—";
   state.textContent = index ? `${band.label} · #${issueRank(handle)}` : "Pending review";
-  const detail = index ? `${index.value.toFixed(1)}/100 · ${band.label}. Global rank #${issueRank(handle)}. Higher means more frequent or severe documented product problems in the reviewed sample.` : report?.reason ?? "Source review needed";
+  if (report?.points) state.append(document.createElement("br"), `${report.points.affected} of ${report.points.reviewed} products affected`);
+  const detail = index && report?.points ? `${index.value.toFixed(1)}/100 · ${band.label}. Global rank #${issueRank(handle)}. ${report.points.affected} of ${report.points.reviewed} reviewed products affected. Higher means more frequent or severe documented product problems in the reviewed sample.` : report?.reason ?? "Source review needed";
   element.title = `Onion Score: ${detail} ${ISSUE_VERSION}. Votes and evidence coverage do not determine the score or rank.`;
   element.setAttribute("aria-label", element.title);
   return element;
@@ -60,6 +62,8 @@ export function renderIssueReport(handle: string): HTMLElement {
   summary.className = "creator-confidence-summary";
   summary.textContent = report.points ? `${report.points.affected} of ${report.points.reviewed} reviewed products have confirmed problems. Higher is worse. See the calculation and sources below.` : "Not ranked yet. Price listings, public captions and research gaps alone cannot establish recurring product problems. A completed issue review is needed.";
   section.append(heading, description, summary, renderOnionScale());
+  const sample = screeningSampleLinks(handle);
+  if (sample) section.append(sample);
   const calculation = document.createElement("details");
   calculation.className = "creator-method";
   const title = document.createElement("summary");

@@ -1,0 +1,12 @@
+{
+  "id": "priced-archive-2026-11-17",
+  "rubricVersion": "product-issues-v1",
+  "selectedAt": "2026-11-18",
+  "archiveCommit": "d078be4",
+  "selection": "Include every price record in the November 17 archive before looking for findings. Check the recorded sales market and variant. A price record is a search target. Resolve related variants and packs to distinct products before counting reviewed products.",
+  "windowStart": "2025-11-18",
+  "windowEnd": "2026-11-17",
+  "productIds": [
+    "painted-basic", "haus-bronzer", "nikkie-biodance-mist", "mikayla-telescopic", "pov-drench", "pov-glaze", "nimya-cream", "nimya-spray", "glamzilla-dirty30", "glamzilla-root", "arun-sony", "feastables-standard", "feastables-king", "rare-blush", "rare-mini", "rhode-treatment", "kylie-matte", "kylie-velvet", "rem-gloss", "rem-balm", "papatui-wash"
+  ]
+}
