@@ -3,6 +3,22 @@
   "records": [
     {
       "productId": "winco-msp-4p",
+      "quoteMarket": "United States",
+      "supplierId": "ford-hotel-supply",
+      "otherQuotes": [
+        {
+          "supplierId": "east-bay-restaurant-supply", "label": "East Bay Restaurant Supply", "amount": 2.99, "units": 1,
+          "currency": "USD", "market": "United States", "match": "same", "observedAt": "2026-11-18",
+          "url": "https://eastbayrestaurantsupply.com/products/cckmsp-4p",
+          "note": "Single four-piece Winco MSP-4P set, UPC 812944006815. The public USD offer was in stock."
+        },
+        {
+          "supplierId": "jeans-restaurant-supply", "label": "Jean’s Restaurant Supply", "amount": 2.33, "units": 1,
+          "currency": "USD", "market": "United States", "match": "same", "observedAt": "2026-11-18",
+          "url": "https://jeansrs.com/products/winco-msp-4p-economy-4-piece-stainless-steel-measuring-spoon-set-includes-1-4-tsp-1-2-tsp-1-tsp-1-tbsp",
+          "note": "SKU 50170 names the Winco MSP-4P economy set and its four capacities. The single-set USD offer was in stock."
+        }
+      ],
       "barcode": "812944006815",
       "retailListing": {
         "name": "Winco measuring spoon set",
@@ -26,6 +42,8 @@
     },
     {
       "productId": "feastables-king",
+      "quoteMarket": "United States",
+      "supplierId": "boxncase",
       "barcode": "850027880129",
       "match": "same",
       "retailUnits": 10,
@@ -40,6 +58,8 @@
     },
     {
       "productId": "nikkie-biodance-mist",
+      "quoteMarket": "International",
+      "supplierId": "q-depot",
       "barcode": "8809891186570",
       "match": "unresolved",
       "retailUnits": 1,

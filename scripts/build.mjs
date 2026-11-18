@@ -38,8 +38,11 @@ const ENTRIES = [
   },
   {
     entryPoints: [join(root, "src/web/app.ts")],
-    outfile: join(web, "app.js"),
-    format: "iife",
+    outdir: web,
+    format: "esm",
+    splitting: true,
+    minify: !isWatch,
+    chunkNames: "chunks/[name]-[hash]",
   },
 ];
 
@@ -152,9 +155,7 @@ async function runBuild() {
       ENTRIES.map((entry) =>
         context({
           ...buildOptions,
-          entryPoints: entry.entryPoints,
-          outfile: entry.outfile,
-          format: entry.format,
+          ...entry,
         }),
       ),
     );
@@ -179,9 +180,7 @@ async function runBuild() {
     ENTRIES.map((entry) =>
       build({
         ...buildOptions,
-        entryPoints: entry.entryPoints,
-        outfile: entry.outfile,
-        format: entry.format,
+        ...entry,
       }),
     ),
   );

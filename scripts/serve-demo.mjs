@@ -4,6 +4,7 @@ import { createReadStream, readFileSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createGzip } from "node:zlib";
 import { createCreatorFeedback } from "../server/creator-feedback.mjs";
 
 const root = resolve(fileURLToPath(new URL("../web", import.meta.url)));
@@ -47,12 +48,15 @@ const server = http.createServer((req, res) => {
       }
       if (!info.isFile()) throw new Error("Not a file");
 
+      const gzip = /\b(?:js|css|html)$/.test(extname(filePath)) && /\bgzip\b(?!\s*;\s*q=0(?:\.0*)?\s*(?:,|$))/.test(req.headers["accept-encoding"] || "");
       res.writeHead(200, {
         "Content-Type": MIME[extname(filePath)] || "application/octet-stream",
-        "Content-Length": info.size,
+        ...(gzip ? { "Content-Encoding": "gzip" } : { "Content-Length": info.size }),
+        "Vary": "Accept-Encoding",
         "Cache-Control": "no-store",
       });
-      createReadStream(filePath).pipe(res);
+      const file = createReadStream(filePath);
+      (gzip ? file.pipe(createGzip()) : file).pipe(res);
     } catch {
       res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
       res.end("Not found. Run `npm run build` first, then open /demo/.");

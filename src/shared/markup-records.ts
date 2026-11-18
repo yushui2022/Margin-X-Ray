@@ -1,6 +1,7 @@
 import archive from "../../research/creator-products.json";
 import assessments from "../../research/creator-confidence-assessments.json";
 import checks from "../../research/product-quote-checks.json";
+import { assessPrice, type SupplierObservation } from "./price-comparison";
 
 export const quoteDate = checks.observedAt;
 
@@ -40,6 +41,17 @@ export function markupRecord(id?: string) {
   if (!listing) return undefined;
   const quote = checks.records.find(entry => entry.productId === listing.id && entry.currency === listing.currency);
   return { listing, quote };
+}
+
+export function observationsFor(quote: typeof checks.records[number]): SupplierObservation[] {
+  return [{ supplierId: quote.supplierId, label: quote.quoteLabel, url: quote.quoteUrl, match: quote.match,
+    amount: quote.quoteAmount, units: quote.quoteUnits, observedAt: quoteDate, currency: quote.currency, market: quote.quoteMarket,
+    note: quote.matchNote }, ...(quote.otherQuotes ?? [])];
+}
+
+export function archivedAssessment(record: NonNullable<ReturnType<typeof markupRecord>>) {
+  const { listing, quote } = record;
+  return assessPrice({ ...listing, units: quote?.retailUnits ?? NaN }, quote ? observationsFor(quote) : []);
 }
 
 export function listingUrl(value: string): string | undefined {

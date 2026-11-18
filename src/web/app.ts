@@ -3,7 +3,7 @@ import {
   buildLinkContext,
   isSupportedImageType,
 } from "../shared/capture";
-import { consumerVerdict, fairnessLabel, matchLabel } from "../shared/consumer";
+import { consumerVerdict } from "../shared/consumer";
 import { assumptionsForResult, computeWaterfall } from "../shared/pricing";
 import { consumeSse } from "../shared/sse";
 import {
@@ -17,7 +17,6 @@ import {
 import { EXTENSION_VERSION } from "../shared/version";
 import { downloadPoster, renderPosterBlob } from "../content/ui/poster";
 import { renderProWorkspace } from "./pro";
-import { initCreators, renderCreatorRoute } from "./creators";
 import { renderMarkup } from "./markup";
 import { markupHref } from "../shared/markup-records";
 import type {
@@ -29,7 +28,7 @@ import type {
   ScanResult,
 } from "../shared/types";
 
-const DEFAULT_API = "http://localhost:8787";
+const DEFAULT_API = location.protocol === "https:" ? location.origin : `${location.protocol}//${location.hostname}:8787`;
 const STORAGE_KEY = "onion-head.apiBase";
 
 interface AgentStepDef {
@@ -116,6 +115,7 @@ function boot(): void {
   els.stopBtn.addEventListener("click", () => abortScan());
   els.newScanBtn.addEventListener("click", () => resetToHero());
   els.backendBtn.addEventListener("click", () => {
+    byId<HTMLDetailsElement>("appTools").open = false;
     els.apiBaseInput.value = apiBase;
     els.dialogStatus.textContent = "";
     els.dialogStatus.className = "dialog-status";
@@ -129,13 +129,29 @@ function boot(): void {
     void refreshHealth();
     toast("Backend saved.");
   });
-  initCreators(els.creatorsView);
+  const tools = byId<HTMLDetailsElement>("appTools");
+  tools.addEventListener("keydown", event => {
+    if (event.key === "Escape") { tools.open = false; tools.querySelector("summary")?.focus(); }
+  });
+  document.addEventListener("click", event => {
+    if (event.target instanceof Node && !tools.contains(event.target)) tools.open = false;
+  });
   window.addEventListener("hashchange", routeView);
   routeView();
   void refreshHealth();
 }
 
 function routeView(): void {
+  byId<HTMLDetailsElement>("appTools").open = false;
+  if (location.hash.startsWith("#scan?")) {
+    const url = new URLSearchParams(location.hash.slice(6)).get("url");
+    history.replaceState(history.state, "", "#scan");
+    resetToHero();
+    els.clearImage.click();
+    els.urlInput.value = url ?? "";
+    els.urlInput.focus();
+    return;
+  }
   if (/^#markup(?:\/|$)/.test(location.hash)) {
     showView("markup");
     return;
@@ -152,7 +168,7 @@ function showView(view: "scan" | "pro" | "creators" | "markup"): void {
   els.workspace.hidden = view !== "scan" || !scanStarted;
   document.body.dataset.view = view;
   for (const link of document.querySelectorAll<HTMLAnchorElement>(".topnav [data-view]")) {
-    const active = link.dataset.view === (view === "markup" ? "scan" : view);
+    const active = link.dataset.view === (location.hash === "#prices" ? "prices" : view);
     link.classList.toggle("active", active);
     if (active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
@@ -162,6 +178,8 @@ function showView(view: "scan" | "pro" | "creators" | "markup"): void {
   if (view === "markup") {
     const route = location.hash.replace(/^#markup\/?/, "");
     els.markupView.replaceChildren(renderMarkup(route, result ?? undefined));
+    const heading = els.markupView.querySelector("h1");
+    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
     window.scrollTo({ top: 0, behavior: "instant" });
     return;
   }
@@ -169,8 +187,13 @@ function showView(view: "scan" | "pro" | "creators" | "markup"): void {
     renderProWorkspace();
   }
   const hash = view === "creators" && (location.hash.startsWith("#creator/") || location.hash === "#prices") ? location.hash : `#${view}`;
-  if (location.hash !== hash) location.hash = hash;
-  if (view === "creators") renderCreatorRoute();
+  if (location.hash !== hash) history.replaceState(history.state, "", hash);
+  if (view === "creators") void import("./creators").then(({ initCreators, renderCreatorRoute }) => {
+    if (document.body.dataset.view === "creators") {
+      initCreators(els.creatorsView);
+      renderCreatorRoute();
+    }
+  });
   else window.scrollTo({ top: 0, behavior: "instant" });
 }
 
@@ -277,8 +300,7 @@ async function submitScan(): Promise<void> {
       }
       scanContext = buildLinkContext(raw);
       const check = markupHref(raw);
-      const publicStorefront = /\/products\/[\w%-]+\/?$/.test(new URL(raw).pathname);
-      if (!check.startsWith("#markup/item?") || (publicStorefront && !els.agentStatus.classList.contains("online"))) {
+      if (!check.startsWith("#markup/item?") || (scanContext.pageType === "product" && !els.agentStatus.classList.contains("online"))) {
         location.hash = check;
         return;
       }
@@ -306,7 +328,7 @@ async function runScan(scanContext: PageContext): Promise<void> {
   startTimer();
 
   const request: ScanRequest = {
-    scanId: crypto.randomUUID(),
+    scanId: crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, "0")).join(""),
     context: scanContext,
     client: {
       version: EXTENSION_VERSION,
@@ -553,7 +575,7 @@ function renderReport(scan: ScanResult, scanContext: PageContext): void {
   const card = el("section", { class: "verdict" });
   card.append(
     el("div", { class: "verdict-head" }, [
-      el("p", { class: "eyebrow", text: fairnessLabel(verdict.fairness) }),
+      el("p", { class: "eyebrow", text: "Estimated cost model" }),
       el("div", {
         class: `verdict-number ${
           verdict.fairness === "extreme" || verdict.fairness === "well-above"
@@ -593,18 +615,9 @@ function renderReport(scan: ScanResult, scanContext: PageContext): void {
     el("div", { class: "match" }, [
       el("span", {
         class: `badge ${verdict.matchStrength}`,
-        text:
-          verdict.matchStrength === "high"
-            ? "High match"
-            : verdict.matchStrength === "medium"
-              ? "Match"
-              : verdict.matchStrength === "low"
-                ? "Few matches"
-                : verdict.matchStrength === "none"
-                  ? "No match"
-                  : "Not checked",
+        text: "Image search",
       }),
-      el("span", { text: matchLabel(verdict.matchStrength, verdict.matchCount) }),
+      el("span", { text: verdict.matchCount === null ? "No candidate count available" : `${verdict.matchCount} priced candidates · Verify variant and pack size` }),
     ]),
   );
   card.append(
@@ -955,8 +968,8 @@ async function shareCard(
     fairLowUsd: verdict.fairLowUsd,
     fairHighUsd: verdict.fairHighUsd,
     markupX: verdict.markupX,
-    fairness: fairnessLabel(verdict.fairness),
-    matchLabel: matchLabel(verdict.matchStrength, verdict.matchCount),
+    fairness: "Estimated cost model",
+    matchLabel: verdict.matchCount === null ? "Image search unavailable" : `${verdict.matchCount} priced image-search candidates`,
     disclaimer:
       scan.dataSource !== "api"
         ? "Sample agent run. The factory range, markup and fair price are not a real price check."

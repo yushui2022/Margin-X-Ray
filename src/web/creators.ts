@@ -6,6 +6,9 @@ import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidence
 import { renderCreatorFeedback } from "./creator-feedback";
 import { createOnionIndicator, renderOnionScale, renderIssueReport } from "./onion-index";
 import { ISSUE_SCORES } from "../shared/creator-issues";
+import { archivedAssessment, listingUrl, markupHref, markupRecord } from "../shared/markup-records";
+import { looksLikeVideoUrl } from "../shared/capture";
+import { rangeLabel } from "./supplier-range";
 
 type PublicCreator = CreatorProfile;
 
@@ -406,21 +409,20 @@ function renderBoard(): void {
     productCurrency = saved.productCurrency ?? "all";
   }
   const hero = node("header", "research-hero");
-  const heading = node("h1", "", productView ? "The price " : "The creator ");
-  heading.append(node("em", "", productView ? "archive." : "index."));
+  const heading = node("h1", "", productView ? "The price " : "Check a ");
+  heading.append(node("em", "", productView ? "archive." : "recommendation."));
   const intro = node("div", "research-intro");
-  intro.append(heading, node("p", "", productView ? "Look up observed prices, compare variants and inspect the original listings." : "Look up a creator to see the products behind their posts and the sources behind each price."));
-  hero.append(intro, priceReceipt());
-  const layout = node("div", "research-layout");
-  const indexNav = node("nav", "index-nav");
-  indexNav.setAttribute("aria-label", "Research collections");
-  for (const [name, size, hash] of [["Creator directory", PUBLIC_CREATORS.length, "#creators"], ["Price archive", PRODUCT_ARCHIVE.length, "#prices"]] as const) {
-    const link = node("a", "", name);
-    link.href = hash;
-    link.append(node("span", "", String(size)));
-    if ((hash === "#prices") === productView) link.setAttribute("aria-current", "page");
-    indexNav.append(link);
+  intro.append(heading, node("p", "", productView ? "Find a recorded price and its original listing." : "Paste a creator profile or product link to check the evidence behind a recommendation."));
+  hero.append(intro);
+  if (productView) hero.append(priceReceipt());
+  else {
+    const record = markupRecord("winco-msp-4p")!;
+    const check = archivedAssessment(record);
+    const card = node("a", "home-comparison"); card.href = "#markup/winco-msp-4p";
+    card.append(node("small", "", "Featured price check"), node("strong", "", record.listing.name), node("b", "", rangeLabel(check)), node("span", "", `Compare ${check.sources.length} supplier offers →`));
+    hero.append(card);
   }
+  const layout = node("div", "research-layout");
   const archive = priceArchive();
   archive.select.addEventListener("change", () => {
     productCurrency = archive.select.value;
@@ -455,14 +457,14 @@ function renderBoard(): void {
   const directoryTools = node("div", "creator-directory-tools");
   const directoryInput = node("input");
   directoryInput.type = "search";
-  directoryInput.placeholder = productView ? "Product, variant or @handle" : "Name, @handle or TikTok URL";
+  directoryInput.placeholder = productView ? "Product, variant or @handle" : "Name, @handle or product link";
   directoryInput.spellcheck = false;
   directoryInput.autocomplete = "off";
-  directoryInput.setAttribute("aria-label", productView ? "Search price records" : "Search collected creators");
+  directoryInput.setAttribute("aria-label", productView ? "Search price records" : "Search creators or check a product link");
   directoryInput.value = productView ? productQuery : directoryQuery;
   const search = node("form", "research-search");
   search.setAttribute("role", "search");
-  const submit = node("button", "btn primary", "Search");
+  const submit = node("button", "btn primary", productView ? "Search" : "Check");
   submit.type = "submit";
   search.append(directoryInput, submit);
   intro.append(search);
@@ -494,8 +496,17 @@ function renderBoard(): void {
     }
     if (mode === "examples") switchMode("public");
     const handle = parseHandle(directoryQuery);
-    const match = handle && list.querySelector<HTMLAnchorElement>(`a[href="${reportHref(handle, productsOnly ? 1 : 0)}"]`);
-    if (match) { match.click(); return; }
+    if (!handle) {
+      const url = listingUrl(directoryQuery.trim());
+      if (url) {
+        location.hash = looksLikeVideoUrl(url) ? `#scan?${new URLSearchParams({ url })}` : markupHref(url);
+        return;
+      }
+    }
+    if (handle && PUBLIC_CREATORS.some(item => item.handle === handle)) {
+      location.hash = reportHref(handle, productsOnly ? 1 : 0);
+      return;
+    }
     if (handle && /^(@|https?:\/\/|(?:www\.)?tiktok\.com\/)/i.test(directoryQuery.trim()) && !PUBLIC_CREATORS.some(item => item.handle === handle)) {
       location.hash = reportHref(handle);
       return;
@@ -524,7 +535,6 @@ function renderBoard(): void {
   const refineOptions = node("div", "creator-refine-options");
   refineOptions.append(researchLabel);
   refine.append(refineSummary, refineOptions);
-  header.append(modeSwitch);
   directoryTools.append(coverageLabel, refine, selectLabel);
   const exampleFilters = node("div");
   const list = node("ol", "creator-ranking");
@@ -655,11 +665,12 @@ function renderBoard(): void {
     key.append(item);
   }
   board.append(key);
-  layout.append(indexNav, productView ? archive.section : board);
+  layout.append(productView ? archive.section : board);
   const collection = node("details", "creator-collection-note");
   collection.append(node("summary", "", "About the research sample"), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
   const footer = node("footer", "index-notes");
   footer.append(collection, evidenceMethodology());
+  if (!productView) footer.append(modeSwitch);
   const home = node("div", "index-home");
   home.append(hero, layout, footer);
   root.replaceChildren(home);
@@ -719,14 +730,12 @@ function renderProfile(item: CreatorExample): void {
 function renderUnavailable(raw: string): void {
   const handle = parseHandle(raw);
   const card = node("section", "creator-unavailable card");
-  card.append(node("p", "eyebrow", "Creator lookup"), node("h1", "", handle ? `@${handle}` : "Invalid creator address"), node("span", "creator-unrated", "Not rated"), node("p", "lede", handle ? "Your username is ready for lookup. Live TikTok retrieval is not connected, so we have not verified this account or retrieved its posts." : "Enter a valid TikTok username to prepare a lookup."));
-  const steps = node("ol", "creator-pending");
-  for (const text of ["Resolve the public TikTok profile", "Collect recent shopping recommendations", "Check products, disclosures and seller policies", "Review evidence coverage before scoring"]) steps.append(node("li", "", `${text} — not started`));
+  card.append(node("p", "eyebrow", "Creator lookup"), node("h1", "", handle ? `@${handle}` : "Invalid creator address"), node("span", "creator-unrated", "Not rated"), node("p", "lede", handle ? "This account has no report yet. Check a product they recommend by pasting its listing link." : "Enter a valid TikTok username to look up a report."));
   if (handle) {
     const lookup = node("a", "btn secondary", "Check a product from this creator →");
     lookup.href = "#markup";
     card.append(lookup);
   }
-  card.append(steps, node("p", "", "No score has been generated and no background request has been queued."), searchForm(), action("Explore a fictional sample report", () => { location.hash = "#creator/demo-01"; }));
+  card.append(searchForm());
   root.replaceChildren(backLink(), card);
 }

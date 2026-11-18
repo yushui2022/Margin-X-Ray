@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Look up a creator or product. Compare dated retail and supplier offers and inspect the sources behind each result." />
+    <meta name="theme-color" content="#faf6ee" />
     <title>Creator research · Onion Head</title>
     <link rel="icon" href="assets/mascot/onion-head.webp" />
     <link rel="stylesheet" href="fonts.css" />
@@ -19,13 +21,15 @@
       </a>
       <nav class="topnav" aria-label="Research tools">
         <a class="topnav-btn active" data-view="creators" href="#creators">Creators</a>
-        <a class="topnav-btn" data-view="scan" href="#scan">Product scan</a>
-        <a class="topnav-btn" data-view="pro" href="#pro">Pro workspace</a>
+        <a class="topnav-btn" data-view="markup" href="#markup">Price check</a>
+        <a class="topnav-btn" data-view="prices" href="#prices">Price archive</a>
       </nav>
-      <div class="topbar-right">
+      <details class="app-tools" id="appTools"><summary>Tools</summary><div class="tools-menu">
+        <a href="#scan">Scan a video or image</a>
+        <a href="#pro">Pricing workspace · sample</a>
         <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
         <button class="btn ghost" id="backendBtn" type="button">Backend</button>
-      </div>
+      </div></details>
     </header>
 
     <main class="page">
@@ -66,7 +70,7 @@
           <button class="btn secondary" id="uploadBtn" type="button">Upload image</button>
           <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
           <a class="btn secondary" href="#markup">Check product markup</a>
-          <a class="chip-link" href="#markup/winco-msp-4p">See a high price gap →</a>
+          <a class="chip-link" href="#markup/winco-msp-4p">Compare three supplier quotes →</a>
         </div>
         <div class="image-ready" id="imageReady" hidden>
           <img id="imageThumb" alt="" />
@@ -152,6 +156,6 @@
 
     <div class="toast" id="toast" hidden></div>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

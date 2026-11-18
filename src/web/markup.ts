@@ -1,4 +1,6 @@
-import { listingUrl, markupHref, markupRecord, quoteDate, supplierForBarcode } from "../shared/markup-records";
+import { archivedAssessment, listingUrl, markupHref, markupRecord, observationsFor, quoteDate, supplierForBarcode } from "../shared/markup-records";
+import { assessPrice } from "../shared/price-comparison";
+import { supplierRange } from "./supplier-range";
 import { compareUnitPrices, HIGH_PRICE_MULTIPLE } from "../shared/product-markup";
 import type { ScanResult, SupplyReport } from "../shared/types";
 import { storefrontOffers } from "../shared/storefront-offer";
@@ -38,6 +40,25 @@ function examples() {
   nav.append(link("New check", "#markup"), link("Winco measuring spoons", "#markup/winco-msp-4p"),
     link("Feastables chocolate", "#markup/feastables-king"), link("Biodance serum mist", "#markup/nikkie-biodance-mist"));
   return nav;
+}
+
+function shareRecord(name: string) {
+  const button = el("button", "Share price check"); button.type = "button";
+  const status = el("span"); status.setAttribute("role", "status");
+  const wrap = el("div"); wrap.className = "record-share";
+  button.addEventListener("click", async () => {
+    const url = location.href;
+    try {
+      if (navigator.share) await navigator.share({ title: `${name} · Onion Head`, url });
+      else { await navigator.clipboard.writeText(url); status.textContent = "Link copied"; }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      const address = el("input"); address.value = url; address.readOnly = true;
+      address.setAttribute("aria-label", "Select and copy report link");
+      status.replaceChildren(address); address.focus(); address.select();
+    }
+  });
+  wrap.append(button, status); return wrap;
 }
 
 function productLookup() {
@@ -98,7 +119,12 @@ export function renderMarkup(route: string, scan?: ScanResult) {
   const live = id === "scan" && scan?.dataSource === "api" ? scan : undefined;
   const enteredUrl = id === "item" && listingUrl(params.get("url") ?? "");
   const main = el("section"); main.className = "markup-page";
-  main.append(listing?.handle ? link("← Product record", `#creator/${encodeURIComponent(`@${listing.handle}`)}/products/${id}`) : link("← Product scan", "#scan"));
+  if (id) {
+    const toolbar = el("div"); toolbar.className = "price-toolbar";
+    toolbar.append(listing?.handle ? link("← Product record", `#creator/${encodeURIComponent(`@${listing.handle}`)}/products/${id}`) : link("← Price check", "#markup"));
+    if (listing) toolbar.append(shareRecord(listing.name));
+    main.append(toolbar);
+  }
   if (id && !record && !live && !enteredUrl) {
     main.append(el("h1", id === "scan" ? "Scan result unavailable" : "Listing unavailable"),
       el("p", id === "scan" ? "Run a live product scan to use its supplier offers, or start a new check below." : "Open a product link or choose a check below."), productLookup(), examples());
@@ -114,7 +140,18 @@ export function renderMarkup(route: string, scan?: ScanResult) {
     intro.append(`Scanned ${live.generatedAt.slice(0, 10)}`);
   } else intro.textContent = listing ? `Product markup check · ${listing.market}` : "Paste a product link or enter two pack prices to compare their cost per item.";
   main.append(intro);
-  if (!id) main.append(productLookup());
+  if (!id) {
+    main.append(productLookup());
+    const samples = el("section"); samples.className = "example-checks";
+    samples.append(el("h2", "Explore a price check"));
+    for (const [key, detail] of [["winco-msp-4p", "Multiple suppliers"], ["feastables-king", "Different pack sizes"], ["nikkie-biodance-mist", "Missing wholesale price"]]) {
+      const example = markupRecord(key)!;
+      const item = link(example.listing.name, `#markup/${key}`);
+      item.append(el("small", detail + " →")); samples.append(item);
+    }
+    main.append(samples);
+  }
+  if (record) main.append(supplierRange(archivedAssessment(record), record.listing.currency, quote?.unit ?? "item", record.listing.observedAt, record.listing.url));
 
   const grid = el("div"); grid.className = "markup-grid";
   const form = el("form"); form.className = "card markup-form";
@@ -140,6 +177,11 @@ export function renderMarkup(route: string, scan?: ScanResult) {
   sourceInput.placeholder = "https://…";
   let retailUrl = listing?.url || enteredUrl || listingUrl(live?.product.sourceUrl ?? "");
   let supplierUrl = quote?.quoteUrl;
+  let barcodeQuote: ReturnType<typeof supplierForBarcode>;
+  let fetchedRetail: number | undefined;
+  let quotedAmount = quote?.quoteAmount;
+  const confirmMarket = el("input"); confirmMarket.type = "checkbox";
+  const linkedRange = el("div");
   if (!quote) {
     const sources = el("details");
     sources.append(el("summary", "Add a supplier source"), label("Supplier listing URL", sourceInput));
@@ -149,7 +191,7 @@ export function renderMarkup(route: string, scan?: ScanResult) {
     const availability = el("p", "Reading public storefront offers…");
     availability.setAttribute("role", "status");
     const source = el("div");
-    main.append(availability, source);
+    main.append(availability, source, linkedRange);
     // A delayed storefront response must not overwrite the reader's edits.
     let edited = false;
     form.addEventListener("input", () => { edited = true; });
@@ -172,6 +214,10 @@ export function renderMarkup(route: string, scan?: ScanResult) {
         match.value = "unknown";
         currency.disabled = false;
         supplierUrl = undefined;
+        quotedAmount = undefined;
+        barcodeQuote = undefined;
+        fetchedRetail = undefined;
+        confirmMarket.checked = false;
         sourceInput.value = "";
         retailUrl = enteredUrl;
         receipt.replaceChildren();
@@ -186,10 +232,14 @@ export function renderMarkup(route: string, scan?: ScanResult) {
           receipt.append(link(`${offer.title} ↗`, variantUrl.href));
           const supplier = supplierForBarcode(offer.barcode ?? "", offer.currency);
           if (supplier) {
+            barcodeQuote = supplier;
+            fetchedRetail = offer.price;
             supplierUrl = supplier.quoteUrl;
+            quotedAmount = supplier.quoteAmount;
             wholesale.value = supplier.quoteAmount == null ? "" : String(supplier.quoteAmount);
             quoteUnits.value = String(supplier.quoteUnits);
             receipt.append(el("p", `Barcode ${offer.barcode} matches a supplier record from ${quoteDate}. Confirm how many ${supplier.unit}s the retail offer contains.`), link(supplier.quoteLabel, supplier.quoteUrl));
+            receipt.append(label(`Both listings use ${supplier.quoteMarket} merchandise prices before tax and delivery`, confirmMarket));
           } else receipt.append(el("p", "Enter the item count and a supplier quote for this variant."));
         }
         update();
@@ -204,6 +254,7 @@ export function renderMarkup(route: string, scan?: ScanResult) {
   }
   if (live?.supply?.offers.length) form.append(quoteTiers(live.supply, (price, url) => {
     supplierUrl = url;
+    quotedAmount = price ? Number(price) : undefined;
     sourceInput.value = "";
     wholesale.value = price;
     quoteUnits.value = "1";
@@ -214,7 +265,12 @@ export function renderMarkup(route: string, scan?: ScanResult) {
   const result = el("section"); result.className = "card markup-result"; result.setAttribute("role", "status");
   const output = el("div"); output.className = "markup-output";
   output.append(result, el("small", `Provisional high-gap threshold ≥ ${HIGH_PRICE_MULTIPLE}×`));
-  grid.append(form, output); main.append(grid);
+  grid.append(form, output);
+  if (!id || (record && quote?.match === "same")) {
+    const calculator = el("details"); calculator.className = "pack-calculator";
+    calculator.append(el("summary", id ? "Compare an individual quote or edit pack sizes" : "Calculate from your own pack prices"), grid);
+    main.append(calculator);
+  } else main.append(grid);
   const note = el("p", "Profit depends on actual purchase cost, shipping, tax, fees and returns.");
   note.className = "fine-print"; main.append(note);
   if (listing) {
@@ -224,12 +280,18 @@ export function renderMarkup(route: string, scan?: ScanResult) {
     else evidence.append(el("p", "A comparable supplier quote is still needed for this record."));
     main.append(evidence);
   }
-  main.append(examples());
+  if (id) main.append(examples());
 
   function update() {
+    linkedRange.replaceChildren();
+    if (barcodeQuote && confirmMarket.checked && fetchedRetail === retail.valueAsNumber && retailUrl && retailUnits.validity.valid && retailUnits.valueAsNumber > 0 && match.value === "same") {
+      const date = new Date().toISOString().slice(0, 10);
+      const analysis = assessPrice({ amount: fetchedRetail, units: retailUnits.valueAsNumber, currency: currency.value, market: barcodeQuote.quoteMarket, observedAt: date, url: retailUrl }, observationsFor(barcodeQuote));
+      linkedRange.append(supplierRange(analysis, currency.value, barcodeQuote.unit, date, retailUrl));
+    }
     const comparison = compareUnitPrices(retail.valueAsNumber, retailUnits.valueAsNumber, wholesale.valueAsNumber, quoteUnits.valueAsNumber);
     const observed = listing && quote?.match === "same" && retail.valueAsNumber === listing.amount && retailUnits.valueAsNumber === quote.retailUnits && wholesale.valueAsNumber === quote.quoteAmount && quoteUnits.valueAsNumber === quote.quoteUnits && match.value === "same";
-    const status = el("p", observed ? "Observed listing prices" : "Your price comparison"); status.className = "eyebrow";
+    const status = el("p", observed ? "One observed quote" : "Your price scenario"); status.className = "eyebrow";
     result.replaceChildren(status);
     result.dataset.high = "false";
     if (!comparison || match.value !== "same") {
@@ -247,12 +309,15 @@ export function renderMarkup(route: string, scan?: ScanResult) {
     const equation = el("p");
     const sale = `Retail ${money.format(comparison.salePerUnit)}`;
     const cost = `supplier ${money.format(comparison.quotePerUnit)}`;
-    const url = sourceInput.value ? listingUrl(sourceInput.value) : supplierUrl;
-    equation.append(retailUrl ? link(sale, retailUrl) : sale, " ÷ ", url ? link(cost, url) : cost, ` per ${unit}.`);
-    result.append(el("h2", comparison.high ? "High price gap" : "Below the high-gap threshold"), el("strong", `${display}×`), equation,
+    // An edited price is a scenario. Link only the inputs that match their source.
+    const url = sourceInput.value ? listingUrl(sourceInput.value) : wholesale.valueAsNumber === quotedAmount ? supplierUrl : undefined;
+    const saleSource = retail.valueAsNumber === (listing?.amount ?? fetchedRetail ?? live?.product.retailUsd) ? retailUrl : undefined;
+    equation.append(saleSource ? link(sale, saleSource) : sale, " ÷ ", url ? link(cost, url) : cost, ` per ${unit}.`);
+    result.append(el("h2", comparison.high ? "At or above 3× for this quote" : "Below 3× for this quote"), el("strong", `${display}×`), equation,
       el("p", `${money.format(comparison.spread)} difference per ${unit}.`));
   }
   form.addEventListener("input", update);
+  confirmMarket.addEventListener("change", update);
   // Keep the result in a stable position while editing on phones.
   grid.classList.toggle("markup-observation", quote?.match === "same" && quote.quoteAmount != null);
   update();
