@@ -3,7 +3,10 @@ import { brandScenario, commissionScenario, scenarioNumber } from "../shared/cre
 import { renderScreening } from "./creator-screening";
 import { screeningFor, brandLeadsFor } from "../shared/creator-screening";
 
-type Product = (typeof RESEARCH.products)[number];
+export type Product = (typeof RESEARCH.products)[number];
+export const PRODUCT_ARCHIVE = RESEARCH.products;
+export const PRODUCT_OBSERVATION = RESEARCH.observedAt;
+export const PRODUCT_SOURCE_COUNT = RESEARCH.sources.length;
 
 function node<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text?: string): HTMLElementTagNameMap[K] {
   const element = document.createElement(tag);
@@ -24,7 +27,7 @@ export function productCount(handle: string): number {
   return RESEARCH.products.filter((product) => product.handle === handle).length;
 }
 
-function sources(ids: string[]): HTMLElement {
+function sources(ids: string[]): HTMLDetailsElement {
   const details = node("details", "creator-product-sources");
   details.append(node("summary", "", `Sources & access notes (${ids.length})`));
   const list = node("ul");
@@ -39,7 +42,7 @@ function sources(ids: string[]): HTMLElement {
   return details;
 }
 
-function money(amount: number, currency: string): string {
+export function money(amount: number, currency: string): string {
   return new Intl.NumberFormat("en-US", { style: "currency", currency, currencyDisplay: "code" }).format(amount);
 }
 
@@ -101,27 +104,53 @@ function calculator(product: Product, commission: boolean): HTMLElement {
   return details;
 }
 
-function productCard(product: Product): HTMLElement {
+function productCard(product: Product, standalone = false): HTMLElement {
   const card = node("article", "card creator-product");
   card.dataset.productId = product.id;
-  card.append(node("p", "eyebrow", product.relationship), node("h3", "", product.name), node("p", "", product.variant));
+  const heading = node("header", "record-heading");
+  heading.append(node("p", "eyebrow", product.relationship), node(standalone ? "h1" : "h3", "", product.name), node("p", "record-variant", product.variant));
+  card.append(heading);
   const facts = node("div", "creator-product-facts");
   const price = node("div");
   price.append(node("span", "", "Observed reference price"), node("strong", "", money(product.price.amount, product.price.currency)), node("small", "", `${product.price.market} · ${RESEARCH.observedAt}`));
   const earnings = node("div");
   earnings.append(node("span", "", product.kind === "third-party" ? "Creator commission / fee" : "Brand gross / contribution margin"), node("strong", "", "Unknown"), node("small", "", product.kind === "third-party" ? "Rate, contract and settlement unavailable" : "Net revenue and costs unavailable"));
   facts.append(price, earnings);
-  card.append(facts, sources(product.sources), node("p", "", product.price.conditions), node("p", "creator-product-status", product.shopStatus));
+  const reading = standalone ? node("section", "record-reading") : card;
+  (standalone ? card : reading).append(facts);
+  const references = sources(product.sources);
+  if (standalone) {
+    card.append(reading);
+    const sourcePanel = node("aside", "record-references");
+    sourcePanel.append(node("h2", "", "Source documents"), references);
+    references.open = true;
+    card.append(sourcePanel);
+    reading.append(node("h2", "", "Purchase conditions"));
+  } else reading.append(references);
+  reading.append(node("p", "", product.price.conditions), node("p", "creator-product-status", product.shopStatus));
   const evidence = node("details", "creator-product-evidence");
   evidence.append(node("summary", "", "Relationship & financial gaps"), node("p", "", `Evidence confidence: ${product.confidence}.`));
   if (product.postUrl) evidence.append(link("Open source TikTok post", product.postUrl), node("p", "", `Promotion date: ${product.promotionDate ?? "not established"}. Original video content was not directly retrieved.`));
   evidence.append(node("p", "", product.kind === "third-party"
     ? "Actual commission rate, sponsorship fee, sales, refunds and creator expenses are unknown. Merchant costs and product margins are also unknown. A paid post does not establish sales-based commission."
     : "Actual net revenue, manufacturing / landed costs, variable costs, sales volumes and creator distributions are unknown. A founder or collaboration relationship does not establish ownership percentage or personal earnings."));
-  card.append(evidence);
-  if (product.kind === "third-party") card.append(calculator(product, true));
-  card.append(calculator(product, false));
+  reading.append(evidence);
+  if (product.kind === "third-party") reading.append(calculator(product, true));
+  reading.append(calculator(product, false));
   return card;
+}
+
+export function renderProductFile(product: Product, creatorName: string, creatorReport: string): HTMLElement {
+  const wrapper = node("section", "creator-products product-file");
+  const nav = node("nav", "record-nav");
+  nav.setAttribute("aria-label", "Price record navigation");
+  const archive = node("a", "", "← Price archive");
+  archive.href = "#prices";
+  const report = node("a", "", `${creatorName} · Creator report →`);
+  report.href = creatorReport;
+  nav.append(archive, report);
+  wrapper.append(nav, productCard(product, true));
+  return wrapper;
 }
 
 export function renderCreatorProducts(handle: string): HTMLElement {

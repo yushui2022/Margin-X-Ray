@@ -155,11 +155,12 @@ function showView(view: "scan" | "pro" | "creators"): void {
     if (active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   }
-  document.title = `${{ creators: "Creator research", scan: "Product scan", pro: "Pricing workspace" }[view]} · Onion Head`;
+  const title = location.hash === "#prices" ? "Price archive" : { creators: "Creator research", scan: "Product scan", pro: "Pricing workspace" }[view];
+  document.title = `${title} · Onion Head`;
   if (pro) {
     renderProWorkspace();
   }
-  const hash = view === "creators" && location.hash.startsWith("#creator/") ? location.hash : `#${view}`;
+  const hash = view === "creators" && (location.hash.startsWith("#creator/") || location.hash === "#prices") ? location.hash : `#${view}`;
   if (location.hash !== hash) location.hash = hash;
   if (view === "creators") renderCreatorRoute();
   else window.scrollTo({ top: 0, behavior: "instant" });

@@ -1,5 +1,6 @@
 import { PUBLIC_CREATORS, directoryPage, type CreatorProfile } from "../shared/creator-directory";
-import { productCount, renderCreatorProducts } from "./creator-products";
+import { PRODUCT_ARCHIVE, PRODUCT_SOURCE_COUNT, productCount, renderCreatorProducts, renderProductFile } from "./creator-products";
+import { priceArchive, priceReceipt } from "./price-archive";
 import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
 import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor, formatEvidenceScore } from "../shared/creator-evidence-score";
 import { renderCreatorFeedback } from "./creator-feedback";
@@ -41,6 +42,8 @@ let directoryQuery = "";
 let directoryPageNumber = 1;
 let productsOnly = false;
 let researchFilter = "all";
+let productQuery = "";
+let productCurrency = "all";
 const PRODUCT_HANDLES = new Set(PUBLIC_CREATORS.filter((item) => productCount(item.handle) > 0).map((item) => item.handle));
 const REPORT_PATHS = ["", "/products", "/sources"] as const;
 
@@ -58,13 +61,23 @@ export function renderCreatorRoute(): void {
   window.scrollTo({ top: 0, behavior: "instant" });
   if (location.hash.startsWith("#creator/")) {
     const [rawHandle, ...path] = location.hash.slice(9).split("/");
-    const section = REPORT_PATHS.findIndex(suffix => suffix === (path.length ? `/${path.join("/")}` : ""));
+    const productId = path[0] === "products" && path.length === 2 ? path[1] : undefined;
+    const section = productId ? 1 : REPORT_PATHS.findIndex(suffix => suffix === (path.length ? `/${path.join("/")}` : ""));
     let id: string;
     try { id = decodeURIComponent(rawHandle!); }
     catch { renderUnavailable(""); return; }
     const profile = PUBLIC_CREATORS.find((item) => item.handle === parseHandle(id));
     const example = EXAMPLES.find((item) => item.id === id);
-    if (profile && section >= 0) renderPublicProfile(profile, section);
+    if (profile && productId) {
+      const product = PRODUCT_ARCHIVE.find(p => p.handle === profile.handle && p.id === productId);
+      if (product) {
+        root.replaceChildren(renderProductFile(product, profile.name, reportHref(profile.handle, 1)));
+        document.title = `${product.name} · Onion Head`;
+        const heading = root.querySelector("h1")!;
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      } else renderUnavailable(id);
+    } else if (profile && section >= 0) renderPublicProfile(profile, section);
     else if (example && section === 0) renderProfile(example);
     else renderUnavailable(id);
     return;
@@ -385,37 +398,34 @@ function methodology(): HTMLElement {
 }
 
 function renderBoard(): void {
+  const productView = location.hash === "#prices";
   const saved = history.state?.creatorDirectory;
   if (saved) {
     ({ category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter } = saved);
+    productQuery = saved.productQuery ?? "";
+    productCurrency = saved.productCurrency ?? "all";
   }
   const hero = node("header", "research-hero");
-  const heading = node("h1", "", "Find a ");
-  heading.append(node("em", "", "creator."));
+  const heading = node("h1", "", productView ? "The price " : "The creator ");
+  heading.append(node("em", "", productView ? "archive." : "index."));
   const intro = node("div", "research-intro");
-  intro.append(heading, node("p", "", `Explore product prices, source posts and Onion Scores across ${PUBLIC_CREATORS.length} creator reports.`));
-  const visual = node("div", "research-visual");
-  const mascot = node("img");
-  mascot.src = "assets/mascot/onion-kid.webp";
-  mascot.alt = "";
-  visual.append(mascot);
-  hero.append(intro, visual);
+  intro.append(heading, node("p", "", productView ? "Look up observed prices, compare variants and inspect the original listings." : "Look up a creator to see the products behind their posts and the sources behind each price."));
+  hero.append(intro, priceReceipt());
   const layout = node("div", "research-layout");
-  const rail = node("aside", "research-rail");
-  const picks = node("section", "research-picks");
-  picks.append(node("h2", "", "Explore product reports"));
-  for (const handle of ["nikkietutorials", "glamzilla", "mikaylanogueira"]) {
-    const profile = PUBLIC_CREATORS.find(item => item.handle === handle);
-    if (!profile || !productCount(handle)) continue;
-    const link = node("a", "research-pick");
-    link.href = reportHref(handle, 1);
-    const copy = node("span");
-    const quantity = productCount(handle);
-    copy.append(node("strong", "", profile.name), node("small", "", `${quantity} priced ${quantity === 1 ? "product" : "products"}`));
-    link.append(portrait(profile), copy, node("span", "research-pick-arrow", "→"));
-    picks.append(link);
+  const indexNav = node("nav", "index-nav");
+  indexNav.setAttribute("aria-label", "Research collections");
+  for (const [name, size, hash] of [["Creator directory", PUBLIC_CREATORS.length, "#creators"], ["Price archive", PRODUCT_ARCHIVE.length, "#prices"]] as const) {
+    const link = node("a", "", name);
+    link.href = hash;
+    link.append(node("span", "", String(size)));
+    if ((hash === "#prices") === productView) link.setAttribute("aria-current", "page");
+    indexNav.append(link);
   }
-  rail.append(picks);
+  const archive = priceArchive();
+  archive.select.addEventListener("change", () => {
+    productCurrency = archive.select.value;
+    archive.update(productQuery, productCurrency);
+  });
 
   const board = node("section", "creator-board");
   const header = node("div", "creator-board-head");
@@ -445,18 +455,30 @@ function renderBoard(): void {
   const directoryTools = node("div", "creator-directory-tools");
   const directoryInput = node("input");
   directoryInput.type = "search";
-  directoryInput.placeholder = "Name, @handle or URL";
+  directoryInput.placeholder = productView ? "Product, variant or @handle" : "Name, @handle or TikTok URL";
   directoryInput.spellcheck = false;
   directoryInput.autocomplete = "off";
-  directoryInput.setAttribute("aria-label", "Search collected creators");
-  directoryInput.value = directoryQuery;
+  directoryInput.setAttribute("aria-label", productView ? "Search price records" : "Search collected creators");
+  directoryInput.value = productView ? productQuery : directoryQuery;
   const search = node("form", "research-search");
   search.setAttribute("role", "search");
   const submit = node("button", "btn primary", "Search");
   submit.type = "submit";
   search.append(directoryInput, submit);
   intro.append(search);
+  const statsLine = node("div", "index-totals");
+  for (const [value, label] of [[PUBLIC_CREATORS.length, "profiles"], [PRODUCT_ARCHIVE.length, "prices"], [PRODUCT_SOURCE_COUNT, "product sources"]] as const) {
+    const stat = node("span");
+    stat.append(node("b", "", String(value)), ` ${label}`);
+    statsLine.append(stat);
+  }
+  intro.append(statsLine);
   directoryInput.addEventListener("input", () => {
+    if (productView) {
+      productQuery = directoryInput.value;
+      archive.update(productQuery, productCurrency);
+      return;
+    }
     directoryQuery = directoryInput.value;
     directoryPageNumber = 1;
     if (mode === "examples") switchMode("public");
@@ -464,6 +486,12 @@ function renderBoard(): void {
   });
   search.addEventListener("submit", event => {
     event.preventDefault();
+    if (productView) {
+      archive.count.tabIndex = -1;
+      archive.count.focus();
+      archive.section.scrollIntoView({ block: "start" });
+      return;
+    }
     if (mode === "examples") switchMode("public");
     const handle = parseHandle(directoryQuery);
     const match = handle && list.querySelector<HTMLAnchorElement>(`a[href="${reportHref(handle, productsOnly ? 1 : 0)}"]`);
@@ -608,8 +636,16 @@ function renderBoard(): void {
     }));
     count.textContent = `${items.length} fictional creators · Ranks reflect the full example list · No live accounts have been rated`;
   }
-  renderRows();
-  board.append(header, directoryTools, exampleFilters, resultInfo, votingGuide, empty, list, pagination);
+  if (productView) archive.update(productQuery, productCurrency);
+  else renderRows();
+  const toolbar = node("div", "index-toolbar");
+  toolbar.append(header, directoryTools);
+  const columns = node("div", "index-columns");
+  columns.setAttribute("aria-hidden", "true");
+  columns.append(...["Creator", "Collected evidence", "Onion Score", "Coverage vote"].map(label => node("span", "", label)));
+  const statusBar = node("div", "index-status");
+  statusBar.append(resultInfo, votingGuide);
+  board.append(toolbar, exampleFilters, statusBar, columns, empty, list, pagination);
   const key = node("div", "creator-grade-key");
   key.hidden = mode === "public";
   key.append(node("span", "", "Example tiers"));
@@ -619,33 +655,27 @@ function renderBoard(): void {
     key.append(item);
   }
   board.append(key);
-  layout.append(board, rail);
-  const collectionPanel = node("section", "research-collection");
-  collectionPanel.append(node("h2", "", "Research collection"));
-  const stats = node("dl");
-  for (const [label, value] of [["Creator profiles", PUBLIC_CREATORS.length], ["Public post samples", SCREENING_TOTALS.sampled], ["Profiles with prices", PRODUCT_HANDLES.size], ["Ranked profiles", ISSUE_SCORES.size]] as const) {
-    const row = node("div");
-    row.append(node("dt", "", label), node("dd", "", String(value)));
-    stats.append(row);
-  }
+  layout.append(indexNav, productView ? archive.section : board);
   const collection = node("details", "creator-collection-note");
   collection.append(node("summary", "", "About the research sample"), node("p", "", `${SCREENING_TOTALS.attempted} accounts attempted · ${SCREENING_TOTALS.posts.toLocaleString("en-US")} public captions · ${SCREENING_TOTALS.unavailable} sample unavailable · ${SCREENING_TOTALS.brandLeads} creators with follow-up leads. Initial sampling is not a complete product investigation.`));
-  collectionPanel.append(stats, collection);
-  rail.append(collectionPanel, evidenceMethodology());
-  root.replaceChildren(hero, layout);
+  const footer = node("footer", "index-notes");
+  footer.append(collection, evidenceMethodology());
+  const home = node("div", "index-home");
+  home.append(hero, layout, footer);
+  root.replaceChildren(home);
   // Save the originating result on its history entry so Back works even after
   // the report is reloaded. New visits to the directory have their own entry.
-  layout.addEventListener("click", event => {
+  home.addEventListener("click", event => {
     const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href^="#creator/"]') : null;
     if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     history.replaceState({ ...history.state, creatorDirectory: {
-      category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter,
+      category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter, productQuery, productCurrency,
       href: link.hash, linkClass: link.className, refineOpen: refine.open,
     } }, "");
   });
   if (saved) {
     refine.open = saved.refineOpen;
-    const origin = Array.from(layout.querySelectorAll<HTMLAnchorElement>("a")).find(link => link.hash === saved.href && link.className === saved.linkClass);
+    const origin = Array.from(home.querySelectorAll<HTMLAnchorElement>("a")).find(link => link.hash === saved.href && link.className === saved.linkClass);
     origin?.focus();
     history.replaceState({ ...history.state, creatorDirectory: null }, "");
   }
