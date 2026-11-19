@@ -22,9 +22,10 @@ function itemName(row: ShopRankingRow, item: Item) {
   return first.length >= 18 ? first : title;
 }
 
-function gap(item: Item) {
+function priceGap(item: Item) {
   const cents = Math.round(item.sourcePrice * 100) - Math.round(item.peerPrice * 100);
-  return cents === 0 ? "Same item price" : money(Math.abs(cents) / 100, item.currency) + (cents > 0 ? " more" : " less");
+  const label = cents === 0 ? "Same item price" : money(Math.abs(cents) / 100, item.currency) + (cents > 0 ? " more" : " less");
+  return { cents, label };
 }
 
 function rankLabel(row: ShopRankingRow) {
@@ -76,7 +77,7 @@ export function scoredArchiveList() {
     const title = el("small", itemName(row, item), "shop-archive-product");
     title.title = product.name;
     const comparison = el("span", "", "shop-archive-gap");
-    comparison.append(el("b", gap(item)), el("small", item.basis === "exact" ? "Verified match" : "Similar-item estimate"));
+    comparison.append(el("b", priceGap(item).label), el("small", item.basis === "exact" ? "Verified match" : "Similar-item estimate"));
     const { value, band } = onionScore(row.verdict.score)!;
     const badge = el("span", "", "shop-archive-score");
     badge.setAttribute("role", "img");
@@ -99,64 +100,78 @@ export function scoredArchiveList() {
 
 function featuredCheck(row: ShopRankingRow, item: Item) {
   const article = el("article", "", "shop-home-feature");
+  const { product, sourceUrl } = row.observations[item.productIndex];
+  const selected = product.variants[item.variantIndex];
+  const evidence = el("div", "", "shop-home-evidence");
+  const heading = el("div", "", "shop-home-checkline");
+  heading.append(el("span", "TikTok Shop price check"));
+  const benchmark = row.baselines.find(entry => entry.productId === product.productId && entry.skuId === selected?.skuId);
+  if (benchmark) {
+    const date = new Intl.DateTimeFormat("en-US", { month:"short", day:"numeric", timeZone:"UTC" }).format(new Date(benchmark.observedAt));
+    const time = el("time", "Checked " + date);
+    time.dateTime = benchmark.observedAt;
+    time.title = "Price observed · " + benchmark.observedAt;
+    heading.append(time);
+  }
+
+  const difference = priceGap(item);
+  const headline = el("h2", "", "shop-home-gap");
+  if (difference.cents === 0) {
+    headline.textContent = "No difference in listed price";
+  } else {
+    headline.append(el("strong", difference.label), " on the creator’s link");
+  }
+  const title = el("h3", itemName(row, item));
+  title.title = product.name;
+  const byline = el("p", "", "shop-home-byline");
+  const post = postsByProduct.get(sourceUrl + "/" + product.productId);
+  if (post?.handle === row.handle && post.avatar) {
+    const avatar = el("img");
+    avatar.src = post.avatar; avatar.alt = ""; avatar.width = avatar.height = 24;
+    byline.append(avatar);
+  }
+  byline.append(el("span", "@" + row.handle));
+  const variant = selected?.variant;
+  if (variant && !/^(?:default|single variant)$/i.test(variant) && !title.textContent?.toLowerCase().includes(variant.toLowerCase()))
+    byline.append(el("span", variant, "shop-home-variant"));
+
+  const exact = item.basis === "exact";
+  const peerLabel = item.peerCount === 1
+    ? (exact ? "Same item elsewhere" : "Similar item elsewhere")
+    : (exact ? "Lowest same-item price" : "Similar items · median");
+  const prices = el("dl", "", "shop-home-prices");
+  for (const [label, price] of [["Creator’s link", item.sourcePrice], [peerLabel, item.peerPrice]] as const) {
+    const quote = el("div");
+    quote.append(el("dt", label), el("dd", money(price, item.currency)));
+    prices.append(quote);
+  }
+  const footer = el("div", "", "shop-home-receipt-footer");
+  const count = item.peerCount + (item.peerCount === 1 ? " other shop" : " other shops");
+  const percent = Math.abs(item.premiumPct).toFixed(1).replace(/\.0$/, "");
+  const comparison = item.premiumPct === 0 ? count : percent + (item.premiumPct > 0 ? "% higher" : "% lower") + " · " + count;
+  footer.append(el("span", comparison), link("See price sources →",
+    shoppingRankingHref(row.handle) + "?" + new URLSearchParams({ product: product.productId }), "shop-home-receipt"));
+  evidence.append(heading, headline, title, byline, prices, footer);
+
   const panel = el("div", "", "shop-home-result");
-  const label = el("p", rankLabel(row), "shop-home-stamp");
-  const handle = el("h2", "@" + row.handle);
+  const label = el("h3", "Creator’s Onion Score", "shop-home-score-title");
   const score = el("div", "", "shop-home-score");
   score.setAttribute("role", "img");
   score.setAttribute("aria-label", "Price score " + row.verdict.score + " out of 100. Prices within 5% of the benchmark score 50. Higher scores mean higher prices.");
   score.append(el("strong", String(row.verdict.score)), el("small", "/100"));
+  const mascot = el("img", "", "shop-home-mascot");
+  mascot.src = "assets/mascot/onion-boy-side-eye.webp";
+  mascot.alt = ""; mascot.width = mascot.height = 140;
   const track = el("div", "", "shop-home-scale");
   track.setAttribute("aria-hidden", "true");
   track.style.setProperty("--score", row.verdict.score + "%");
   const legend = el("div", "", "shop-home-scale-legend");
   legend.setAttribute("aria-hidden", "true");
   legend.append(el("span", "Lower prices"), el("span", "50 · Similar prices"), el("span", "Higher prices"));
-  const mascot = el("img", "", "shop-home-mascot");
-  mascot.src = "assets/mascot/onion-boy-side-eye.webp";
-  mascot.alt = "";
-  mascot.width = 140;
-  mascot.height = 140;
-  panel.append(label, handle, score, mascot, track, legend);
-
-  const evidence = el("div", "", "shop-home-evidence");
-  const product = row.observations[item.productIndex].product;
-  const selected = product.variants[item.variantIndex];
-  const variant = selected?.variant;
-  const title = el("h3", itemName(row, item)); title.title = product.name;
-  const basis = item.basis === "exact" ? "Verified match" : "Similar-item estimate";
-  evidence.append(el("p", basis, "shop-home-label"), title);
-  if (variant && !/^(?:default|single variant)$/i.test(variant) && !title.textContent?.toLowerCase().includes(variant.toLowerCase()))
-    evidence.append(el("p", variant, "shop-home-variant"));
-  const prices = el("dl", "", "shop-home-prices");
-  for (const [label, price] of [["Original shop", item.sourcePrice], ["Shop benchmark", item.peerPrice]] as const) {
-    const quote = el("div");
-    const amount = el("dd");
-    const bar = el("span"); bar.setAttribute("aria-hidden", "true");
-    bar.style.setProperty("--price", price / Math.max(item.sourcePrice, item.peerPrice) * 100 + "%");
-    amount.append(bar, el("b", money(price, item.currency)));
-    quote.append(el("dt", label), amount); prices.append(quote);
-  }
-  const note = el("p", "", "shop-home-gap");
-  note.append(el("strong", gap(item)));
-  if (item.premiumPct !== 0) {
-    const percent = Math.abs(item.premiumPct).toFixed(1).replace(/\.0$/, "");
-    note.append(el("span", percent + (item.premiumPct > 0 ? "% above benchmark" : "% below benchmark")));
-  }
-  const footer = el("div", "", "shop-home-receipt-footer");
-  const coverage = el("span", item.peerCount + (item.peerCount === 1 ? " reference shop" : " reference shops"));
-  if (row.verdict.items.length > 1) coverage.append(" · Example from " + row.verdict.items.length + " scored products");
-  const benchmark = row.baselines.find(entry => entry.productId === product.productId && entry.skuId === selected?.skuId);
-  if (benchmark) {
-    const time = el("time", "Saved " + benchmark.observedAt.slice(11,16) + " UTC");
-    time.dateTime = benchmark.observedAt;
-    time.title = "Benchmark observation · " + benchmark.observedAt;
-    coverage.append(" · ", time);
-  }
-  footer.append(coverage,
-    link("View receipt →", shoppingRankingHref(row.handle) + "?" + new URLSearchParams({ product: product.productId }), "shop-home-receipt"));
-  evidence.append(prices, note, footer);
-  article.append(panel, evidence);
+  const scored = row.verdict.scoredCount;
+  const scope = el("p", rankLabel(row) + " · " + scored + (scored === 1 ? " product scored" : " products scored"), "shop-home-stamp");
+  panel.append(label, score, mascot, track, legend, scope);
+  article.append(evidence, panel);
   return article;
 }
 
@@ -164,7 +179,7 @@ export function homeRanking(lookup: HTMLElement, savedOnly = false) {
   const section = el("section", "", "shop-home-ranking");
   const header = el("header", "", "shop-home-mast");
   const intro = el("div");
-  const scope = el("p", "US TikTok Shop", "shop-home-edition");
+  const scope = el("p", "Rotten Onion Index", "shop-home-edition");
   const count = el("span", ranked.length + " ranked");
   count.append(el("span", ranked.length === 1 ? " creator" : " creators", "shop-home-count-unit"));
   scope.append(count);
@@ -177,8 +192,8 @@ export function homeRanking(lookup: HTMLElement, savedOnly = false) {
     edition.title = "Ranking edition · " + utcDay + " UTC";
     scope.append(edition);
   }
-  intro.append(scope, el("h1", "Rotten Onion Index"),
-    el("p", "Look up a creator to see what other TikTok shops charge for the same or similar items.", "shop-home-purpose"));
+  intro.append(scope, el("h1", "Is it cheaper at another TikTok shop?"),
+    el("p", "Look up a creator to compare their picks across US TikTok shops.", "shop-home-purpose"));
   const actions = el("div", "", "shop-home-links");
   const board = link("Full ranking →", shoppingRankingHref(), "shop-home-board");
   const check = el("button", savedOnly ? "Search" : "Check a link", "shop-home-jump");
