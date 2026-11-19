@@ -9,12 +9,6 @@ const ranked = shopRankingRows.filter(row => row.rank !== null && row.verdict.it
 const postsByProduct = new Map(archivePosts.map(post => [post.sourceUrl + "/" + post.productId, post]));
 type Item = ShopRankingRow["verdict"]["items"][number];
 
-function representative(row: ShopRankingRow) {
-  const score = row.verdict.score!;
-  return row.verdict.items.reduce((best, candidate) =>
-    Math.abs(candidate.score - score) < Math.abs(best.score - score) ? candidate : best);
-}
-
 function itemName(row: ShopRankingRow, item: Item) {
   const product = row.observations[item.productIndex].product;
   const title = sourceName(product);
@@ -30,7 +24,7 @@ function priceGap(item: Item) {
 
 function rankLabel(row: ShopRankingRow) {
   const tied = ranked.filter(other => other.rank === row.rank).length;
-  return tied > 1 ? "Tied #" + row.rank + " · " + tied + " creators" : "Rank #" + row.rank;
+  return tied > 1 ? "Tied #" + row.rank + " overall · " + tied + " creators" : "Ranked #" + row.rank + " overall";
 }
 
 function archivePicks() {
@@ -57,25 +51,21 @@ export function scoredArchiveList() {
   const entries = el("ol", "", "shop-archive-entries");
   list.append(head, entries);
   for (const [index, { row, item, post }] of picks.entries()) {
-    const product = row.observations[item.productIndex].product;
-    const entry = el("li", "", "shop-archive-row");
+    const entry = el("li");
+    const disclosure = el("details", "", "shop-archive-disclosure");
+    const summary = el("summary", "", "shop-archive-row");
     const rank = el("span", "#" + (index + 1), "shop-archive-rank");
     const portrait = el("img", "", "shop-archive-portrait");
     portrait.src = post.avatar; portrait.alt = ""; portrait.width = portrait.height = 48;
     const identity = el("span", "", "shop-archive-identity");
     const handle = "@" + row.handle;
     const sameName = post.displayName.toLowerCase() === row.handle.toLowerCase();
-    const receipt = link(sameName ? handle : post.displayName, shoppingRankingHref(row.handle) + "?" + new URLSearchParams({ product: product.productId }), "shop-archive-receipt");
-    receipt.setAttribute("aria-label", (sameName ? handle : post.displayName + " · " + handle) + " · Price receipt for " + itemName(row, item));
-    identity.append(receipt);
+    identity.append(el("strong", sameName ? handle : post.displayName));
     if (!sameName) identity.append(el("small", handle));
     const excerpt = post.caption.replace(/(?:\s+#[^\s#]+)+\s*$/u, "").trim() || post.caption;
-    const video = link("", post.sourceUrl, "shop-archive-post");
-    video.title = post.caption;
-    video.setAttribute("aria-label", "Watch " + handle + " on TikTok · " + excerpt);
-    video.append(el("span", excerpt || "Watch on TikTok"));
+    const caption = el("span", excerpt, "shop-archive-post");
     const title = el("small", itemName(row, item), "shop-archive-product");
-    title.title = product.name;
+    title.title = row.observations[item.productIndex].product.name;
     const comparison = el("span", "", "shop-archive-gap");
     comparison.append(el("b", priceGap(item).label), el("small", item.basis === "exact" ? "Verified match" : "Similar-item estimate"));
     const { value, band } = onionScore(row.verdict.score)!;
@@ -92,15 +82,21 @@ export function scoredArchiveList() {
     const amount = el("span", "", "shop-archive-points");
     amount.append(el("b", String(value)), el("small", "/100"));
     badge.append(skin, amount);
-    entry.append(rank, portrait, identity, video, title, comparison, badge);
+    summary.setAttribute("aria-label", "Price check for " + handle + " · " + title.textContent + " · Onion score " + value + " out of 100");
+    summary.append(rank, portrait, identity, caption, title, comparison, badge);
+    disclosure.append(summary);
+    disclosure.addEventListener("toggle", () => {
+      if (disclosure.open && !summary.nextElementSibling) disclosure.append(archivePriceCheck(row, item, post));
+    });
+    entry.append(disclosure);
     entries.append(entry);
   }
   return list;
 }
 
-function featuredCheck(row: ShopRankingRow, item: Item) {
+function archivePriceCheck(row: ShopRankingRow, item: Item, post: typeof archivePosts[number]) {
   const article = el("article", "", "shop-home-feature");
-  const { product, sourceUrl } = row.observations[item.productIndex];
+  const { product } = row.observations[item.productIndex];
   const selected = product.variants[item.variantIndex];
   const evidence = el("div", "", "shop-home-evidence");
   const heading = el("div", "", "shop-home-checkline");
@@ -124,8 +120,7 @@ function featuredCheck(row: ShopRankingRow, item: Item) {
   const title = el("h3", itemName(row, item));
   title.title = product.name;
   const byline = el("p", "", "shop-home-byline");
-  const post = postsByProduct.get(sourceUrl + "/" + product.productId);
-  if (post?.handle === row.handle && post.avatar) {
+  if (post.avatar) {
     const avatar = el("img");
     avatar.src = post.avatar; avatar.alt = ""; avatar.width = avatar.height = 24;
     byline.append(avatar);
@@ -134,6 +129,9 @@ function featuredCheck(row: ShopRankingRow, item: Item) {
   const variant = selected?.variant;
   if (variant && !/^(?:default|single variant)$/i.test(variant) && !title.textContent?.toLowerCase().includes(variant.toLowerCase()))
     byline.append(el("span", variant, "shop-home-variant"));
+  const original = link("Watch TikTok post ↗", post.sourceUrl, "shop-home-source-post");
+  original.setAttribute("aria-label", "Watch " + row.handle + "’s original TikTok post");
+  byline.append(original);
 
   const exact = item.basis === "exact";
   const peerLabel = item.peerCount === 1
@@ -214,7 +212,5 @@ export function homeRanking(lookup: HTMLElement, savedOnly = false) {
   check.addEventListener("click", () => lookup.querySelector<HTMLInputElement>("input[type=search]")?.focus());
   actions.append(board, check); header.append(intro, actions);
   section.append(header, lookup);
-  if (ranked.length) section.append(featuredCheck(ranked[0], representative(ranked[0])));
-  else section.append(el("p", "The first eligible price comparison will open the ranking."));
   return section;
 }
