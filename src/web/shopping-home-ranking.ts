@@ -155,22 +155,35 @@ function featuredCheck(row: ShopRankingRow, item: Item) {
 
   const panel = el("div", "", "shop-home-result");
   const label = el("h3", "Creator’s Onion Score", "shop-home-score-title");
+  const points = String(row.verdict.score);
   const score = el("div", "", "shop-home-score");
-  score.setAttribute("role", "img");
-  score.setAttribute("aria-label", "Price score " + row.verdict.score + " out of 100. Prices within 5% of the benchmark score 50. Higher scores mean higher prices.");
-  score.append(el("strong", String(row.verdict.score)), el("small", "/100"));
+  score.setAttribute("aria-hidden", "true");
+  score.append(el("strong", points), el("small", "/100"));
   const mascot = el("img", "", "shop-home-mascot");
   mascot.src = "assets/mascot/onion-boy-side-eye.webp";
   mascot.alt = ""; mascot.width = mascot.height = 140;
-  const track = el("div", "", "shop-home-scale");
-  track.setAttribute("aria-hidden", "true");
-  track.style.setProperty("--score", row.verdict.score + "%");
+  const scale = el("div", "", "shop-home-scale");
+  scale.setAttribute("role", "meter");
+  scale.setAttribute("aria-label", "Creator’s price score");
+  scale.setAttribute("aria-valuemin", "0");
+  scale.setAttribute("aria-valuemax", "100");
+  scale.setAttribute("aria-valuenow", points);
+  scale.setAttribute("aria-valuetext", points + " out of 100. For a product, prices within 5% of the other shops’ benchmark score 50. Higher scores mean higher relative prices.");
+  scale.style.setProperty("--score", points + "%");
+  const rail = el("div", "", "shop-home-scale-rail");
+  rail.setAttribute("aria-hidden", "true");
+  rail.append(el("span", "", "shop-home-scale-range"), el("span", points, "shop-home-scale-pin"));
   const legend = el("div", "", "shop-home-scale-legend");
   legend.setAttribute("aria-hidden", "true");
-  legend.append(el("span", "Lower prices"), el("span", "50 · Similar prices"), el("span", "Higher prices"));
+  for (const [value, meaning] of [["0", "Cheaper"], ["50", "Similar prices"], ["100", "Pricier"]]) {
+    const anchor = el("span");
+    anchor.append(el("b", value), meaning);
+    legend.append(anchor);
+  }
+  scale.append(rail, legend);
   const scored = row.verdict.scoredCount;
   const scope = el("p", rankLabel(row) + " · " + scored + (scored === 1 ? " product scored" : " products scored"), "shop-home-stamp");
-  panel.append(label, score, mascot, track, legend, scope);
+  panel.append(label, score, mascot, scale, scope);
   article.append(evidence, panel);
   return article;
 }
