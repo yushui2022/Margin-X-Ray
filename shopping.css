@@ -683,11 +683,8 @@ body[data-view="shop"] .page { padding-top:clamp(22px,3vw,44px); }
 
 /* The landing edition shares its ranks and receipts with the full index. */
 .shop-home-mast { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:end; gap:6px 20px; margin-bottom:20px; }
-.shop-home-mast h1 { max-width:19ch; margin:6px 0 0; font-size:clamp(40px,5vw,68px); line-height:1.02; letter-spacing:-.05em; text-wrap:balance; }
+.shop-home-mast h1 { max-width:19ch; margin:0; font-size:clamp(40px,5vw,68px); line-height:1.02; letter-spacing:-.05em; text-wrap:balance; }
 .shop-home-mast .shop-home-purpose { max-width:53ch; margin:8px 0 0; color:#614b58; font:500 18px/1.4 var(--mx-font-sans); text-wrap:pretty; }
-.shop-home-edition { margin:0; font:600 14px/1.35 var(--mx-font-sans); }
-.shop-home-edition { display:flex; align-items:center; flex-wrap:wrap; gap:4px 11px; color:#6c435e; }
-.shop-home-edition > :is(span,time) { padding-left:11px; border-left:1px solid #b5a1ab; font:500 13px/1.2 var(--mx-font-sans); text-transform:none; letter-spacing:0; }
 .shop-home-links { display:flex; gap:6px; align-items:center; }
 .shop-home-links a,.shop-home-links button,.shop-home-receipt { display:inline-flex; align-items:center; justify-content:center; min-height:44px; font:650 14px/1.2 var(--mx-font-sans); text-decoration:none; }
 .shop-home .shop-home-links .shop-home-board { padding:0 16px; border-radius:7px; background:#452a3e; color:#fff9ed; }
@@ -852,13 +849,9 @@ body[data-view="shop"] .page { padding-top:clamp(22px,3vw,44px); }
 }
 @media (max-width:510px) {
   .shop-home-mast { display:block; }
-  .shop-home-mast h1 { font-size:clamp(35px,9.5vw,48px); margin:6px 0 4px; }
-  .shop-home-edition { font-size:11px; }
+  .shop-home-mast h1 { font-size:clamp(35px,9.5vw,48px); margin-bottom:4px; }
 }
 @media (max-width:360px) {
-  .shop-home-edition { gap:4px 7px; }
-  .shop-home-count-unit { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
-  .shop-home-edition > :is(span,time) { padding-left:7px; font-size:12px; }
   .shop-home-evidence,.shop-home-result { padding-inline:14px; }
   .shop-home-prices > div { padding-inline:10px; }
   .shop-home-checkline time,.shop-home-receipt-footer > span { font-size:12px; }
