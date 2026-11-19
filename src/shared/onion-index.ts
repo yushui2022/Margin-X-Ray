@@ -7,11 +7,11 @@ export const ONION_BANDS = [
 ] as const;
 export const UNRATED_ONION = { id: "unrated", label: "Pending review", image: "assets/mascot/index-unrated.svg" } as const;
 
-// The input is an eligible product-problem score, never evidence coverage,
-// confidence or votes. Missing reviews stay neutral, not fresh or rotten.
-export function onionScore(problemScore: number | null | undefined) {
-  if (problemScore == null || !Number.isFinite(problemScore) || problemScore < 0 || problemScore > 100) return null;
-  const value = Math.round(problemScore * 10) / 10;
+// Map a published higher-is-worse score to its artwork. The caller owns the
+// rubric and eligibility. Missing scores have no rot band.
+export function onionScore(score: number | null | undefined) {
+  if (score == null || !Number.isFinite(score) || score < 0 || score > 100) return null;
+  const value = Math.round(score * 10) / 10;
   const band = [...ONION_BANDS].reverse().find(band => value >= band.minimum)!;
   return { value, band };
 }

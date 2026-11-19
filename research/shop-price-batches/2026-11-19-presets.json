@@ -1,0 +1,155 @@
+{
+  "observedOn": "2026-11-19",
+  "rubric": "shop-onion-v2",
+  "market": "US",
+  "scope": "tiktok-shop",
+  "roster": "assets/creators/sources.json",
+  "selection": "A targeted sample of preset accounts with public shopping or brand leads. Each video was submitted to the local product endpoint POST /api/shopping-check. Only videos with a native TikTok Shop product link from the attributed creator were added to the ranking archive.",
+  "timing": "Elapsed time for the retained successful product request per video, including price lookup. Excludes source discovery, queueing outside the request and superseded attempts.",
+  "results": {
+    "checkedCreators": 11,
+    "checkedVideos": 20,
+    "linkedCreators": 7,
+    "linkedVideos": 15,
+    "linkedListings": 18,
+    "listingsWithAnOriginalPrice": 17,
+    "listingsWithCrossShopCandidates": 6,
+    "listingsWithEligibleComparisons": 0,
+    "linkedVideoMedianSeconds": 16.91
+  },
+  "videos": [
+    {
+      "sourceUrl": "https://www.tiktok.com/@baderalsafar/video/7705976793064312094",
+      "elapsedSeconds": 30.78,
+      "linkedProductIds": [
+        "1732195217319498354"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@dermdoctor/video/7442832736475204906",
+      "elapsedSeconds": 16.91,
+      "linkedProductIds": [
+        "1729677534709978070",
+        "1729451793837429718"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@drpimplepopper/video/7361492293859249439",
+      "elapsedSeconds": 27.37,
+      "linkedProductIds": [
+        "1729461567052681593"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@glamzilla/video/7453459977592786181",
+      "elapsedSeconds": 2.48,
+      "linkedProductIds": []
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@iamcardib/video/7707718021527260430",
+      "elapsedSeconds": 12.42,
+      "linkedProductIds": [
+        "1732734255989560039"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@kallmekris/video/7692199101592620319",
+      "elapsedSeconds": 31.29,
+      "linkedProductIds": [
+        "1732655700512117200"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@ladygaga/video/7693264531493080334",
+      "elapsedSeconds": 3.26,
+      "linkedProductIds": []
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7192357598744759598",
+      "elapsedSeconds": 2.57,
+      "linkedProductIds": []
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7348105543782763818",
+      "elapsedSeconds": 12.89,
+      "linkedProductIds": [
+        "1729385213365162161"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7506615988587072811",
+      "elapsedSeconds": 24.57,
+      "linkedProductIds": [
+        "1729386832161248974"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7575746266425019662",
+      "elapsedSeconds": 12.64,
+      "linkedProductIds": [
+        "1731893022493348075"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7579050132944014605",
+      "elapsedSeconds": 15.33,
+      "linkedProductIds": [
+        "1729568240189804836"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7579759140529032461",
+      "elapsedSeconds": 14.98,
+      "linkedProductIds": [
+        "1731608766941270043"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7632493965719112973",
+      "elapsedSeconds": 10.86,
+      "linkedProductIds": [
+        "1731997246433955867"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7693340049223568654",
+      "elapsedSeconds": 13.9,
+      "linkedProductIds": [
+        "1730568395494036270"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7703682427289357581",
+      "elapsedSeconds": 26.6,
+      "linkedProductIds": [
+        "1732702313434288906",
+        "1732744852267176714",
+        "1732754271851090698"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@mikaylanogueira/video/7708816774652808462",
+      "elapsedSeconds": 28.8,
+      "linkedProductIds": [
+        "1732832274565927684"
+      ]
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@nikkietutorials/video/7708812710728748319",
+      "elapsedSeconds": 4.15,
+      "linkedProductIds": []
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@theestallion/video/7703407297808059661",
+      "elapsedSeconds": 4.39,
+      "linkedProductIds": []
+    },
+    {
+      "sourceUrl": "https://www.tiktok.com/@tooturnttony/video/7624331324442135839",
+      "elapsedSeconds": 22.6,
+      "linkedProductIds": [
+        "1732284173341200815"
+      ]
+    }
+  ]
+}

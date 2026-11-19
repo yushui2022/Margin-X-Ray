@@ -3,28 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="Look up a creator or product. Compare dated retail and supplier offers and inspect the sources behind each result." />
+    <meta name="description" content="Check products from a TikTok video or creator. Compare the same item at consumer retailers, including delivery when verified." />
     <meta name="theme-color" content="#faf6ee" />
-    <title>Creator research · Onion Head</title>
+    <title>Shopping check · Onion Head</title>
     <link rel="icon" href="assets/mascot/onion-head.webp" />
     <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="shopping.css" />
+    <link rel="stylesheet" href="creator-shopping.css" />
   </head>
   <body class="mx-theme">
     <header class="topbar">
-      <a class="brand" href="#creators" aria-label="Onion Head home">
+      <a class="brand" href="#shop" aria-label="Onion Head home">
         <img class="brand-mark" src="assets/mascot/onion-head.webp" alt="" />
         <span class="brand-text">
           <strong>Onion Head</strong>
         </span>
       </a>
       <nav class="topnav" aria-label="Research tools">
-        <a class="topnav-btn active" data-view="creators" href="#creators">Creators</a>
-        <a class="topnav-btn" data-view="markup" href="#markup">Price check</a>
+        <a class="topnav-btn active" data-view="shop" href="#shop">Shopping check</a>
+        <a class="topnav-btn" data-view="creators" href="#creators">Creators</a>
         <a class="topnav-btn" data-view="prices" href="#prices">Price archive</a>
       </nav>
       <details class="app-tools" id="appTools"><summary>Tools</summary><div class="tools-menu">
+        <a href="#markup">Compare supplier prices</a>
         <a href="#scan">Scan a video or image</a>
         <a href="#pro">Pricing workspace · sample</a>
         <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
@@ -33,7 +36,8 @@
     </header>
 
     <main class="page">
-      <section id="creatorsView" aria-label="Creator scores"></section>
+      <section id="shopView" aria-label="Shopping check"></section>
+      <section id="creatorsView" aria-label="Creator directory" hidden></section>
       <div id="markupView" hidden></div>
       <section class="hero" id="hero" hidden>
         <div class="hero-grid">

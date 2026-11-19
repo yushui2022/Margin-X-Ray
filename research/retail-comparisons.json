@@ -1,0 +1,278 @@
+{
+  "version": "retail-premium-v1",
+  "minimumFamilies": 3,
+  "freshDays": 30,
+  "pairWindowDays": 7,
+  "samples": [
+    {
+      "handle": "kyliejenner",
+      "selectedAt": "2026-11-18",
+      "families": ["kylie-matte", "kylie-velvet", "kylie-kylash"],
+      "selection": "The sample covers the two Bare lip kit formulas already in the archive and the original full-size black Kylash mascara, selected before checking its price. Each comparison covers one item shipped to an Oregon street address by Kylie Cosmetics or Ulta. Missing observations stay in the coverage count."
+    }
+  ],
+  "familyAliases": {
+    "feastables-standard": "feastables-milk-chocolate",
+    "feastables-king": "feastables-milk-chocolate",
+    "rare-blush": "rare-soft-pinch-liquid-blush",
+    "rare-mini": "rare-soft-pinch-liquid-blush"
+  },
+  "records": [
+    {
+      "productId": "arun-sony",
+      "familyId": "arun-sony",
+      "handle": "mrwhosetheboss",
+      "name": "Sony WF-1000XM6",
+      "variant": "Platinum Silver · WF1000XM6S.CE7 · one new pair with charging case",
+      "market": "Mainland UK",
+      "currency": "GBP",
+      "relation": "retail-reference",
+      "matchNote": "The original ad identifies the WF-1000XM6. Its caption leaves the colour, seller and price unspecified. These two shops list the same Platinum Silver UK model. The comparison uses the manufacturer's store as the reference.",
+      "sourceUrl": "https://www.tiktok.com/@mrwhosetheboss/video/7606015834678381831",
+      "reference": {
+        "seller": "Sony UK",
+        "url": "https://www.sony.co.uk/store/product/wf1000xm6s.ce7/1000X-series-WF-1000XM6-Wireless-Noise-Cancelling-Headphones",
+        "kind": "consumer",
+        "sku": "WF1000XM6S.CE7",
+        "quantity": 1,
+        "market": "Mainland UK",
+        "currency": "GBP",
+        "amount": 199,
+        "shipping": 0,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "The silver UK model was orderable at £199 including VAT. One pair qualifies for free standard delivery. Optional timed delivery and membership offers are excluded.",
+        "sources": [
+          {"label": "Sony UK delivery charges", "url": "https://www.sony.co.uk/store/DeliveryMethods/"},
+          {"label": "Sony UK VAT and pricing terms", "url": "https://www.sony.co.uk/store/TermsAndConditions"}
+        ]
+      },
+      "alternative": {
+        "seller": "John Lewis",
+        "url": "https://www.johnlewis.com/sony-wf-1000xm6-noise-cancelling-true-wireless-bluetooth-sweat-weather-resistant-in-ear-headphones-with-mic-remote/silver/p114867788",
+        "kind": "consumer",
+        "sku": "WF1000XM6S.CE7",
+        "quantity": 1,
+        "market": "Mainland UK",
+        "currency": "GBP",
+        "amount": 197.99,
+        "shipping": 0,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "The silver variant was orderable at £197.99 with free standard delivery. The listing identifies the manufacturer's model and a two-year retailer guarantee. UK consumer prices include VAT.",
+        "sources": [
+          {"label": "UK consumer price and VAT basis", "url": "https://www.gov.uk/tax-on-shopping/where-you-see-vat"}
+        ]
+      }
+    },
+    {
+      "productId": "kylie-matte",
+      "familyId": "kylie-matte",
+      "handle": "kyliejenner",
+      "name": "Kylie Cosmetics Matte Lip Kit",
+      "variant": "700 Bare · GTIN 4064941008675 · one new full-size matte lipstick and matching liner kit",
+      "market": "Oregon, US",
+      "currency": "USD",
+      "relation": "founder-store",
+      "matchNote": "Coty documents Kylie Jenner as the brand's founder. Both shops identify the same Bare kit by barcode. The two item prices are equal. Standard shipping accounts for the full difference for one kit to an Oregon street address. This comparison covers the brand store and Ulta. A TikTok offer has not been established.",
+      "sourceUrl": "https://www.coty.com/news/coty-and-kylie-jenner-announce-strategic-partnership-to-expand-beauty-brands",
+      "reference": {
+        "seller": "Kylie Cosmetics",
+        "url": "https://kyliecosmetics.com/products/matte-lip-kit?variant=48399747481842",
+        "kind": "consumer",
+        "sku": "4064941008675",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 35,
+        "shipping": 8.95,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "The November 17 archive URL selected Brown Sugar. On November 18 the US variant feed identified the matching Bare shade as variant 48399747481842. The feed lists Bare, KC854, as available at $35. One standard, unpersonalized kit falls below the brand's $40 free-shipping threshold. Oregon has no general sales tax.",
+        "sources": [
+          {"label": "Kylie Cosmetics shade, barcode and availability", "url": "https://kyliecosmetics.com/variants/48399747481842.js"},
+          {"label": "November 17 URL variant check · Brown Sugar", "url": "https://kyliecosmetics.com/variants/43927621632242.js"},
+          {"label": "Kylie Cosmetics standard shipping", "url": "https://kyliecosmetics.com/pages/shipping"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      },
+      "alternative": {
+        "seller": "Ulta Beauty",
+        "url": "https://www.ulta.com/p/matte-lip-kit-pimprod2026503?sku=2584000",
+        "kind": "consumer",
+        "sku": "4064941008675",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 35,
+        "shipping": 0,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "Ulta item 2584000 is 700 Bare, in stock at $35 for a one-time order. The product's own page advertises free shipping at $35. Standard shipping to an Oregon street address qualifies. Subscription and member discounts are excluded.",
+        "sources": [
+          {"label": "Ulta standard shipping locations and exclusions", "url": "https://www.ulta.com/guestservices/all"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      }
+    },
+    {
+      "productId": "kylie-velvet",
+      "familyId": "kylie-velvet",
+      "handle": "kyliejenner",
+      "name": "Kylie Cosmetics Velvet Lip Kit",
+      "variant": "700 Bare · GTIN 4064941006992 · one new full-size velvet lipstick and matching liner kit",
+      "market": "Oregon, US",
+      "currency": "USD",
+      "relation": "founder-store",
+      "matchNote": "Coty documents Kylie Jenner as the brand's founder. Both shops identify the same Bare kit by barcode. The two item prices are equal. Standard shipping accounts for the full difference for one kit to an Oregon street address. This comparison covers the brand store and Ulta. A TikTok offer has not been established.",
+      "sourceUrl": "https://www.coty.com/news/coty-and-kylie-jenner-announce-strategic-partnership-to-expand-beauty-brands",
+      "reference": {
+        "seller": "Kylie Cosmetics",
+        "url": "https://kyliecosmetics.com/products/velvet-lip-kit?variant=43927612391666",
+        "kind": "consumer",
+        "sku": "4064941006992",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 35,
+        "shipping": 8.95,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "The November 17 archive URL selected Say No More. On November 18 the US variant feed identified the matching Bare shade as variant 43927612391666. The feed lists Bare, KC140, as available at $35. One standard, unpersonalized kit falls below the brand's $40 free-shipping threshold. Oregon has no general sales tax.",
+        "sources": [
+          {"label": "Kylie Cosmetics shade, barcode and availability", "url": "https://kyliecosmetics.com/variants/43927612391666.js"},
+          {"label": "November 17 URL variant check · Say No More", "url": "https://kyliecosmetics.com/variants/44109989216498.js"},
+          {"label": "Kylie Cosmetics standard shipping", "url": "https://kyliecosmetics.com/pages/shipping"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      },
+      "alternative": {
+        "seller": "Ulta Beauty",
+        "url": "https://www.ulta.com/p/velvet-lip-kit-pimprod2036757?sku=2585658",
+        "kind": "consumer",
+        "sku": "4064941006992",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 35,
+        "shipping": 0,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "Ulta item 2585658 is 700 Bare, in stock at $35 for a one-time order. The product's own page advertises free shipping at $35. Standard shipping to an Oregon street address qualifies. Subscription and member discounts are excluded.",
+        "sources": [
+          {"label": "Ulta standard shipping locations and exclusions", "url": "https://www.ulta.com/guestservices/all"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      }
+    },
+    {
+      "productId": "kylie-kylash",
+      "familyId": "kylie-kylash",
+      "handle": "kyliejenner",
+      "name": "Kylie Cosmetics Kylash Volume Mascara",
+      "variant": "Black · full-size 0.4 oz · GTIN 4064941112686 · one new mascara",
+      "market": "Oregon, US",
+      "currency": "USD",
+      "relation": "founder-store",
+      "matchNote": "Both stores identify the original full-size black mascara by the same barcode. Coty documents the founder relationship. The $2 difference on a single tube comes entirely from standard shipping to an Oregon street address.",
+      "sourceUrl": "https://www.coty.com/news/coty-and-kylie-jenner-announce-strategic-partnership-to-expand-beauty-brands",
+      "reference": {
+        "seller": "Kylie Cosmetics",
+        "url": "https://kyliecosmetics.com/products/kylash-volume-mascara?variant=44379326906610",
+        "kind": "consumer",
+        "sku": "4064941112686",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 25,
+        "shipping": 8.95,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "Black KC611 was in stock at $25. One tube falls below the free-shipping threshold. Standard domestic shipping is $8.95. Oregon has no general sales tax.",
+        "sources": [
+          {"label": "Kylie Cosmetics shade, barcode and availability", "url": "https://kyliecosmetics.com/variants/44379326906610.js"},
+          {"label": "Kylie Cosmetics standard shipping", "url": "https://kyliecosmetics.com/pages/shipping"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      },
+      "alternative": {
+        "seller": "Ulta Beauty",
+        "url": "https://www.ulta.com/p/kylash-volume-mascara-pimprod2038642?sku=2608568",
+        "kind": "consumer",
+        "sku": "4064941112686",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 25,
+        "shipping": 6.95,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "The selected black 0.4 oz tube, item 2608568, was in stock. One tube falls below Ulta's $35 free-shipping threshold. Standard shipping is $6.95 for a guest order. Auto-delivery, coupons and member offers are excluded.",
+        "sources": [
+          {"label": "Ulta guest shipping charges and conditions", "url": "https://www.ulta.com/guestservices/all"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      }
+    },
+    {
+      "productId": "haus-bronzer",
+      "familyId": "haus-bronzer",
+      "handle": "ladygaga",
+      "name": "Haus Labs Sun Dipped Bronzing Veil",
+      "variant": "Suede · toasted warm bronze · one new full-size 7 mL bottle",
+      "market": "Oregon, US",
+      "currency": "USD",
+      "relation": "founder-store",
+      "matchNote": "Lady Gaga's original announcement names the bronzer line and both shops. The matched retail shade is Suede in the 7 mL size. Both shops list it at $32. Haus Labs publishes two different standard shipping rates, so the delivered-price difference is pending.",
+      "sourceUrl": "https://www.tiktok.com/@ladygaga/video/7693264531493080334",
+      "reference": {
+        "seller": "Haus Labs",
+        "url": "https://www.hauslabs.com/products/sun-dipped-bronzing-veil?variant=44227405021272",
+        "kind": "consumer",
+        "sku": "HAUS-LABS-SUN-DIPPED-SUEDE-7ML",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 32,
+        "shipping": null,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "The official Suede variant is in stock, SKU 46AL-03-9273, barcode 840073509273. Its public shipping guide gives $5.95 and its shipping policy gives $6.95. A confirmed guest rate for one bottle is pending.",
+        "sources": [
+          {"label": "Haus Labs Suede variant", "url": "https://www.hauslabs.com/variants/44227405021272.js"},
+          {"label": "Haus Labs customer shipping guide", "url": "https://www.hauslabs.com/pages/shipping"},
+          {"label": "Haus Labs shipping policy", "url": "https://www.hauslabs.com/policies/shipping-policy"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      },
+      "alternative": {
+        "seller": "Sephora",
+        "url": "https://www.sephora.com/product/sun-dipped-hydrating-bronzing-veil-for-12-hour-wear-P524916?skuId=2983732",
+        "kind": "consumer",
+        "sku": "HAUS-LABS-SUN-DIPPED-SUEDE-7ML",
+        "quantity": 1,
+        "market": "Oregon, US",
+        "currency": "USD",
+        "amount": 32,
+        "shipping": 6.95,
+        "taxIncluded": true,
+        "available": true,
+        "observedAt": "2026-11-18",
+        "note": "Item 2983732 is Suede, standard size 7 mL, orderable for shipping. Standard guest shipping costs $6.95 on this one-bottle order. Membership delivery benefits are excluded.",
+        "sources": [
+          {"label": "Sephora US guest shipping conditions", "url": "https://www.sephora.com/beauty/shipping-information"},
+          {"label": "Oregon Department of Revenue sales tax", "url": "https://www.oregon.gov/dor/programs/businesses/Pages/Sales-Tax.aspx"}
+        ]
+      }
+    }
+  ]
+}

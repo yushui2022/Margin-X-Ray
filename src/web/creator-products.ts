@@ -1,3 +1,5 @@
+import { productHref } from "../shared/shopping-links";
+import { retailComparisons } from "../shared/retail-premium";
 import RESEARCH from "../../research/creator-products.json";
 import { brandScenario, commissionScenario, scenarioNumber } from "../shared/creator-economics";
 import { renderScreening } from "./creator-screening";
@@ -8,6 +10,21 @@ export type Product = (typeof RESEARCH.products)[number];
 export const PRODUCT_ARCHIVE = RESEARCH.products;
 export const PRODUCT_OBSERVATION = RESEARCH.observedAt;
 export const PRODUCT_SOURCE_COUNT = RESEARCH.sources.length;
+
+const retailRecords = retailComparisons();
+const archiveIds = new Set(PRODUCT_ARCHIVE.map(product => product.id));
+const supplements = retailRecords.filter(record => !archiveIds.has(record.productId));
+const relationLabels = { "founder-store": "Founder-associated brand store", "creator-offer": "Documented creator offer", "retail-reference": "Retail reference" };
+export const CREATOR_SHOP_PRODUCTS = [
+  ...PRODUCT_ARCHIVE.map(product => ({
+    id: product.id, handle: product.handle, name: product.name, variant: product.variant, relationship: product.relationship,
+    promotionDate: product.promotionDate, observedAt: PRODUCT_OBSERVATION, price: product.price,
+  })),
+  ...supplements.map(record => ({
+    id: record.productId, handle: record.handle, name: record.name, variant: record.variant, relationship: relationLabels[record.relation],
+    promotionDate: null, observedAt: record.reference.observedAt, price: { amount: record.reference.amount, currency: record.currency },
+  })),
+];
 
 function node<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text?: string): HTMLElementTagNameMap[K] {
   const element = document.createElement(tag);
@@ -25,7 +42,7 @@ function link(label: string, url: string): HTMLAnchorElement {
 }
 
 export function productCount(handle: string): number {
-  return RESEARCH.products.filter((product) => product.handle === handle).length;
+  return CREATOR_SHOP_PRODUCTS.filter(product => product.handle === handle).length;
 }
 
 function sources(ids: string[]): HTMLDetailsElement {
@@ -137,8 +154,8 @@ function productCard(product: Product, standalone = false): HTMLElement {
   }
   reading.append(node("p", "", product.price.conditions), node("p", "creator-product-status", product.shopStatus));
   if (standalone) {
-    const compare = node("a", "btn secondary", "Check product markup →");
-    compare.href = `#markup/${product.id}`;
+    const compare = node("a", "btn primary", "Compare retail prices →");
+    compare.href = productHref(product.id);
     reading.append(compare);
   }
   const evidence = node("details", "creator-product-evidence");
@@ -168,11 +185,27 @@ export function renderProductFile(product: Product, creatorName: string, creator
 
 export function renderCreatorProducts(handle: string): HTMLElement {
   const wrapper = node("div", "creator-products");
+  const additional = supplements.filter(record => record.handle === handle);
+  if (additional.length) {
+    const section = node("section", "card creator-product-overview");
+    section.append(node("h3", "", "Additional retail comparisons"));
+    for (const record of additional) {
+      const item = node("a", "", record.name + " →");
+      item.href = productHref(record.productId);
+      section.append(item, node("p", "", [relationLabels[record.relation], record.market, "Observed " + record.reference.observedAt].join(" · ")));
+    }
+    wrapper.append(section);
+  }
   const creator = RESEARCH.creators.find((item) => item.handle === handle);
   if (!creator) {
     const empty = node("section", "card creator-product-overview");
     const sample = screeningFor(handle);
     const leads = brandLeadsFor(handle);
+    if (additional.length) {
+      empty.append(node("h3", "", "Historical price archive"), node("p", "", "No price file for this creator was included in the " + PRODUCT_OBSERVATION + " archive."));
+      wrapper.append(empty, renderScreening(handle));
+      return wrapper;
+    }
     empty.append(node("p", "eyebrow", sample ? "Initial research · Offer verification pending" : "Research not started"), node("h2", "", "Products & earnings"), node("p", "", sample
       ? `No priced product record has been accepted for this creator. ${leads.length ? `See the ${leads.length} follow-up ${leads.length === 1 ? "lead" : "leads"} below.` : "No product or brand lead has been selected for this report yet."} Exact products, current seller offers and financial terms need verification.`
       : "Product research has not started for this account."), node("p", "", "0 priced product records · Earnings unknown. A limited sample does not establish that the creator has no products, brand or commercial relationships."));
@@ -181,7 +214,7 @@ export function renderCreatorProducts(handle: string): HTMLElement {
   }
   const products = RESEARCH.products.filter((item) => item.handle === handle);
   const overview = node("section", "card creator-product-overview");
-  overview.append(node("p", "eyebrow", `@${handle} · ${RESEARCH.observedAt}`), node("h2", "", "Prices & sources"), node("p", "", `${products.length} priced ${products.length === 1 ? "product" : "products"} · Observed reference prices · Earnings unknown`));
+  overview.append(node("p", "eyebrow", `@${handle} · ${RESEARCH.observedAt}`), node("h2", "", "Historical price files"), node("p", "", `${products.length} archived ${products.length === 1 ? "product" : "products"} · Observed reference prices · Earnings unknown`));
   wrapper.append(overview);
   const grid = node("div", "creator-product-grid");
   for (const product of products) grid.append(productCard(product));

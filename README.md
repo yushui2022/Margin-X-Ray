@@ -1,25 +1,164 @@
 # Onion Head (Don't Be the Onion Head)
 
-**Check the creator behind the recommendation.**
+**Check the price behind the post.**
 
-Onion Head now opens with a creator shopping-transparency leaderboard. The
-web interface supports category filtering, score/name sorting, fictional creator
-reports, and TikTok username/profile-link input. Product scanning and the Pro
-sourcing workspace remain available through the navigation.
+The [public Sites edition](https://onion-head-price-index.purebeak64.chatgpt.site) serves saved US TikTok Shop checks. Visitors can search an archived creator, video or product and share its receipt URL. Live TikHub lookups, screenshot recognition and voting run on the Node deployment.
 
-The creator entry follows a compact rating flow: username input beside the
-leaderboard, then a scorecard with a large score, an example S–D tier, a short
-verdict and weighted dimension bars. Real profiles display a preliminary Evidence
-Score with ten sourced coverage checks in four groups. Transparency-scoring examples remain explicitly fictional and can
-be sorted highest/lowest or by name. Report controls switch between the score
-breakdown, products/earnings and profile sources; copying a report link copies
-the current URL without publishing anything. The warm Onion Head visual identity
-and mascot are retained.
+Start at `#shop` and paste a TikTok profile, @handle, video or TikTok Shop
+listing. The server uses `TIKHUB_TOKEN` to read the original post attachment,
+seller and SKU price, search other sellers in US TikTok Shop, and read their
+listing details. A profile check samples up to five recent public posts and
+three linked products. For each selected SKU the server starts with one search
+window of up to 20 results and two detail slots. When an edition has a reviewed
+peer for the same market, source seller, listing and SKU, one of those slots
+reads that address alongside search. Its current seller, selected option, stock,
+currency and price must qualify again. If fewer than two comparable shops qualify
+or the first comparable prices differ by over 20%, a follow-up may use a second
+search window and more candidate shops, up to five detail reads total. A verified
+matching offer ends the follow-up. The report preserves the source post and listing for
+each product. If the sample contains no Shop attachment, it asks for a more
+specific TikTok link. A screenshot can supply a handle or TikTok link through
+local OCR. A single unambiguous TikTok source can start a check.
+
+The live result gives a purchase decision, a **Rotten Onion Score**, its confidence
+and the observed price premium. In `shop-onion-v3`, the premium measures the
+original item price relative to a verified same-SKU offer or the median of qualifying
+similar listings (one offer per peer shop). The decision checks scope, stock, options,
+pack and one-off offers. Explicit differences in comparable warranty terms or primary
+materials can make price grading inappropriate.
+
+The rubric starts with an editorial price allowance of 5% for an exact variant,
+10% for comparable standardized goods with a matching measurement, 25% for
+comparable items with specific material/craft or collectible-edition evidence,
+and 15% for other qualifying similar items. With at least two independent peer
+shops, the observed upper price may expand that allowance by up to 10 percentage
+points. These are MVP editorial thresholds. Each receipt shows which evidence and
+allowance applied. With allowance A in percentage points, the anchors below use
+the original item's percentage difference from the peer price.
+
+| Price gap | −50% or less | −30% | −15% | −5% to +5% | +(5+A)% | +(5+2A)% | +100% | +200% or more |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Score | 0 | 15 | 35 | 50 | 65 | 75 | 90 | 100 |
+
+The scale interpolates and rounds between anchors, reserving 0, 50 and 100
+for their stated ranges on individual items. Higher scores indicate higher
+item prices relative to the benchmark. Insufficient comparable evidence
+produces an unscored decision. A single similar seller warrants a tentative
+buying action even when the observed gap is large.
+
+The server saves the four decision steps and their inputs. Profiles aggregate
+the median of scored products and state coverage. Raw price premiums remain
+visible. The score concerns sampled item prices; a seller's profit, intent or
+product quality cannot be inferred from these observations. Existing snapshots
+keep their original rubric. V1 added a point per percentage point of premium.
+V2 scored only the excess above the category price band.
+The previous report can be reviewed under the current rules with
+`POST /api/shopping-jobs/:id/reassess`. This creates a separate, shareable
+assessment from its saved listing evidence, preserves the original observation
+dates, and makes no upstream requests.
+
+**Share report** freezes the completed price report and its score. A recipient
+can open `/r/<id>` after the transient job cache expires. The same URL includes
+a title, description and a 1200 × 630 PNG preview at `/r/<id>/card.png`.
+Reading the shared report only reads saved evidence. For a hosted installation,
+set `PUBLIC_BASE_URL` to its public origin for social preview URLs. Local development
+uses the loopback origin. Published snapshots live in the shopping SQLite database.
+
+For each product the server checks the explicitly linked SKU, the listing's
+default, or its only variant. Ambiguous or missing options require a selection.
+A numeric difference requires distinct seller IDs, compatible specifications,
+a verified barcode or brand/manufacturer-model match, same-currency item prices,
+and confirmed stock on both sides. The signed difference is the original price
+minus the lowest qualifying offer **among the listings checked**. Delivery,
+tax and checkout discounts are excluded. Similar offers retain their prices
+and source links as candidates. This number measures a shopper's item-price
+difference. It does not establish creator costs, earnings or product quality.
+
+Run `npm run build` and, with the token in the server environment, start
+`HOST=127.0.0.1 npm run serve:demo`. The home form submits
+`POST /api/shopping-jobs`. The response includes a job ID, and
+`GET /api/shopping-jobs/:id` reads its current stage or saved report.
+Refreshing the result URL resumes the same job. SQLite stores jobs outside the
+web root at `data/shopping-jobs.sqlite`; override with `SHOPPING_JOBS_DB`.
+The server keeps up to 500 finished jobs for up to 24 hours, coalesces identical
+active checks, reuses recent results, and limits simultaneous workers.
+`POST /api/shopping-check` runs the same comparison synchronously. Requests
+accept `url`, optional `market` (US by default) and optional selection
+`{productId, skuId}`. UK listing identity is preserved when a UK price is
+unavailable. Live comparisons use TikHub exclusively. Amazon, 1688 and general
+web search are outside this workflow.
+
+`POST /api/shopping-screenshot` reads a PNG or JPEG of up to 5 MiB in memory.
+On macOS it uses Swift and Vision. On Linux install Tesseract with the English
+language data and set `SHOPPING_OCR_LANGUAGES` for additional installed
+languages. The upload is discarded after OCR.
+
+Creator profiles lead with their products and **Price premium index**. The
+`retail-premium-v1` index needs complete consumer comparisons for at least three
+distinct creator-linked product families. Its coverage and sample selection
+are visible. Products with a manufacturer reference and an unknown creator
+offer can have useful consumer comparisons while remaining ineligible for the
+creator index. The quality review, evidence coverage and shared coverage votes
+retain their existing versioned rules.
+
+The [Rotten Onion Index](http://127.0.0.1:4196/#shop/rankings) opens a
+preloaded edition of US TikTok Shop price checks. Each creator’s score is the
+rounded median of eligible product scores under `shop-onion-v3`. The newest
+observation of each listing counts once per creator. Ties share a rank. The
+index shows how many products qualified and includes dated receipts with
+links to the posts, original variants and competing sellers. Opening a ranking
+or receipt uses the bundled public observations and makes no TikHub request.
+The launch receipts live in `research/shop-price-ranking-seed.json`. Further
+original posts from those creators are recorded in
+`research/shop-price-batches/2026-11-19-additional-posts.json`.
+
+The ranking uses `shop-ranking-benchmark-v1` to give the same US store, listing,
+SKU and currency one reference set per UTC observation day. A dedicated edition
+check freezes the store quotes for that variant. Other variants use the latest
+recorded observation per competing SKU in that day's receipts. Each store
+contributes one eligible price. The benchmark uses the lowest verified exact
+match or the median of the similar-item store prices. One-store references
+are labelled. The original per-post receipts keep their original comparisons.
+Named cushion shades need matching brand, shade and stated fill to qualify as
+similar items. Conflicting size information stays visible on the candidate link.
+
+Build the dated reference file from completed public US SKU listing checks with
+`node scripts/seed-shop-ranking-benchmarks.mjs`. Its optional `--candidates`
+argument accepts a file of separately documented, excluded listings. These links
+never contribute a price to the score. The current evidence file is
+`research/shop-price-benchmark-checks.json`.
+
+To reproduce a local batch, set `TIKHUB_TOKEN` in the backend environment.
+The discovery command emits posts whose TikTok Shop attachment matches the
+specified product ID. The batch command runs the same shopping check as the
+paste-a-link flow and writes a public receipt per video. Rerunning the batch
+resumes missing or incomplete receipts.
+
+```sh
+node scripts/find-shop-posts.mjs --pages 2 --product-id 1731176397038522481 'Spidey tool bench' > /tmp/onion-posts.ndjson
+node scripts/run-shop-ranking-batch.mjs /tmp/onion-posts.ndjson /tmp/onion-receipts
+```
+
+The November 19 launch edition records its sampling method, creator coverage,
+and distinct scored listings in `research/shop-price-batches/2026-11-19-launch.json`.
+The subsequent calibrated edition is summarized in
+`research/shop-price-batches/2026-11-19-benchmarks.json`, including the
+per-SKU reference prices and the number of creators with multiple scored items.
+The same evidence scored under v3 is recorded in
+`research/shop-price-batches/2026-11-19-price-index-v3.json`. The 89 ranked
+creators share four similar-item references. Each reference has one eligible
+peer shop. Their scores span 53–63, with 72 further creators awaiting a match.
+
+The separate archive and manual comparison tools let shoppers inspect storefront variants, search
+for a barcode in the US or UK and compare two checkout totals for their address.
+Optional live eBay Browse candidates require server-side `EBAY_CLIENT_ID` and
+`EBAY_CLIENT_SECRET`. Without credentials the barcode can be opened directly
+in the marketplace. Shopper-entered comparisons stay in the current view.
 
 Frontend changes follow the project-specific self-review prompt in
 [`docs/frontend-self-review.md`](docs/frontend-self-review.md), referenced by
 `AGENTS.md`. It uses a fixed rubric and a 9/10 target, with screenshots and real
-interaction checks. The [latest review](docs/frontend-review-2026-11-17.md)
+interaction checks. The [shopping workflow review](docs/shopping-check-review.md)
 records the iterations, measured improvements and testing limits. Mobile lookup
 and research filters use disclosures to bring searchable creator rows forward.
 
@@ -28,11 +167,9 @@ locally stored portraits and searchable names/handles. It retains Glamzilla,
 Mikayla Nogueira, Mrwhosetheboss and NikkieTutorials and adds 496 profiles from
 Famadex's public TikTok people ranking. All 500 reports retain a **preliminary Evidence
 Score**, measuring report coverage rather than creator trustworthiness. The directory
-now supports one **Onion Score** for documented product problems: higher is worse,
-and higher scores sort first. Pending reports have no rank. Currently all 500
-profiles are pending because no completed product-problem sample has been accepted;
-the directory opens in name order and labels the profiles unranked. The score
-sort options appear when the first eligible review is available.
+opens with the most documented products first. The separate **Onion Score**
+for documented product problems is under the quality review. No completed
+product-problem sample has been admitted to date.
 Browse 20 records per page, search the full collection,
 sort by name, filter by collected category, or show the twelve profiles with
 priced product evidence using the directory toolbar. The main search accepts a
@@ -54,8 +191,13 @@ Provenance is in `assets/creators/sources.json` and
 `research/creator-seed-evidence.json`; collection rules are in
 `research/creator-seed-notes.md`.
 The separate Fictional examples view contains six ranked sample identities,
-post counts and scores. Unknown TikTok handles also show **Not rated**;
-no creator retrieval service is connected and no lookup is queued.
+post counts and scores. Public TikTok handles outside the directory open a
+research workspace. **Run research** starts a server-side job that collects
+account-matched public captions, traces commercial and product leads, checks
+applicable recall sources and applies the published rubrics. Seeded profiles
+offer the same workspace. Public reports include dated sources, collection
+limits and the evidence needed for an eligible Onion Score. See the
+[agent workflow, scoring example and server settings](docs/creator-agent-design.md).
 The real-profile Evidence Score uses the `evidence-v3` rubric: public sample (20),
 commercial trail (25), product and price documentation (35), and financial evidence
 (20 reserved). Ten checks cover account matching, caption depth, selected leads,
@@ -149,7 +291,7 @@ view, clear on navigation/reload, and never update evidence or creator scores.
 See `research/creator-products-notes.md` for the evidence gaps and collection rules.
 
 `web/` is the standalone frontend (`npm run serve:demo`, port 4173; default route
-`#creators`). `dist/` is the loadable Chrome extension. `preview/` is a dev-only
+`#shop`). `dist/` is the loadable Chrome extension. `preview/` is a dev-only
 HUD harness. `server/mock-xray.mjs` supplies fictional product scan responses;
 it does not search or score TikTok creators.
 

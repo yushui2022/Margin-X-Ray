@@ -1,14 +1,15 @@
 import { PUBLIC_CREATORS, directoryPage, type CreatorProfile } from "../shared/creator-directory";
-import { PRODUCT_ARCHIVE, PRODUCT_SOURCE_COUNT, productCount, renderCreatorProducts, renderProductFile } from "./creator-products";
+import { CREATOR_SHOP_PRODUCTS, PRODUCT_ARCHIVE, PRODUCT_SOURCE_COUNT, productCount, renderCreatorProducts, renderProductFile } from "./creator-products";
 import { priceArchive, priceReceipt } from "./price-archive";
 import { SCREENING_TOTALS, screeningFor, screeningLabel, brandLeadsFor } from "../shared/creator-screening";
 import { EVIDENCE_SCORES, EVIDENCE_SCORE_SCOPE, EVIDENCE_SCORE_VERSION, evidenceScoreFor, formatEvidenceScore } from "../shared/creator-evidence-score";
 import { renderCreatorFeedback } from "./creator-feedback";
-import { createOnionIndicator, renderOnionScale, renderIssueReport } from "./onion-index";
-import { ISSUE_SCORES } from "../shared/creator-issues";
-import { archivedAssessment, listingUrl, markupHref, markupRecord } from "../shared/markup-records";
-import { looksLikeVideoUrl } from "../shared/capture";
-import { rangeLabel } from "./supplier-range";
+import { creatorAgent } from "./creator-agent";
+import { createOnionIndicator, renderIssueReport } from "./onion-index";
+import { creatorPremium } from "../shared/retail-premium";
+import { creatorShopProducts, premiumSummary } from "./creator-shopping";
+import { shopRankingRows } from "./shopping-ranking-data";
+import { markShoppingSubmission, productHref, shoppingDestination, shoppingRankingHref } from "../shared/shopping-links";
 
 type PublicCreator = CreatorProfile;
 
@@ -40,7 +41,7 @@ let root: HTMLElement;
 let category = "All";
 let sort = "score";
 let mode: "public" | "examples" = "public";
-let directorySort: "followers" | "name" | "evidence" | "evidence-low" | "issues" | "issues-low" = ISSUE_SCORES.size ? "issues" : "name";
+let directorySort: "products" | "premium" | "premium-low" | "followers" | "name" | "evidence" | "evidence-low" = "products";
 let directoryQuery = "";
 let directoryPageNumber = 1;
 let productsOnly = false;
@@ -48,10 +49,24 @@ let researchFilter = "all";
 let productQuery = "";
 let productCurrency = "all";
 const PRODUCT_HANDLES = new Set(PUBLIC_CREATORS.filter((item) => productCount(item.handle) > 0).map((item) => item.handle));
-const REPORT_PATHS = ["", "/products", "/sources"] as const;
+const PRICED_PRODUCTS = new Map([...PRODUCT_HANDLES].map(handle => [handle, productCount(handle)]));
+const PREMIUM_SCORES = new Map([...PRODUCT_HANDLES].flatMap(handle => {
+  const value = creatorPremium(handle).value;
+  return value === null ? [] : [[handle, value] as const];
+}));
+const REPORT_PATHS = ["", "/products", "/sources", "/quality"] as const;
 
 function reportHref(handle: string, section = 0): string {
   return `#creator/${encodeURIComponent(`@${handle}`)}${REPORT_PATHS[section]}`;
+}
+
+function savedRankingLink(handle: string) {
+  const row = shopRankingRows.find(entry => entry.handle === handle);
+  if (!row) return null;
+  const score = row.verdict.score === null ? "Unrated" : row.verdict.score + "/100";
+  const anchor = node("a", "creator-ranking-entry", "@" + handle + " · Rotten Onion price index · " + score + " →");
+  anchor.href = shoppingRankingHref(handle);
+  return anchor;
 }
 
 export function initCreators(container: HTMLElement): void {
@@ -69,7 +84,8 @@ export function renderCreatorRoute(): void {
     let id: string;
     try { id = decodeURIComponent(rawHandle!); }
     catch { renderUnavailable(""); return; }
-    const profile = PUBLIC_CREATORS.find((item) => item.handle === parseHandle(id));
+    const handle = parseHandle(id);
+    const profile = PUBLIC_CREATORS.find((item) => item.handle === handle);
     const example = EXAMPLES.find((item) => item.id === id);
     if (profile && productId) {
       const product = PRODUCT_ARCHIVE.find(p => p.handle === profile.handle && p.id === productId);
@@ -79,7 +95,21 @@ export function renderCreatorRoute(): void {
         const heading = root.querySelector("h1")!;
         heading.tabIndex = -1;
         heading.focus({ preventScroll: true });
+      } else if (CREATOR_SHOP_PRODUCTS.some(product => product.handle === profile.handle && product.id === productId)) {
+        location.replace(productHref(productId));
       } else renderUnavailable(id);
+    } else if (handle && (path.join("/") === "research" || (!profile && !path.length))) {
+      const tools = reportToolbar();
+      const ranking = savedRankingLink(handle);
+      if (ranking) tools.append(ranking);
+      if (profile) {
+        const back = tools.querySelector("a")!;
+        back.href = reportHref(handle);
+        back.textContent = "← Creator report";
+      }
+      root.replaceChildren(tools, creatorAgent(handle));
+      document.title = `@${handle} research · Onion Head`;
+      root.querySelector("h1")?.focus({ preventScroll: true });
     } else if (profile && section >= 0) renderPublicProfile(profile, section);
     else if (example && section === 0) renderProfile(example);
     else renderUnavailable(id);
@@ -115,7 +145,7 @@ function scoreDisplay(value: number | null, evidence = false): HTMLElement {
   return display;
 }
 
-function reportToolbar(): HTMLElement {
+function reportToolbar(handle?: string): HTMLElement {
   const bar = node("div", "creator-report-toolbar");
   const status = node("span", "creator-copy-status");
   status.setAttribute("role", "status");
@@ -125,7 +155,13 @@ function reportToolbar(): HTMLElement {
       status.textContent = "Link copied";
     } catch { status.textContent = "Copy the URL from your address bar."; }
   });
-  bar.append(backLink(), status, copy);
+  bar.append(backLink());
+  if (handle) {
+    const agent = node("a", "btn secondary", "Search posts");
+    agent.href = reportHref(handle) + "/research";
+    bar.append(agent);
+  }
+  bar.append(status, copy);
   return bar;
 }
 
@@ -196,7 +232,7 @@ function action(text: string, onClick: () => void, className = "btn secondary"):
 }
 
 function sampleNotice(): HTMLElement {
-  return node("p", "creator-notice", "Interface preview · All ranked creators, scores and evidence below are fictional examples. Live TikTok lookup is not connected.");
+  return node("p", "creator-notice", "Interface preview · All ranked creators, scores and evidence below are fictional examples.");
 }
 
 function portrait(item: PublicCreator): HTMLElement {
@@ -228,21 +264,18 @@ function renderPublicProfile(item: PublicCreator, section: number): void {
   const hasProducts = productCount(item.handle) > 0;
   const sample = screeningFor(item.handle);
   const leads = brandLeadsFor(item.handle);
-  const evidence = evidenceScoreFor(item.handle)!;
+  document.title = `${item.name} · Creator prices · Onion Head`;
   const header = node("header", "creator-scorecard creator-evidence-card");
   const main = node("div", "creator-scorecard-main");
   const identity = node("div", "creator-public-identity");
   const text = node("div");
-  text.append(node("p", "eyebrow", `${item.category} / Public profile`), node("h1", "", item.name), node("p", "", `@${item.handle}`));
+  text.append(node("p", "eyebrow", item.category === "Uncategorized" ? "Public TikTok profile" : item.category + " · TikTok profile"), node("h1", "", item.name), node("p", "", `@${item.handle}`));
   identity.append(portrait(item), text);
-  const verdict = node("div", "creator-verdict-line");
-  verdict.append(node("span", "creator-coverage-dot"), node("div", "", `${evidence.level} · Preliminary`));
-  main.append(identity, verdict, node("p", "creator-verdict-copy", hasProducts || leads.length ? "Follow the evidence, layer by layer." : sample?.status === "sampled" ? "A first look. More layers to uncover." : "A research gap. More sources needed."), node("p", "creator-scorecard-note", "Onion Score measures documented product problems in a reviewed sample. Higher is worse. Evidence coverage below describes research progress, not a product-problem rating."));
-  const strip = node("div", "creator-scorecard-strip");
-  strip.append(node("span", "", item.followersLabel ? `${item.followersLabel} followers · Directory snapshot` : "Follower count not collected"), node("span", "", `${productCount(item.handle)} priced records · ${leads.length} follow-up leads`), node("span", "", screeningLabel(item.handle)));
-  const display = node("div", "creator-score-display creator-onion-display");
-  display.append(createOnionIndicator(item.handle, false), node("span", "creator-score-check-count", "Out of 100 · Higher is worse"));
-  header.append(main, display, strip);
+  main.append(identity);
+  header.classList.add("creator-shopping-header");
+  header.append(main, premiumSummary(item.handle));
+  const ranking = savedRankingLink(item.handle);
+  if (ranking) header.append(ranking);
   const details = node("section", "card creator-evidence");
   details.append(node("h2", "", "Public profile & collected evidence"), node("p", "", "The preliminary Evidence Score measures this report's collected sources. Creator transparency, product quality and personal earnings have not received a verified rating."));
   const links = node("div", "creator-profile-links");
@@ -253,17 +286,30 @@ function renderPublicProfile(item: PublicCreator, section: number): void {
   }
   if (item.sourceCategory) details.append(node("p", "", `Directory category: ${item.sourceCategory}. ${item.category === "Uncategorized" ? "A product niche has not been established." : ""}`));
   if (item.country) details.append(node("p", "", `Directory country label: ${item.country}. Not independently verified.`));
-  if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. See Products for the sample and access limitations.`), externalLink("Public TikTok sample source", sample.sourceUrl));
+  if (sample) details.append(node("p", "", `${screeningLabel(item.handle)} · Attempted ${sample.observedAt}. ${leads.length} sourced follow-up leads.`), externalLink("Public TikTok sample source", sample.sourceUrl));
   const scorePanel = node("div");
-  scorePanel.append(renderIssueReport(item.handle), renderCreatorFeedback(item.handle), evidenceBreakdown(item.handle), evidenceMethodology());
+  const issues = renderIssueReport(item.handle);
+  issues.prepend(createOnionIndicator(item.handle, false));
+  scorePanel.append(issues, renderCreatorFeedback(item.handle), evidenceBreakdown(item.handle), evidenceMethodology());
+  const productsPanel = node("div");
+  productsPanel.append(creatorShopProducts(item.handle));
+  if (!hasProducts) {
+    const searchPosts = node("a", "btn primary", "Find products in public posts →");
+    searchPosts.href = reportHref(item.handle) + "/research";
+    productsPanel.append(searchPosts);
+  }
+  const files = node("details", "creator-shop-files");
+  files.append(node("summary", "", "Product files, source notes & collection scope"), renderCreatorProducts(item.handle));
+  productsPanel.append(files);
+  const initialTab = section === 2 ? 2 : section === 3 ? 1 : 0;
   const sections = reportSections([
-    { label: "Score & coverage", content: scorePanel },
-    { label: `Products (${productCount(item.handle)})`, content: renderCreatorProducts(item.handle) },
+    { label: `Products (${productCount(item.handle)})`, content: productsPanel },
+    { label: "Quality & evidence", content: scorePanel },
     { label: "Profile sources", content: details },
-  ], section, index => {
-    history.replaceState(history.state, "", reportHref(item.handle, index));
+  ], initialTab, index => {
+    history.replaceState(history.state, "", reportHref(item.handle, [1, 3, 2][index]));
   });
-  root.replaceChildren(reportToolbar(), header, sections);
+  root.replaceChildren(reportToolbar(item.handle), header, sections);
   if (section !== 0) {
     sections.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus({ preventScroll: true });
     sections.scrollIntoView({ block: "start", behavior: "instant" });
@@ -304,7 +350,7 @@ function searchForm(): HTMLElement {
 
 function parseHandle(raw: string): string | null {
   let value = raw.trim();
-  if (/^(https?:\/\/|(?:www\.)?tiktok\.com\/)/i.test(value)) {
+  if (/^(https?:\/\/|(?:(?:www|m)\.)?tiktok\.com\/)/i.test(value)) {
     try {
       const url = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
       if (!["tiktok.com", "www.tiktok.com", "m.tiktok.com"].includes(url.hostname) || url.username || url.password || url.port) return null;
@@ -405,21 +451,22 @@ function renderBoard(): void {
   const saved = history.state?.creatorDirectory;
   if (saved) {
     ({ category, sort, mode, directorySort, directoryQuery, directoryPageNumber, productsOnly, researchFilter } = saved);
+    if (!["products", "premium", "premium-low", "name", "evidence", "evidence-low", "followers"].includes(directorySort)) directorySort = "products";
     productQuery = saved.productQuery ?? "";
     productCurrency = saved.productCurrency ?? "all";
   }
   const hero = node("header", "research-hero");
-  const heading = node("h1", "", productView ? "The price " : "Check a ");
-  heading.append(node("em", "", productView ? "archive." : "recommendation."));
+  const heading = node("h1", "", productView ? "The price " : "Shop by ");
+  heading.append(node("em", "", productView ? "archive." : "creator."));
   const intro = node("div", "research-intro");
-  intro.append(heading, node("p", "", productView ? "Find a recorded price and its original listing." : "Paste a creator profile or product link to check the evidence behind a recommendation."));
+  intro.append(heading, node("p", "", productView ? "Find a recorded price and its original listing." : "Find a creator, choose a product and compare its price."));
   hero.append(intro);
   if (productView) hero.append(priceReceipt());
   else {
-    const record = markupRecord("winco-msp-4p")!;
-    const check = archivedAssessment(record);
-    const card = node("a", "home-comparison"); card.href = "#markup/winco-msp-4p";
-    card.append(node("small", "", "Featured price check"), node("strong", "", record.listing.name), node("b", "", rangeLabel(check)), node("span", "", `Compare ${check.sources.length} supplier offers →`));
+    const featured = PUBLIC_CREATORS.find(item => item.handle === "mrwhosetheboss")!;
+    const card = node("a", "home-comparison creator-featured-profile");
+    card.href = reportHref(featured.handle);
+    card.append(node("small", "", "Featured creator"), portrait(featured), node("strong", "", featured.name), node("span", "", "Compare Sony earbud prices →"));
     hero.append(card);
   }
   const layout = node("div", "research-layout");
@@ -469,12 +516,17 @@ function renderBoard(): void {
   search.append(directoryInput, submit);
   intro.append(search);
   const statsLine = node("div", "index-totals");
-  for (const [value, label] of [[PUBLIC_CREATORS.length, "profiles"], [PRODUCT_ARCHIVE.length, "prices"], [PRODUCT_SOURCE_COUNT, "product sources"]] as const) {
+  for (const [value, label] of [[PUBLIC_CREATORS.length, "profiles"], [productView ? PRODUCT_ARCHIVE.length : CREATOR_SHOP_PRODUCTS.length, productView ? "archive prices" : "priced products"], [PRODUCT_SOURCE_COUNT, "archive sources"]] as const) {
     const stat = node("span");
     stat.append(node("b", "", String(value)), ` ${label}`);
     statsLine.append(stat);
   }
   intro.append(statsLine);
+  if (!productView) {
+    const ranking = node("a", "creator-ranking-entry", "View the Rotten Onion price ranking →");
+    ranking.href = shoppingRankingHref();
+    intro.append(ranking);
+  }
   directoryInput.addEventListener("input", () => {
     if (productView) {
       productQuery = directoryInput.value;
@@ -496,10 +548,11 @@ function renderBoard(): void {
     }
     if (mode === "examples") switchMode("public");
     const handle = parseHandle(directoryQuery);
-    if (!handle) {
-      const url = listingUrl(directoryQuery.trim());
-      if (url) {
-        location.hash = looksLikeVideoUrl(url) ? `#scan?${new URLSearchParams({ url })}` : markupHref(url);
+    if (!handle && directoryQuery.trim()) {
+      const destination = shoppingDestination(directoryQuery);
+      if (destination && !destination.startsWith("#shop/search?")) {
+        markShoppingSubmission(destination);
+        location.hash = destination;
         return;
       }
     }
@@ -507,7 +560,12 @@ function renderBoard(): void {
       location.hash = reportHref(handle, productsOnly ? 1 : 0);
       return;
     }
-    if (handle && /^(@|https?:\/\/|(?:www\.)?tiktok\.com\/)/i.test(directoryQuery.trim()) && !PUBLIC_CREATORS.some(item => item.handle === handle)) {
+    if (handle && shopRankingRows.some(row => row.handle === handle)) {
+      location.hash = shoppingRankingHref(handle);
+      return;
+    }
+    if (handle && (/^(@|https?:\/\/|(?:(?:www|m)\.)?tiktok\.com\/)/i.test(directoryQuery.trim())
+      || (!directoryPage({ query: handle, category: "All", sort: "name", page: 1 }).total && !CREATOR_SHOP_PRODUCTS.some(record => record.name.toLowerCase().includes(handle))))) {
       location.hash = reportHref(handle);
       return;
     }
@@ -542,7 +600,7 @@ function renderBoard(): void {
   count.tabIndex = -1;
   count.setAttribute("aria-live", "polite");
   const votingGuide = node("div", "creator-voting-guide");
-  votingGuide.append(node("span", "", "Higher score = more product problems"), renderOnionScale());
+  votingGuide.append(node("span", "", "Price premium compares matched retail offers."));
   const pagination = node("nav", "creator-pagination");
   pagination.setAttribute("aria-label", "Creator directory pages");
   const empty = node("div", "creator-directory-empty");
@@ -552,11 +610,14 @@ function renderBoard(): void {
   const resultInfo = node("div", "research-result-info");
   resultInfo.append(count, clear);
   empty.append(node("strong", "", "No matching creators"), node("p", "", "Try another name or clear the current filters."));
+  const lookup = node("a", "btn secondary");
+  const related = node("div", "creator-shop-directory-related");
+  empty.append(lookup, related);
   function renderRows(): void {
     const activeFilters = Number(category !== "All") + Number(researchFilter !== "all");
     refineSummary.textContent = `More filters${activeFilters ? ` (${activeFilters})` : ""}`;
-    const scoreSorts = ISSUE_SCORES.size ? [["issues", "Highest score"], ["issues-low", "Lowest score"]] : [];
-    select.replaceChildren(...(mode === "public" ? [...scoreSorts, ["name", "Name A–Z"], ["evidence", "Most evidence"], ["evidence-low", "Least evidence"], ["followers", "Most followers"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Name A–Z"]]).map(([value, text]) => {
+    const scoreSorts = PREMIUM_SCORES.size ? [["premium", "Highest premium"], ["premium-low", "Lowest premium"]] : [];
+    select.replaceChildren(...(mode === "public" ? [["products", "Most priced products"], ...scoreSorts, ["name", "Name A–Z"], ["evidence", "Most evidence"], ["evidence-low", "Least evidence"], ["followers", "Most followers"]] : [["score", "Highest score"], ["lowest", "Lowest score"], ["name", "Name A–Z"]]).map(([value, text]) => {
       const option = node("option", "", text); option.value = value!; return option;
     }));
     select.value = mode === "public" ? directorySort : sort;
@@ -578,14 +639,33 @@ function renderBoard(): void {
     if (exampleKey) exampleKey.hidden = mode === "public";
     pagination.hidden = mode !== "public";
     empty.hidden = true;
-    boardTitle.textContent = mode === "public" ? ISSUE_SCORES.size ? "Onion rankings" : "Creator directory" : "Transparency scores";
+    boardTitle.textContent = mode === "public" ? "Creator directory" : "Transparency scores";
     if (mode === "public") {
       const profiles = PUBLIC_CREATORS.filter((item) => researchFilter === "all"
         || (researchFilter === "sampled" && screeningFor(item.handle)?.status === "sampled")
         || (researchFilter === "unavailable" && screeningFor(item.handle)?.status === "unavailable")
         || (researchFilter === "leads" && brandLeadsFor(item.handle).length > 0));
       const query = parseHandle(directoryQuery) ?? directoryQuery;
-      const result = directoryPage({ query, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES, issueScores: ISSUE_SCORES }, profiles);
+      const candidate = parseHandle(directoryQuery);
+      const productTerm = directoryQuery.trim().toLowerCase();
+      const productHits = productTerm ? CREATOR_SHOP_PRODUCTS.filter(product => product.name.toLowerCase().includes(productTerm)) : [];
+      lookup.hidden = !candidate || productHits.length > 0;
+      related.replaceChildren();
+      const ranking = candidate && savedRankingLink(candidate);
+      if (ranking) related.append(ranking);
+      if (productHits.length) {
+        related.append(node("strong", "", "Matching products"));
+        for (const item of productHits) {
+          const product = node("a", "", item.name + " →");
+          product.href = productHref(item.id);
+          related.append(product);
+        }
+      }
+      if (candidate) {
+        lookup.href = reportHref(candidate);
+        lookup.textContent = `Look up @${candidate} →`;
+      }
+      const result = directoryPage({ query, category, sort: directorySort, page: directoryPageNumber, productHandles: productsOnly ? PRODUCT_HANDLES : undefined, evidenceScores: EVIDENCE_SCORES, pricedProducts: PRICED_PRODUCTS, premiumScores: PREMIUM_SCORES }, profiles);
       directoryPageNumber = result.page;
       list.replaceChildren(...result.items.map((item) => {
         const li = node("li", "creator-public-item");
@@ -598,11 +678,12 @@ function renderBoard(): void {
         const status = node("span", "creator-row-status", total ? `${productsOnly ? "View " : ""}${total} priced ${total === 1 ? "product" : "products"}${productsOnly ? " →" : ""}` : leads ? `${leads} sourced ${leads === 1 ? "lead" : "leads"} · Unverified` : screeningLabel(item.handle));
         status.dataset.kind = total ? "priced" : leads ? "lead" : "sample";
         link.append(portrait(item), identity, status);
-        li.append(link, renderCreatorFeedback(item.handle, true));
+        const metrics = node("div", "creator-shop-row-metrics");
+        metrics.append(premiumSummary(item.handle, true), renderCreatorFeedback(item.handle, true));
+        li.append(link, metrics);
         return li;
       }));
-      const status = ISSUE_SCORES.size ? `${ISSUE_SCORES.size} ranked overall` : "Unranked · Issue reviews pending";
-      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} profiles · ${status}` : "0 matching profiles";
+      count.textContent = result.total ? `${result.start + 1}–${result.start + result.items.length} of ${result.total} profiles` : "0 matching profiles";
       empty.hidden = result.total > 0;
       pagination.replaceChildren();
       pagination.hidden = result.pageCount <= 1;
@@ -652,7 +733,7 @@ function renderBoard(): void {
   toolbar.append(header, directoryTools);
   const columns = node("div", "index-columns");
   columns.setAttribute("aria-hidden", "true");
-  columns.append(...["Creator", "Collected evidence", "Onion Score", "Coverage vote"].map(label => node("span", "", label)));
+  columns.append(...["Creator", "Product records", "Price premium index", "Coverage vote"].map(label => node("span", "", label)));
   const statusBar = node("div", "index-status");
   statusBar.append(resultInfo, votingGuide);
   board.append(toolbar, exampleFilters, statusBar, columns, empty, list, pagination);
@@ -730,10 +811,10 @@ function renderProfile(item: CreatorExample): void {
 function renderUnavailable(raw: string): void {
   const handle = parseHandle(raw);
   const card = node("section", "creator-unavailable card");
-  card.append(node("p", "eyebrow", "Creator lookup"), node("h1", "", handle ? `@${handle}` : "Invalid creator address"), node("span", "creator-unrated", "Not rated"), node("p", "lede", handle ? "This account has no report yet. Check a product they recommend by pasting its listing link." : "Enter a valid TikTok username to look up a report."));
+  card.append(node("p", "eyebrow", "Creator lookup"), node("h1", "", handle ? "Report section unavailable" : "Invalid creator address"), node("p", "lede", handle ? "Open the creator profile to see its available research." : "Enter a valid TikTok username to look up a report."));
   if (handle) {
-    const lookup = node("a", "btn secondary", "Check a product from this creator →");
-    lookup.href = "#markup";
+    const lookup = node("a", "btn secondary", `Open @${handle} →`);
+    lookup.href = reportHref(handle);
     card.append(lookup);
   }
   card.append(searchForm());

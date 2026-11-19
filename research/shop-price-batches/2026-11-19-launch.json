@@ -1,0 +1,93 @@
+{
+  "observedOn": "2026-11-19",
+  "market": "US",
+  "scope": "tiktok-shop",
+  "scoringVersion": "shop-onion-v2",
+  "evidence": {
+    "file": "research/shop-price-ranking-seed.json",
+    "sha256": "09345cdc56a4fa39f5472524e7c751bec577afb4ed3af94453b44a5506b70cd2"
+  },
+  "selection": "The team screened the preset directory for native product links and used US TikHub product-keyword searches to find additional shoppable posts. The launch edition includes product-focused searches for listings with suitable other-shop comparisons. Each post went through the product shopping check; the index groups its receipts by creator. Many creators promoted the same listing.",
+  "coverage": {
+    "checkedCreators": 161,
+    "rankedCreators": 78,
+    "unratedCreators": 83,
+    "previouslyRankedCreators": 2,
+    "newlyRankedCreators": 76,
+    "archivedPosts": 186,
+    "distinctLinkedListings": 75,
+    "distinctScoredListings": 3,
+    "presetRosterSize": 500,
+    "presetCreatorsInArchive": 14,
+    "presetCreatorsRanked": 0,
+    "rankedCreatorsByComparisonBasis": {
+      "exact": 0,
+      "similar": 78,
+      "mixed": 0
+    }
+  },
+  "scoreDistribution": {
+    "0": 42,
+    "1": 1,
+    "2": 1,
+    "9": 20,
+    "12": 1,
+    "24": 13
+  },
+  "scoredListings": [
+    {
+      "productId": "1731176397038522481",
+      "listing": "https://shop.tiktok.com/us/pdp/1731176397038522481",
+      "title": "Marvel Spider-Man, Spidey and His Amazing Friends, NASCAR & Transformers Pit Stop Tool Bench Playset – Pretend Play Racing & Real Tool Fun for Kids 4+, Official Licensed",
+      "rankedCreators": 61,
+      "scoredSkuIds": [
+        "1732004415659217009"
+      ],
+      "originalUsdRange": [
+        59.99,
+        59.99
+      ],
+      "comparisonUsdRange": [
+        49.95,
+        59.93
+      ],
+      "exampleCreator": "allicoolmom"
+    },
+    {
+      "productId": "1731165367326642778",
+      "listing": "https://shop.tiktok.com/us/pdp/1731165367326642778",
+      "title": "[TIRTIR Official] Mask Fit AI Filter Cushion Foundation l Full Size 0.63oz / 18g l Natural Satin Finish Makeup for Long Lasting Coverage & Smooth Texture Concealer Cosmetic Matte Hydrate",
+      "rankedCreators": 13,
+      "scoredSkuIds": [
+        "1731165503455269466"
+      ],
+      "originalUsdRange": [
+        32.5,
+        32.5
+      ],
+      "comparisonUsdRange": [
+        25,
+        25
+      ],
+      "exampleCreator": "bbsanti1"
+    },
+    {
+      "productId": "1731739658644197489",
+      "listing": "https://shop.tiktok.com/us/pdp/1731739658644197489",
+      "title": "Disney Wooden Electronic Air Hockey Table: Mickey Mouse, Minnie Mouse, Stitch, Toy Story, Disney Princess – Age 4+, Officially Licensed Family Board Game",
+      "rankedCreators": 4,
+      "scoredSkuIds": [
+        "1731739783067308145"
+      ],
+      "originalUsdRange": [
+        64.94,
+        64.94
+      ],
+      "comparisonUsdRange": [
+        53.27,
+        57.49
+      ],
+      "exampleCreator": "meganelizabeth90"
+    }
+  ]
+}

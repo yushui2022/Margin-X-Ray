@@ -2571,3 +2571,50 @@ body[data-view="creators"] .page { padding-top: 24px; }
   .example-checks a { gap: 5px; }
   .toast { bottom: calc(65px + env(safe-area-inset-bottom)); }
 }
+
+/* On-demand creator research */
+.creator-agent { overflow-wrap: anywhere; }
+.agent-top { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(290px,.75fr); gap: 22px; align-items: stretch; }
+.agent-intro, .agent-trail, .agent-score, .agent-sources { padding: clamp(18px,2.8vw,36px); border: 1px solid var(--mx-line-strong); border-radius: 12px; background: var(--mx-panel); }
+.agent-intro { border-top: 4px solid #77576e; }
+.agent-intro .eyebrow, .agent-score .eyebrow { margin: 0; color: #77576e; }
+.agent-intro h1 { margin: 12px 0; font: 550 clamp(28px,3.5vw,49px)/1.1 var(--mx-font-display); letter-spacing: -.03em; }
+.agent-intro h1:focus { outline: none; }
+.agent-lede { max-width: 62ch; font-size: 16px; line-height: 1.55; }
+.agent-provenance, .agent-state, .agent-rule-note, .agent-source-entry small, .agent-score small { color: var(--mx-muted); font-size: 13px; line-height: 1.5; }
+.agent-provenance:empty, .agent-state:empty { display: none; }
+.agent-actions { display: flex; align-items: center; gap: 8px 18px; flex-wrap: wrap; margin-top: 18px; }
+.agent-actions .btn, .agent-actions a, .agent-sources summary, .agent-sources a, .creator-report-toolbar .btn { min-height: 44px; }
+.agent-actions .btn { font-size: 13px; }
+.agent-actions a, .agent-sources a { display: inline-flex; align-items: center; color: var(--mx-accent-strong); text-decoration: underline; text-underline-offset: 3px; }
+.agent-trail { background: #f3ecf1; border-color: #d9c9d5; }
+.agent-trail h2, .agent-sources h2 { margin: 0 0 14px; font: 550 25px/1.15 var(--mx-font-display); }
+.agent-trail ol { margin: 0; padding: 0; list-style: none; }
+.agent-trail li { display: grid; grid-template-columns: 14px minmax(0,1fr); gap: 2px 10px; padding: 6px 0; font-size: 14px; }
+.agent-trail li::before { content: ""; grid-column: 1; grid-row: 1; align-self: center; width: 9px; height: 9px; border-radius: 50%; border: 1px solid #887280; }
+.agent-trail li[data-state="active"]::before { background: #65455e; outline: 2px solid #c4b0bf; outline-offset: 2px; }
+.agent-trail li[data-state="done"]::before { content: "✓"; border: 0; color: #53414f; font-weight: 700; width: auto; height: auto; }
+.agent-trail li span { grid-column: 2; color: #62585f; font-size: 13px; line-height: 1.4; }
+.agent-rule-note { max-width: 62ch; margin: 16px 0 0; border-top: 1px solid var(--mx-line); padding-top: 12px; }
+.agent-findings { display: grid; grid-template-columns: minmax(240px,.65fr) minmax(0,1.35fr); align-items: start; gap: 22px; margin-top: 22px; }
+.agent-score { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 14px; }
+.agent-score h2 { font: 550 clamp(23px,2vw,32px)/1.2 var(--mx-font-display); margin: 5px 0; }
+.agent-score-reason { grid-column: 1/-1; line-height: 1.5; margin-bottom: 0; }
+.agent-summary { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px; padding: 12px 14px; background: var(--mx-soft); border-radius: 6px; }
+.agent-summary strong { font-family: var(--mx-font-mono); }
+.agent-summary p { grid-column: 1/-1; margin: 0; color: var(--mx-muted); font-size: 13px; line-height: 1.45; }
+.agent-sources details { border-bottom: 1px solid var(--mx-line); }
+.agent-sources summary { padding: 13px 0; color: var(--mx-accent-strong); font-weight: 600; cursor: pointer; }
+.agent-sources details p { font-size: 14px; line-height: 1.5; margin: 0 0 10px; }
+.agent-source-entry { display: grid; padding: 9px 0 14px; border-top: 1px dashed var(--mx-line); }
+.agent-source-entry small { margin-bottom: 6px; }
+.agent-limits { padding: 14px; margin-top: 16px; border-left: 3px solid var(--mx-gold); background: var(--mx-soft); font-size: 14px; }
+.agent-limits p { margin: 6px 0 0; line-height: 1.5; }
+@media (max-width: 720px) {
+  .agent-top, .agent-findings { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .agent-findings { margin-top: 12px; }
+  .agent-lede { font-size: 15px; }
+  .agent-actions { gap: 4px 16px; }
+  .agent-trail li { padding: 4px 0; }
+  .creator-agent:has(.agent-findings):not([data-status="running"]) .agent-trail { display: none; }
+}

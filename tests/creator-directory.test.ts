@@ -65,3 +65,15 @@ test("follower order keeps unknown counts last and name order is stable", () => 
   assert.deepEqual(directoryPage(defaults, fixtures).items.map((item) => item.handle), ["test2", "test1", "test0"]);
   assert.deepEqual(directoryPage({ ...defaults, sort: "name" }, fixtures).items.map((item) => item.handle), ["test1", "test2", "test0"]);
 });
+
+test("shopping directory distinguishes unmeasured price premiums from measured zero", () => {
+  const sample = PUBLIC_CREATORS.slice(0, 3);
+  const [first, second, third] = sample.map(item => item.handle);
+  const pricedProducts = new Map([[first!, 2], [second!, 1]]);
+  const premiumScores = new Map([[first!, 0], [second!, 50]]);
+  const order = (sort: "products" | "premium" | "premium-low") =>
+    directoryPage({ ...defaults, sort, pricedProducts, premiumScores }, sample).items.map(item => item.handle);
+  assert.deepEqual(order("products"), [first, second, third]);
+  assert.deepEqual(order("premium"), [second, first, third]);
+  assert.deepEqual(order("premium-low"), [first, second, third]);
+});

@@ -30,9 +30,11 @@ export const DIRECTORY_PAGE_SIZE = 20;
 export function directoryPage(options: {
   query: string;
   category: string;
-  sort: "followers" | "name" | "evidence" | "evidence-low" | "confidence" | "confidence-low" | "issues" | "issues-low";
+  sort: "followers" | "name" | "evidence" | "evidence-low" | "confidence" | "confidence-low" | "issues" | "issues-low" | "products" | "premium" | "premium-low";
   page: number;
   productHandles?: ReadonlySet<string>;
+  pricedProducts?: ReadonlyMap<string, number>;
+  premiumScores?: ReadonlyMap<string, number>;
   evidenceScores?: ReadonlyMap<string, number>;
   confidenceScores?: ReadonlyMap<string, number>;
   issueScores?: ReadonlyMap<string, number>;
@@ -42,15 +44,33 @@ export function directoryPage(options: {
     (options.category === "All" || item.category === options.category)
     && (!options.productHandles || options.productHandles.has(item.handle))
     && (!query || `${item.name} ${item.handle}`.normalize("NFKC").toLocaleLowerCase().includes(query)),
-  ).sort((a, b) => options.sort === "followers"
-    ? (b.followers ?? -1) - (a.followers ?? -1) || a.handle.localeCompare(b.handle)
-    : ((options.sort === "issues" || options.sort === "issues-low")
-      ? compareScores(a.handle, b.handle, options.issueScores, options.sort === "issues-low")
-      : (options.sort === "confidence" || options.sort === "confidence-low")
-      ? compareScores(a.handle, b.handle, options.confidenceScores, options.sort === "confidence-low")
-      : (options.sort === "evidence" || options.sort === "evidence-low")
-      ? ((options.evidenceScores?.get(b.handle) ?? 0) - (options.evidenceScores?.get(a.handle) ?? 0)) * (options.sort === "evidence-low" ? -1 : 1)
-      : 0) || a.name.localeCompare(b.name) || a.handle.localeCompare(b.handle));
+  ).sort((a, b) => {
+    let order = 0;
+    switch (options.sort) {
+      case "followers":
+        return (b.followers ?? -1) - (a.followers ?? -1) || a.handle.localeCompare(b.handle);
+      case "products":
+        order = (options.pricedProducts?.get(b.handle) ?? 0) - (options.pricedProducts?.get(a.handle) ?? 0);
+        break;
+      case "premium":
+      case "premium-low":
+        order = compareScores(a.handle, b.handle, options.premiumScores, options.sort === "premium-low");
+        break;
+      case "issues":
+      case "issues-low":
+        order = compareScores(a.handle, b.handle, options.issueScores, options.sort === "issues-low");
+        break;
+      case "confidence":
+      case "confidence-low":
+        order = compareScores(a.handle, b.handle, options.confidenceScores, options.sort === "confidence-low");
+        break;
+      case "evidence":
+      case "evidence-low":
+        order = ((options.evidenceScores?.get(b.handle) ?? 0) - (options.evidenceScores?.get(a.handle) ?? 0)) * (options.sort === "evidence-low" ? -1 : 1);
+        break;
+    }
+    return order || a.name.localeCompare(b.name) || a.handle.localeCompare(b.handle);
+  });
   const pageCount = Math.max(1, Math.ceil(items.length / DIRECTORY_PAGE_SIZE));
   const page = Math.min(pageCount, Math.max(1, Math.floor(options.page) || 1));
   const start = (page - 1) * DIRECTORY_PAGE_SIZE;

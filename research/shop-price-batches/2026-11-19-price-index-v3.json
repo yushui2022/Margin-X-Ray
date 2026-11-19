@@ -1,0 +1,106 @@
+{
+  "observedOn": "2026-11-19",
+  "market": "US",
+  "scope": "tiktok-shop",
+  "scoreVersion": "shop-onion-v3",
+  "benchmarkVersion": "shop-ranking-benchmark-v1",
+  "evidence": [
+    {
+      "file": "research/shop-price-ranking-seed.json",
+      "sha256": "09345cdc56a4fa39f5472524e7c751bec577afb4ed3af94453b44a5506b70cd2"
+    },
+    {
+      "file": "research/shop-price-batches/2026-11-19-additional-posts.json",
+      "sha256": "cc98e1eac313ad061b064be3ae6a4650149a6e98d0e189a8c2c4be1190f151b7"
+    },
+    {
+      "file": "research/shop-price-benchmark-checks.json",
+      "sha256": "8e759a211bebfd9cc1887ff85e14014b0ca9588a609459d54c008bb7ea369149"
+    }
+  ],
+  "checkedCreators": 161,
+  "rankedCreators": 89,
+  "unratedCreators": 72,
+  "archivedPosts": 276,
+  "creatorsWithMultipleScoredProducts": 7,
+  "creatorDistribution": [
+    {
+      "score": 63,
+      "creators": 4
+    },
+    {
+      "score": 58,
+      "creators": 6
+    },
+    {
+      "score": 57,
+      "creators": 3
+    },
+    {
+      "score": 53,
+      "creators": 76
+    }
+  ],
+  "items": [
+    {
+      "listing": "https://shop.tiktok.com/us/pdp/1731739658644197489",
+      "skuId": "1731739783067308145",
+      "option": "Disney Princess",
+      "title": "Disney Wooden Electronic Air Hockey Table: Mickey Mouse, Minnie Mouse, Stitch, Toy Story, Disney Princess – Age 4+, Officially Licensed Family Board Game",
+      "sourcePrice": 64.94,
+      "peerPrice": 54.83,
+      "currency": "USD",
+      "observedPremiumPct": 18.44,
+      "allowancePct": 15,
+      "score": 63,
+      "basis": "similar",
+      "peerShopCount": 1,
+      "creators": 11
+    },
+    {
+      "listing": "https://shop.tiktok.com/us/pdp/1731165367326642778",
+      "skuId": "1731165555398644314",
+      "option": "21N Ivory",
+      "title": "[TIRTIR Official] Mask Fit AI Filter Cushion Foundation l Full Size 0.63oz / 18g l Natural Satin Finish Makeup for Long Lasting Coverage & Smooth Texture Concealer Cosmetic Matte Hydrate",
+      "sourcePrice": 32.5,
+      "peerPrice": 29,
+      "currency": "USD",
+      "observedPremiumPct": 12.07,
+      "allowancePct": 15,
+      "score": 57,
+      "basis": "similar",
+      "peerShopCount": 1,
+      "creators": 3
+    },
+    {
+      "listing": "https://shop.tiktok.com/us/pdp/1731176397038522481",
+      "skuId": "1732004415659217009",
+      "option": "Spidey and His Amazing Friends",
+      "title": "Marvel Spider-Man, Spidey and His Amazing Friends, NASCAR & Transformers Pit Stop Tool Bench Playset – Pretend Play Racing & Real Tool Fun for Kids 4+, Official Licensed",
+      "sourcePrice": 59.99,
+      "peerPrice": 55.64,
+      "currency": "USD",
+      "observedPremiumPct": 7.82,
+      "allowancePct": 15,
+      "score": 53,
+      "basis": "similar",
+      "peerShopCount": 1,
+      "creators": 82
+    },
+    {
+      "listing": "https://shop.tiktok.com/us/pdp/1731603800884088945",
+      "skuId": "1731608588969414769",
+      "option": "Spidey and His Amazing Friends",
+      "title": "Officially Licensed Marvel,Hello Kitty,Transformers &WWE Wooden Electronic Air Hockey Table – Spider-Man, Avengers, Spidey and His Amazing Friends & Transformers, Ages 4+",
+      "sourcePrice": 64.94,
+      "peerPrice": 59.86,
+      "currency": "USD",
+      "observedPremiumPct": 8.49,
+      "allowancePct": 15,
+      "score": 53,
+      "basis": "similar",
+      "peerShopCount": 1,
+      "creators": 1
+    }
+  ]
+}

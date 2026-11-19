@@ -1,12 +1,12 @@
 import products from "../../research/creator-products.json";
 import rubric from "../../research/creator-score-rubric.json";
+import { distinct, sourceIndex, usableProducts, evidencePoints, sumEvidencePoints, hasPost, hasPrice, hasContext } from "./creator-scoring.mjs";
 import { PUBLIC_CREATORS } from "./creator-directory";
 import { brandLeadsFor, screeningFor } from "./creator-screening";
 
 export const EVIDENCE_SCORE_VERSION = rubric.version;
 export const formatEvidenceScore = (value: number) => value.toFixed(1);
-export const sumEvidencePoints = (values: number[]) => values.reduce((sum, value) => sum + Math.round(value * 10), 0) / 10;
-export const coveragePoints = (count: number, target: number, maximum: number) => Math.round(maximum * Math.min(Math.max(count, 0), target) / target * 10) / 10;
+export { coveragePoints, evidencePoints, sumEvidencePoints } from "./creator-scoring.mjs";
 export const EVIDENCE_SCORE_SCOPE = "Measures the evidence collected in this report, not creator honesty, product quality or value for money. A low score means limited research coverage. Followers, popularity and assumed earnings earn no points.";
 export const EVIDENCE_GROUPS = [
   { id: "sample", name: "Public sample", maximum: 20 },
@@ -22,34 +22,6 @@ export interface EvidenceInput {
   captionIds: readonly string[];
   commercialUrls: readonly string[];
   products: readonly Product[];
-}
-
-const distinct = (values: readonly string[]) => [...new Set(values.filter(value => value.trim()))];
-const sourceIndex = new Map(products.sources.map(source => [source.id, source]));
-const hasSources = (product: Product) => product.sources.some(id => sourceIndex.has(id));
-const usableProducts = (records: readonly Product[]) => [...new Map(records.filter(product => product.id && product.name.trim() && hasSources(product)).map(product => [product.id, product])).values()];
-const hasPrice = (product: Product) => Number.isFinite(product.price.amount) && product.price.amount > 0 && /^[A-Z]{3}$/.test(product.price.currency);
-const hasContext = (product: Product) => hasPrice(product) && !!product.price.market.trim() && !!product.price.conditions.trim();
-const hasPost = (product: Product) => !!product.postUrl && /^https:\/\/(www\.)?tiktok\.com\/@[^/]+\/video\/\d+$/.test(product.postUrl);
-
-export function evidencePoints(input: EvidenceInput) {
-  const records = usableProducts(input.products);
-  const captions = input.matchedSample ? distinct(input.captionIds).length : 0;
-  const points = {
-    identity: captions ? 10 : 0,
-    captions: coveragePoints(captions, rubric.targets.captions, 10),
-    leads: coveragePoints(distinct(input.commercialUrls).length, rubric.targets.leads, 15),
-    linkage: coveragePoints(distinct(records.filter(hasPost).map(product => product.postUrl!)).length, rubric.targets.linkage, 10),
-    products: coveragePoints(records.length, rubric.targets.products, 10),
-    variants: coveragePoints(records.filter(product => product.variant.trim()).length, rubric.targets.variants, 10),
-    prices: coveragePoints(records.filter(hasPrice).length, rubric.targets.prices, 10),
-    context: coveragePoints(records.filter(hasContext).length, rubric.targets.context, 5),
-    compensation: 0,
-    costs: 0,
-  };
-  // Financial criteria are reserved until reviewed primary records and a new
-  // methodology exist. Descriptive notes and scenario inputs cannot award points.
-  return { ...points, total: sumEvidencePoints(Object.values(points)) };
 }
 
 function buildScore(handle: string) {

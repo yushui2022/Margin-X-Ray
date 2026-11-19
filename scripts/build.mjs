@@ -109,6 +109,10 @@ async function copyStatic() {
   // The agent web app is a standalone frontend served by scripts/serve-demo.mjs.
   await cp(join(root, "src/web/index.html"), join(web, "index.html"));
   await cp(join(root, "src/web/app.css"), join(web, "app.css"));
+  for (const name of ["shopping.css", "creator-shopping.css"]) {
+    await cp(join(root, "src/web", name), join(web, name));
+  }
+  await cp(join(root, "assets/products"), join(web, "assets/products"), { recursive: true });
   await cp(join(root, "src/styles/tokens.css"), join(web, "tokens.css"));
   await cp(join(root, "src/styles/fonts.css"), join(web, "fonts.css"));
   await mkdir(join(web, "assets"), { recursive: true });

@@ -18,6 +18,7 @@ import { EXTENSION_VERSION } from "../shared/version";
 import { downloadPoster, renderPosterBlob } from "../content/ui/poster";
 import { renderProWorkspace } from "./pro";
 import { renderMarkup } from "./markup";
+import { archiveHosting } from "./hosting-mode";
 import { markupHref } from "../shared/markup-records";
 import type {
   Confidence,
@@ -80,6 +81,7 @@ const els = {
   toast: byId<HTMLElement>("toast"),
   proView: byId<HTMLElement>("proView"),
   creatorsView: byId<HTMLElement>("creatorsView"),
+  shopView: byId<HTMLElement>("shopView"),
   markupView: byId<HTMLElement>("markupView"),
 };
 
@@ -138,11 +140,22 @@ function boot(): void {
   });
   window.addEventListener("hashchange", routeView);
   routeView();
-  void refreshHealth();
+  if (archiveHosting) {
+    els.backendBtn.hidden = true;
+    tools.querySelector('a[href="#scan"]')?.remove();
+    setAgentStatus("offline", "Saved edition");
+  } else void refreshHealth();
 }
 
 function routeView(): void {
   byId<HTMLDetailsElement>("appTools").open = false;
+  if (archiveHosting && /^#scan(?:\?|$)/.test(location.hash)) {
+    history.replaceState(history.state, "", "#shop");
+  }
+  if (!location.hash || /^#shop(?:[/?]|$)/.test(location.hash)) {
+    showView("shop");
+    return;
+  }
   if (location.hash.startsWith("#scan?")) {
     const url = new URLSearchParams(location.hash.slice(6)).get("url");
     history.replaceState(history.state, "", "#scan");
@@ -159,10 +172,11 @@ function routeView(): void {
   showView(location.hash === "#pro" ? "pro" : location.hash === "#scan" ? "scan" : "creators");
 }
 
-function showView(view: "scan" | "pro" | "creators" | "markup"): void {
+function showView(view: "scan" | "pro" | "creators" | "markup" | "shop"): void {
   const pro = view === "pro";
   els.proView.hidden = !pro;
   els.creatorsView.hidden = view !== "creators";
+  els.shopView.hidden = view !== "shop";
   els.markupView.hidden = view !== "markup";
   els.hero.hidden = view !== "scan" || scanStarted;
   els.workspace.hidden = view !== "scan" || !scanStarted;
@@ -173,8 +187,16 @@ function showView(view: "scan" | "pro" | "creators" | "markup"): void {
     if (active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   }
-  const title = location.hash === "#prices" ? "Price archive" : { creators: "Creator research", scan: "Product scan", pro: "Pricing workspace", markup: "Product markup check" }[view];
+  const title = location.hash === "#prices" ? "Price archive" : { shop: "Shopping check", creators: "Creator research", scan: "Product scan", pro: "Pricing workspace", markup: "Product markup check" }[view];
   document.title = `${title} · Onion Head`;
+  if (view === "shop") {
+    if (!location.hash) history.replaceState(history.state, "", "#shop");
+    const requested = location.hash;
+    void import("./shopping").then(({ renderShopping }) => {
+      if (location.hash === requested && document.body.dataset.view === "shop") renderShopping(els.shopView);
+    });
+    return;
+  }
   if (view === "markup") {
     const route = location.hash.replace(/^#markup\/?/, "");
     els.markupView.replaceChildren(renderMarkup(route, result ?? undefined));

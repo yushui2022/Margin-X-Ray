@@ -1,0 +1,1250 @@
+{
+  "formatVersion": 1,
+  "method": "shop-ranking-benchmark-v1",
+  "observations": [
+    {
+      "product": {
+        "productId": "1731165367326642778",
+        "name": "[TIRTIR Official] Mask Fit AI Filter Cushion Foundation l Full Size 0.63oz / 18g l Natural Satin Finish Makeup for Long Lasting Coverage & Smooth Texture Concealer Cosmetic Matte Hydrate",
+        "listingUrl": "https://shop.tiktok.com/us/pdp/1731165367326642778?sku_id=1731165503455269466",
+        "sourceUrl": "https://shop.tiktok.com/us/pdp/1731165367326642778?sku_id=1731165503455269466",
+        "market": "US",
+        "seller": "TIRTIR Inc.",
+        "sellerId": "7495857443730262618",
+        "brand": "TIRTIR",
+        "model": null,
+        "netWeight": "0.63oz",
+        "status": "priced",
+        "detailStatus": "read",
+        "observedAt": "2026-11-19T03:44:16.938Z",
+        "defaultSkuId": "1731165503455269466",
+        "selectedSkuId": "1731165503455269466",
+        "requestedSkuId": "1731165503455269466",
+        "variants": [
+          {
+            "skuId": "1731598553185948250",
+            "variant": "10C Shell",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": null
+          },
+          {
+            "skuId": "1731598553186013786",
+            "variant": "11C Cool Rosy",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165507632403034",
+            "variant": "13N Fair Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165503455269466",
+            "variant": "15C Fair Porcelain",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165503455335002",
+            "variant": "17C Porcelain",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165503455400538",
+            "variant": "17N Vanilla",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398513242",
+            "variant": "19C Petal",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398578778",
+            "variant": "21C Cool Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398644314",
+            "variant": "21N Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186079322",
+            "variant": "21W Natural Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398709850",
+            "variant": "22N Shell Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398775386",
+            "variant": "23N Sand",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398840922",
+            "variant": "24N Latte",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186144858",
+            "variant": "24W Soft Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186210394",
+            "variant": "25C Cool Taupe",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186275930",
+            "variant": "25N Mocha",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978654298",
+            "variant": "27C Cool Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978719834",
+            "variant": "27N Camel",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978785370",
+            "variant": "28N Oat",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398906458",
+            "variant": "29N Natural Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978850906",
+            "variant": "30N Rich Honey",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731611697955181146",
+            "variant": "33N Macchiato",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978916442",
+            "variant": "34W Toffee",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224350298",
+            "variant": "37N Peanut Almond",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224415834",
+            "variant": "39W Caramel",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224481370",
+            "variant": "43N Deep Cocoa",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978981978",
+            "variant": "45W Chestnut",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224546906",
+            "variant": "49N Deep Chestnut",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224612442",
+            "variant": "51N Fudge",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224677978",
+            "variant": "55N Espresso",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          }
+        ]
+      },
+      "checks": [
+        {
+          "productIndex": 0,
+          "variantIndex": 3,
+          "status": "candidates",
+          "message": "The similar listings lack a verified matching barcode or manufacturer model and variant. Check the code on the original label or supply the exact retailer listing.",
+          "offers": [
+            {
+              "name": "[Official TIRTIR Partner] Mask Fit Red Cushion, Long Lasting, High Coverage, Semi Matte Light Finish, All Skin Type, Hydrating, makeup by mario powder",
+              "url": "https://shop.tiktok.com/us/pdp/1729544948679283308?sku_id=1729626526433383020",
+              "price": 25,
+              "currency": "USD",
+              "variant": "15C Fair Porcelain",
+              "seller": "StyleKorean US",
+              "sellerId": "7495299042298268268",
+              "skuId": "1729626526433383020",
+              "gtin": null,
+              "match": "candidate",
+              "available": true,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:44:29.465Z",
+              "netWeight": "104g",
+              "weightConflict": "The listing gives 18g for volume and 104g for net weight. Its description gives a fill of about 15g."
+            },
+            {
+              "name": "Tirtir Mask Fit Red Cushion Full Coverage Long Lasting Concealer Foundation",
+              "url": "https://shop.tiktok.com/us/pdp/1729397399032271752?sku_id=1729397881147331464",
+              "price": 29,
+              "currency": "USD",
+              "variant": "17C Porcelain",
+              "seller": "skinsquared",
+              "sellerId": "7495178936511925128",
+              "skuId": "1729397881147331464",
+              "gtin": null,
+              "match": "candidate",
+              "available": null,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:44:14.541Z",
+              "netWeight": "18g"
+            },
+            {
+              "name": "TIRTIR - MINI Mask Fit Red Cushion (55N) 4.5g",
+              "url": "https://shop.tiktok.com/us/pdp/1729579662262637328?sku_id=1729579674451809040",
+              "price": 4.6,
+              "currency": "USD",
+              "variant": "55N Espresso",
+              "seller": "cocomintbeauty",
+              "sellerId": "7495036232066239248",
+              "skuId": "1729579674451809040",
+              "gtin": null,
+              "match": "candidate",
+              "available": null,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:46:00.098Z",
+              "netWeight": "4.5g"
+            }
+          ],
+          "sources": [
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%2015C%20Fair%20Porcelain%20Cushion%2018g",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729397399032271752",
+              "label": "TikTok Shop seller · skinsquared"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729544948679283308",
+              "label": "TikTok Shop seller · StyleKorean US"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20Mask%20Fit%20AI%20Filter%20Cushion%20Korean%20makeup%20foundation",
+              "label": "TikTok Shop · checked 14 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20Mask%20Fit%20red%20cushion%2015C%20fair%20porcelain%20full%20size",
+              "label": "TikTok Shop · checked 9 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20mask%20fit%20aura%20silver%20cushion%2015C%20foundation",
+              "label": "TikTok Shop · checked 11 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20mask%20fit%2015C%20Fair%20Porcelain",
+              "label": "TikTok Shop · checked 11 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732217749772276018",
+              "label": "TikTok Shop seller · CL CONGLIN"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731017212179682192",
+              "label": "TikTok Shop seller · TechTint"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20cushion%20foundation%20full%20size",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729579662262637328",
+              "label": "TikTok Shop seller · cocomintbeauty"
+            }
+          ],
+          "comparison": null
+        }
+      ],
+      "sourceUrl": "https://shop.tiktok.com/us/pdp/1731165367326642778?sku_id=1731165503455269466",
+      "observedAt": "2026-11-19T03:44:16.938Z"
+    },
+    {
+      "product": {
+        "productId": "1731165367326642778",
+        "name": "[TIRTIR Official] Mask Fit AI Filter Cushion Foundation l Full Size 0.63oz / 18g l Natural Satin Finish Makeup for Long Lasting Coverage & Smooth Texture Concealer Cosmetic Matte Hydrate",
+        "listingUrl": "https://shop.tiktok.com/us/pdp/1731165367326642778?sku_id=1731165555398644314",
+        "sourceUrl": "https://shop.tiktok.com/us/pdp/1731165367326642778?sku_id=1731165555398644314",
+        "market": "US",
+        "seller": "TIRTIR Inc.",
+        "sellerId": "7495857443730262618",
+        "brand": "TIRTIR",
+        "model": null,
+        "netWeight": "0.63oz",
+        "status": "priced",
+        "detailStatus": "read",
+        "observedAt": "2026-11-19T03:43:57.459Z",
+        "defaultSkuId": "1731165503455269466",
+        "selectedSkuId": "1731165555398644314",
+        "requestedSkuId": "1731165555398644314",
+        "variants": [
+          {
+            "skuId": "1731598553185948250",
+            "variant": "10C Shell",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": null
+          },
+          {
+            "skuId": "1731598553186013786",
+            "variant": "11C Cool Rosy",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165507632403034",
+            "variant": "13N Fair Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165503455269466",
+            "variant": "15C Fair Porcelain",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165503455335002",
+            "variant": "17C Porcelain",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165503455400538",
+            "variant": "17N Vanilla",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398513242",
+            "variant": "19C Petal",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398578778",
+            "variant": "21C Cool Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398644314",
+            "variant": "21N Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186079322",
+            "variant": "21W Natural Ivory",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398709850",
+            "variant": "22N Shell Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398775386",
+            "variant": "23N Sand",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398840922",
+            "variant": "24N Latte",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186144858",
+            "variant": "24W Soft Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186210394",
+            "variant": "25C Cool Taupe",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598553186275930",
+            "variant": "25N Mocha",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978654298",
+            "variant": "27C Cool Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978719834",
+            "variant": "27N Camel",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978785370",
+            "variant": "28N Oat",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731165555398906458",
+            "variant": "29N Natural Beige",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978850906",
+            "variant": "30N Rich Honey",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731611697955181146",
+            "variant": "33N Macchiato",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978916442",
+            "variant": "34W Toffee",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224350298",
+            "variant": "37N Peanut Almond",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224415834",
+            "variant": "39W Caramel",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224481370",
+            "variant": "43N Deep Cocoa",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598547978981978",
+            "variant": "45W Chestnut",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224546906",
+            "variant": "49N Deep Chestnut",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224612442",
+            "variant": "51N Fudge",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731598605224677978",
+            "variant": "55N Espresso",
+            "gtin": null,
+            "price": 32.5,
+            "currency": "USD",
+            "available": true
+          }
+        ]
+      },
+      "checks": [
+        {
+          "productIndex": 0,
+          "variantIndex": 8,
+          "status": "candidates",
+          "message": "The similar listings lack a verified matching barcode or manufacturer model and variant. Check the code on the original label or supply the exact retailer listing.",
+          "offers": [
+            {
+              "name": "Tirtir Mask Fit Red Cushion Full Coverage Long Lasting Concealer Foundation",
+              "url": "https://shop.tiktok.com/us/pdp/1729397399032271752?sku_id=1729397881147397000",
+              "price": 29,
+              "currency": "USD",
+              "variant": "21N Ivory",
+              "seller": "skinsquared",
+              "sellerId": "7495178936511925128",
+              "skuId": "1729397881147397000",
+              "gtin": null,
+              "match": "candidate",
+              "available": true,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:44:14.541Z",
+              "netWeight": "18g"
+            },
+            {
+              "name": "[Official TIRTIR Partner] Mask Fit Red Cushion, Long Lasting, High Coverage, Semi Matte Light Finish, All Skin Type, Hydrating, makeup by mario powder",
+              "url": "https://shop.tiktok.com/us/pdp/1729544948679283308?sku_id=1729545033067500140",
+              "price": 25,
+              "currency": "USD",
+              "variant": "21N Ivory",
+              "seller": "StyleKorean US",
+              "sellerId": "7495299042298268268",
+              "skuId": "1729545033067500140",
+              "gtin": null,
+              "match": "candidate",
+              "available": true,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:44:29.465Z",
+              "netWeight": "104g",
+              "weightConflict": "The listing gives 18g for volume and 104g for net weight. Its description gives a fill of about 15g."
+            },
+            {
+              "name": "TIRTIR - MINI Mask Fit Red Cushion (55N) 4.5g",
+              "url": "https://shop.tiktok.com/us/pdp/1729579662262637328?sku_id=1729579674451809040",
+              "price": 4.6,
+              "currency": "USD",
+              "variant": "55N Espresso",
+              "seller": "cocomintbeauty",
+              "sellerId": "7495036232066239248",
+              "skuId": "1729579674451809040",
+              "gtin": null,
+              "match": "candidate",
+              "available": null,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:46:00.098Z",
+              "netWeight": "4.5g"
+            }
+          ],
+          "sources": [
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%2015C%20Fair%20Porcelain%20Cushion%2018g",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729397399032271752",
+              "label": "TikTok Shop seller · skinsquared"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729544948679283308",
+              "label": "TikTok Shop seller · StyleKorean US"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20Mask%20Fit%20AI%20Filter%20Cushion%20Korean%20makeup%20foundation",
+              "label": "TikTok Shop · checked 14 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20Mask%20Fit%20red%20cushion%2015C%20fair%20porcelain%20full%20size",
+              "label": "TikTok Shop · checked 9 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20mask%20fit%20aura%20silver%20cushion%2015C%20foundation",
+              "label": "TikTok Shop · checked 11 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20mask%20fit%2015C%20Fair%20Porcelain",
+              "label": "TikTok Shop · checked 11 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732217749772276018",
+              "label": "TikTok Shop seller · CL CONGLIN"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731017212179682192",
+              "label": "TikTok Shop seller · TechTint"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20cushion%20foundation%20full%20size",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729579662262637328",
+              "label": "TikTok Shop seller · cocomintbeauty"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=TIRTIR%20Mask%20Fit%20Red%20Cushion%20foundation%2021N%20Ivory%20full%20size%2018g",
+              "label": "TikTok Shop · checked 11 results for other sellers"
+            }
+          ],
+          "comparison": null
+        }
+      ],
+      "sourceUrl": "https://shop.tiktok.com/us/pdp/1731165367326642778?sku_id=1731165555398644314",
+      "observedAt": "2026-11-19T03:43:57.459Z"
+    },
+    {
+      "product": {
+        "productId": "1731176397038522481",
+        "name": "Marvel Spider-Man, Spidey and His Amazing Friends, NASCAR & Transformers Pit Stop Tool Bench Playset – Pretend Play Racing & Real Tool Fun for Kids 4+, Official Licensed",
+        "listingUrl": "https://shop.tiktok.com/us/pdp/1731176397038522481?sku_id=1732004415659217009",
+        "sourceUrl": "https://shop.tiktok.com/us/pdp/1731176397038522481?sku_id=1732004415659217009",
+        "market": "US",
+        "seller": "World Tech Toys 2.0",
+        "sellerId": "7496114746742376561",
+        "brand": "Marvel",
+        "model": null,
+        "status": "priced",
+        "detailStatus": "read",
+        "observedAt": "2026-11-19T03:43:57.471Z",
+        "defaultSkuId": "1732004415659217009",
+        "selectedSkuId": "1732004415659217009",
+        "requestedSkuId": "1732004415659217009",
+        "variants": [
+          {
+            "skuId": "1731176484097855601",
+            "variant": "SpiderMan Tool Bench Playset",
+            "gtin": null,
+            "price": 77.99,
+            "currency": "USD",
+            "available": null
+          },
+          {
+            "skuId": "1731176484097921137",
+            "variant": "Team Nascar Pit Stop Playset",
+            "gtin": null,
+            "price": 77.99,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732004415659217009",
+            "variant": "Spidey and His Amazing Friends",
+            "gtin": null,
+            "price": 59.99,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732121517841682545",
+            "variant": "Transformers Rescue Bots Academy",
+            "gtin": null,
+            "price": 77.99,
+            "currency": "USD",
+            "available": true
+          }
+        ]
+      },
+      "checks": [
+        {
+          "productIndex": 0,
+          "variantIndex": 2,
+          "status": "candidates",
+          "message": "The similar listings lack a verified matching barcode or manufacturer model and variant. Check the code on the original label or supply the exact retailer listing.",
+          "offers": [
+            {
+              "name": "Marvel Spider-Man | Spidey and His Amazing Friends | Team Nascar Pit Stop Tool Bench Playset - Pretend Play & Real Tool Fun for Kids Age 4+; Official Licensed",
+              "url": "https://shop.tiktok.com/us/pdp/1729722599199904742?sku_id=1732004483217134566",
+              "price": 55.64,
+              "currency": "USD",
+              "variant": "Spidey and His Amazing Friends Tool Bench Playset",
+              "seller": "World Tech Toys",
+              "sellerId": "7495366765598116838",
+              "skuId": "1732004483217134566",
+              "gtin": null,
+              "match": "candidate",
+              "available": true,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:44:21.841Z"
+            }
+          ],
+          "sources": [
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=spidey%20and%20his%20amazing%20friends%20tool%20bench%20playset",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729722599199904742",
+              "label": "TikTok Shop seller · World Tech Toys"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731617056800215487",
+              "label": "TikTok Shop seller · Garvee Store"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=spiderman%20tool%20bench%2055%20piece",
+              "label": "TikTok Shop · checked 17 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731139715134428103",
+              "label": "TikTok Shop seller · QVC, Inc"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732218797125570595",
+              "label": "TikTok Shop seller · Snugglebear01"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=marvel%20spiderman%20tool%20workbench%20kids%20world%20tech%20toys",
+              "label": "TikTok Shop · checked 6 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731432229699817585",
+              "label": "TikTok Shop seller · eKidstoys"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=spidey%20and%20friends%20workshop%20tool%20workbench",
+              "label": "TikTok Shop · checked 11 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732047008055792055",
+              "label": "TikTok Shop seller · Delta Children"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=spider%20man%20toy%20tool%20bench%20playset%20pit%20stop",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732090710323269875",
+              "label": "TikTok Shop seller · Locomoto Shop"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=spidey%20superhero%20tool%20bench%20World%20Tech%20toys",
+              "label": "TikTok Shop · checked 15 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732294478806750022",
+              "label": "TikTok Shop seller · Toynk"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Spidey%20and%20His%20Amazing%20Friends%20tool%20bench",
+              "label": "TikTok Shop · checked 16 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729492158748857807",
+              "label": "TikTok Shop seller · Jay Franco Home"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Spiderman%20tool%20bench%20for%20kids",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            }
+          ],
+          "comparison": null
+        }
+      ],
+      "sourceUrl": "https://shop.tiktok.com/us/pdp/1731176397038522481?sku_id=1732004415659217009",
+      "observedAt": "2026-11-19T03:43:57.471Z"
+    },
+    {
+      "product": {
+        "productId": "1731603800884088945",
+        "name": "Officially Licensed Marvel,Hello Kitty,Transformers &WWE Wooden Electronic Air Hockey Table – Spider-Man, Avengers, Spidey and His Amazing Friends & Transformers, Ages 4+",
+        "listingUrl": "https://shop.tiktok.com/us/pdp/1731603800884088945?sku_id=1731608588969414769",
+        "sourceUrl": "https://shop.tiktok.com/us/pdp/1731603800884088945?sku_id=1731608588969414769",
+        "market": "US",
+        "seller": "World Tech Toys 2.0",
+        "sellerId": "7496114746742376561",
+        "brand": "Marvel",
+        "model": null,
+        "status": "priced",
+        "detailStatus": "read",
+        "observedAt": "2026-11-19T03:56:21.514Z",
+        "defaultSkuId": "1731608588969414769",
+        "selectedSkuId": "1731608588969414769",
+        "requestedSkuId": "1731608588969414769",
+        "variants": [
+          {
+            "skuId": "1731612111547109489",
+            "variant": "Spider-Man",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": null
+          },
+          {
+            "skuId": "1732731743765500017",
+            "variant": "Hello Kitty",
+            "gtin": null,
+            "price": 77.99,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731608588969414769",
+            "variant": "Spidey and His Amazing Friends",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732025651801854065",
+            "variant": "Avengers",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732030165885030513",
+            "variant": "Transformers",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732608649077952625",
+            "variant": "WWE",
+            "gtin": null,
+            "price": 99.95,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732802805350174833",
+            "variant": "Neon Green",
+            "gtin": null,
+            "price": 71.49,
+            "currency": "USD",
+            "available": true
+          }
+        ]
+      },
+      "checks": [
+        {
+          "productIndex": 0,
+          "variantIndex": 2,
+          "status": "candidates",
+          "message": "The similar listings lack a verified matching barcode or manufacturer model and variant. Check the code on the original label or supply the exact retailer listing.",
+          "offers": [
+            {
+              "name": "Marvel Wooden Electronic Air Hockey Table: Spider-Man | Spidey and His Amazing Friends | Avengers | Transformers, Ages 4+, Officially Licensed",
+              "url": "https://shop.tiktok.com/us/pdp/1731758979167523814?sku_id=1731759274114782182",
+              "price": 59.86,
+              "currency": "USD",
+              "variant": "Spidey and His Amazing Friends",
+              "seller": "World Tech Toys",
+              "sellerId": "7495366765598116838",
+              "skuId": "1731759274114782182",
+              "gtin": null,
+              "match": "candidate",
+              "available": true,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:56:34.051Z",
+              "material": "Wood"
+            },
+            {
+              "name": "AIR HOCKEY TABLE",
+              "url": "https://shop.tiktok.com/us/pdp/1732707375019364519?sku_id=1732707376787263655",
+              "price": 68,
+              "currency": "USD",
+              "variant": "Default",
+              "seller": "BOOOM OUTLET",
+              "sellerId": "7494537134904018087",
+              "skuId": "1732707376787263655",
+              "gtin": null,
+              "match": "candidate",
+              "available": null,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:56:49.099Z"
+            }
+          ],
+          "sources": [
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=marvel%20spidey%20his%20amazing%20friends%20hockey%20table",
+              "label": "TikTok Shop · checked 17 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731758979167523814",
+              "label": "TikTok Shop seller · World Tech Toys"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732294478806750022",
+              "label": "TikTok Shop seller · Toynk"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=marvel%20officially%20licensed%20hockey%20table",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729402054118970107",
+              "label": "TikTok Shop seller · Tribesigns"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Marvel%20Spider%20Man%20wooden%20tabletop%20air%20hockey%20game",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732187196594885622",
+              "label": "TikTok Shop seller · Fan Favorites"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Spider-Man%20electronic%20air%20powered%20hockey%20table",
+              "label": "TikTok Shop · checked 19 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=World%20Tech%20Toys%20Marvel%20air%20hockey%20table",
+              "label": "TikTok Shop · checked 20 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732707375019364519",
+              "label": "TikTok Shop seller · BOOOM OUTLET"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Spidey%20and%20His%20Amazing%20Friends%20air%20hockey%20table",
+              "label": "TikTok Shop · checked 15 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1729626595565735960",
+              "label": "TikTok Shop · seller listing details unavailable"
+            }
+          ],
+          "comparison": null
+        }
+      ],
+      "sourceUrl": "https://shop.tiktok.com/us/pdp/1731603800884088945?sku_id=1731608588969414769",
+      "observedAt": "2026-11-19T03:56:21.514Z"
+    },
+    {
+      "product": {
+        "productId": "1731739658644197489",
+        "name": "Disney Wooden Electronic Air Hockey Table: Mickey Mouse, Minnie Mouse, Stitch, Toy Story, Disney Princess – Age 4+, Officially Licensed Family Board Game",
+        "listingUrl": "https://shop.tiktok.com/us/pdp/1731739658644197489?sku_id=1731739783067308145",
+        "sourceUrl": "https://shop.tiktok.com/us/pdp/1731739658644197489?sku_id=1731739783067308145",
+        "market": "US",
+        "seller": "World Tech Toys 2.0",
+        "sellerId": "7496114746742376561",
+        "brand": null,
+        "model": null,
+        "status": "priced",
+        "detailStatus": "read",
+        "observedAt": "2026-11-19T03:44:24.659Z",
+        "defaultSkuId": "1731739783067308145",
+        "selectedSkuId": "1731739783067308145",
+        "requestedSkuId": "1731739783067308145",
+        "variants": [
+          {
+            "skuId": "1732793193434026097",
+            "variant": "Hello Kitty",
+            "gtin": null,
+            "price": 77.99,
+            "currency": "USD",
+            "available": null
+          },
+          {
+            "skuId": "1732025698419642481",
+            "variant": "Toy Story",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732803039859085425",
+            "variant": "Pudgy Penguins",
+            "gtin": null,
+            "price": 77.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731739783067308145",
+            "variant": "Disney Princess",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731739783067373681",
+            "variant": "Disney Mickey Mouse",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732025698419576945",
+            "variant": "Minnie Mouse",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1732718921918287985",
+            "variant": "Frozen",
+            "gtin": null,
+            "price": 77.99,
+            "currency": "USD",
+            "available": true
+          },
+          {
+            "skuId": "1731814332630077553",
+            "variant": "Stitch",
+            "gtin": null,
+            "price": 64.94,
+            "currency": "USD",
+            "available": true
+          }
+        ]
+      },
+      "checks": [
+        {
+          "productIndex": 0,
+          "variantIndex": 3,
+          "status": "candidates",
+          "message": "The similar listings lack a verified matching barcode or manufacturer model and variant. Check the code on the original label or supply the exact retailer listing.",
+          "offers": [
+            {
+              "name": "Disney Wooden Electronic Air Hockey Table: Disney Princess | Mickey | Minnie | Stitch | Toy Story, Age 4+, Officially Licensed",
+              "url": "https://shop.tiktok.com/us/pdp/1731738270696510438?sku_id=1731738301377057766",
+              "price": 54.83,
+              "currency": "USD",
+              "variant": "Disney Princess",
+              "seller": "World Tech Toys",
+              "sellerId": "7495366765598116838",
+              "skuId": "1731738301377057766",
+              "gtin": null,
+              "match": "candidate",
+              "available": true,
+              "verifiedShop": true,
+              "observedAt": "2026-11-19T03:46:24.052Z",
+              "material": "Wood"
+            }
+          ],
+          "sources": [
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Disney%20Princess%20air%20hockey%20table%20wooden",
+              "label": "TikTok Shop · checked 17 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731738270696510438",
+              "label": "TikTok Shop seller · World Tech Toys"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732040757717930998",
+              "label": "TikTok Shop seller · Fan Favorites"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Disney%20wooden%20electronic%20air%20hockey%20table%20pink",
+              "label": "TikTok Shop · checked 11 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1732283124954271771",
+              "label": "TikTok Shop seller · Jasmin-KK"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Disney%20Princess%20tabletop%20air%20hockey%20family%20game",
+              "label": "TikTok Shop · checked 18 results for other sellers"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=World%20Tech%20Toys%20air%20hockey%20Disney%20princess",
+              "label": "TikTok Shop · checked 12 results for other sellers"
+            },
+            {
+              "url": "https://shop.tiktok.com/us/pdp/1731348959908434033",
+              "label": "TikTok Shop · seller listing details unavailable"
+            },
+            {
+              "url": "https://www.tiktok.com/shop/s?search_key=Disney%20Princess%20air%20hockey%20table",
+              "label": "TikTok Shop · checked 15 results for other sellers"
+            }
+          ],
+          "comparison": null
+        }
+      ],
+      "sourceUrl": "https://shop.tiktok.com/us/pdp/1731739658644197489?sku_id=1731739783067308145",
+      "observedAt": "2026-11-19T03:44:24.659Z"
+    }
+  ],
+  "candidates": [
+    {
+      "productId": "1731165367326642778",
+      "skuId": "1731165503455269466",
+      "observedAt": "2026-11-19T03:44:29.465Z",
+      "url": "https://shop.tiktok.com/us/pdp/1729544948679283308?sku_id=1729626526433383020",
+      "label": "StyleKorean US · $25.00",
+      "reason": "The seller lists Volume 18g, Net weight 104g, and about 15g of product in its description. The selected compact’s size needs confirmation."
+    },
+    {
+      "productId": "1731165367326642778",
+      "skuId": "1731165555398644314",
+      "observedAt": "2026-11-19T03:44:29.465Z",
+      "url": "https://shop.tiktok.com/us/pdp/1729544948679283308?sku_id=1729545033067500140",
+      "label": "StyleKorean US · $25.00",
+      "reason": "The seller lists Volume 18g, Net weight 104g, and about 15g of product in its description. The selected compact’s size needs confirmation."
+    },
+    {
+      "productId": "1731165367326642778",
+      "skuId": "1731165555398644314",
+      "observedAt": "2026-11-19T03:46:28.615Z",
+      "url": "https://shop.tiktok.com/us/pdp/1732173980882539196?sku_id=1732174095243055804",
+      "label": "StrawberryNet Beauty Haven · $35.72",
+      "reason": "The listing shows an 18g carton in shade 25N Mocha. Its 21N Ivory SKU has a swatch and no confirmed net weight."
+    }
+  ]
+}

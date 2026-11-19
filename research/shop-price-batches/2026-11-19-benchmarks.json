@@ -1,0 +1,171 @@
+{
+  "observedOn": "2026-11-19",
+  "market": "US",
+  "scope": "tiktok-shop",
+  "scoreVersion": "shop-onion-v2",
+  "benchmarkVersion": "shop-ranking-benchmark-v1",
+  "evidence": [
+    {
+      "file": "research/shop-price-ranking-seed.json",
+      "sha256": "09345cdc56a4fa39f5472524e7c751bec577afb4ed3af94453b44a5506b70cd2"
+    },
+    {
+      "file": "research/shop-price-batches/2026-11-19-additional-posts.json",
+      "sha256": "cc98e1eac313ad061b064be3ae6a4650149a6e98d0e189a8c2c4be1190f151b7"
+    },
+    {
+      "file": "research/shop-price-benchmark-checks.json",
+      "sha256": "8e759a211bebfd9cc1887ff85e14014b0ca9588a609459d54c008bb7ea369149"
+    }
+  ],
+  "selection": "Screened the 78 previously ranked creators for more native product links and submitted distinct posts to the product shopping check. Targeted searches also verified additional sellers and second products. The original post and the calibrated ranking keep separate evidence.",
+  "coverage": {
+    "creatorsScreenedForMoreProducts": 78,
+    "creatorsWithNewProductPosts": 69,
+    "additionalPosts": 90,
+    "distinctListingsInAdditionalPosts": 86,
+    "archivedPosts": 276,
+    "checkedCreators": 161,
+    "rankedCreators": 89,
+    "unratedCreators": 72,
+    "creatorsWithMultipleScoredProducts": 7,
+    "calibratedOriginalVariants": 5,
+    "scoredVariants": 4,
+    "variantsWithMultipleQualifyingStores": 0
+  },
+  "discovery": {
+    "toy": {
+      "distinctQueries": 13,
+      "pagesReturned": 16,
+      "distinctListings": 158,
+      "distinctReturnedStorefronts": 105
+    },
+    "hockey": {
+      "distinctQueries": 8,
+      "pagesReturned": 9,
+      "distinctListings": 51,
+      "distinctReturnedStorefronts": 32
+    },
+    "tirtir": {
+      "distinctQueries": 21,
+      "pagesReturned": 31,
+      "distinctListings": 79,
+      "distinctReturnedStorefronts": 34
+    }
+  },
+  "benchmarks": [
+    {
+      "originalListingId": "1731739658644197489",
+      "skuId": "1731739783067308145",
+      "variant": "Disney Princess",
+      "sourcePrice": 64.94,
+      "referencePrice": 54.83,
+      "basis": "similar",
+      "itemScore": 6,
+      "shops": [
+        {
+          "seller": "World Tech Toys",
+          "url": "https://shop.tiktok.com/us/pdp/1731738270696510438?sku_id=1731738301377057766",
+          "price": 54.83,
+          "observedAt": "2026-11-19T03:46:24.052Z"
+        }
+      ],
+      "candidateListings": 12,
+      "creatorsUsingReference": 11
+    },
+    {
+      "originalListingId": "1731176397038522481",
+      "skuId": "1732004415659217009",
+      "variant": "Spidey and His Amazing Friends",
+      "sourcePrice": 59.99,
+      "referencePrice": 55.64,
+      "basis": "similar",
+      "itemScore": 0,
+      "shops": [
+        {
+          "seller": "World Tech Toys",
+          "url": "https://shop.tiktok.com/us/pdp/1729722599199904742?sku_id=1732004483217134566",
+          "price": 55.64,
+          "observedAt": "2026-11-19T03:44:21.841Z"
+        }
+      ],
+      "candidateListings": 11,
+      "creatorsUsingReference": 82
+    },
+    {
+      "originalListingId": "1731165367326642778",
+      "skuId": "1731165555398644314",
+      "variant": "21N Ivory",
+      "sourcePrice": 32.5,
+      "referencePrice": 29,
+      "basis": "similar",
+      "itemScore": 0,
+      "shops": [
+        {
+          "seller": "skinsquared",
+          "url": "https://shop.tiktok.com/us/pdp/1729397399032271752?sku_id=1729397881147397000",
+          "price": 29,
+          "observedAt": "2026-11-19T03:44:14.541Z"
+        }
+      ],
+      "candidateListings": 5,
+      "creatorsUsingReference": 3
+    },
+    {
+      "originalListingId": "1731603800884088945",
+      "skuId": "1731608588969414769",
+      "variant": "Spidey and His Amazing Friends",
+      "sourcePrice": 64.94,
+      "referencePrice": 59.86,
+      "basis": "similar",
+      "itemScore": 0,
+      "shops": [
+        {
+          "seller": "World Tech Toys",
+          "url": "https://shop.tiktok.com/us/pdp/1731758979167523814?sku_id=1731759274114782182",
+          "price": 59.86,
+          "observedAt": "2026-11-19T03:56:34.051Z"
+        }
+      ],
+      "candidateListings": 5,
+      "creatorsUsingReference": 1
+    }
+  ],
+  "multiProductCreators": [
+    {
+      "handle": "bethannyyyy",
+      "score": 3,
+      "scoredProducts": 2
+    },
+    {
+      "handle": "kimandcrewfinds",
+      "score": 3,
+      "scoredProducts": 2
+    },
+    {
+      "handle": "missshill",
+      "score": 3,
+      "scoredProducts": 2
+    },
+    {
+      "handle": "mr.mojo.black",
+      "score": 3,
+      "scoredProducts": 2
+    },
+    {
+      "handle": "nicoleshow77",
+      "score": 3,
+      "scoredProducts": 2
+    },
+    {
+      "handle": "vanessesencials",
+      "score": 3,
+      "scoredProducts": 2
+    },
+    {
+      "handle": "ka.devore",
+      "score": 0,
+      "scoredProducts": 3
+    }
+  ]
+}
