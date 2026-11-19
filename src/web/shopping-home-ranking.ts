@@ -190,20 +190,7 @@ export function homeRanking(lookup: HTMLElement, savedOnly = false) {
   const section = el("section", "", "shop-home-ranking");
   const header = el("header", "", "shop-home-mast");
   const intro = el("div");
-  const scope = el("p", "Rotten Onion Index", "shop-home-edition");
-  const count = el("span", ranked.length + " ranked");
-  count.append(el("span", ranked.length === 1 ? " creator" : " creators", "shop-home-count-unit"));
-  scope.append(count);
-  const latest = ranked.flatMap(row => row.baselines.map(entry => entry.observedAt)).sort().at(-1);
-  if (latest) {
-    const utcDay = latest.slice(0,10);
-    const date = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(latest));
-    const edition = el("time", date + " edition");
-    edition.dateTime = utcDay;
-    edition.title = "Ranking edition · " + utcDay + " UTC";
-    scope.append(edition);
-  }
-  intro.append(scope, el("h1", "Is it cheaper at another TikTok shop?"),
+  intro.append(el("h1", "Is it cheaper at another TikTok shop?"),
     el("p", "Look up a creator to compare their picks across US TikTok shops.", "shop-home-purpose"));
   const actions = el("div", "", "shop-home-links");
   const board = link("Full ranking →", shoppingRankingHref(), "shop-home-board");
