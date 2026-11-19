@@ -107,7 +107,9 @@ function home() {
   const main = el("div", "", "shop-page shop-home");
   const lookup = el("section", "", "shop-home-lookup");
   const form = searchForm("", "home");
-  lookup.append(el("h2", "Search creators"), form);
+  const lookupHeading = el("div", "", "shop-home-lookup-heading");
+  lookupHeading.append(el("h2", "Search creators"), link("Full ranking →", shoppingRankingHref(), "shop-home-mobile-ranking"));
+  lookup.append(lookupHeading, form);
   if (!archiveHosting) {
     const actions = el("div", "", "shop-entry-actions");
     actions.append(screenshotPicker(submitShopping, "Upload a screenshot", lookup));

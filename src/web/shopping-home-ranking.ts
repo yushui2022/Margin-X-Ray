@@ -109,12 +109,15 @@ function featuredCheck(row: ShopRankingRow, item: Item) {
   const track = el("div", "", "shop-home-scale");
   track.setAttribute("aria-hidden", "true");
   track.style.setProperty("--score", row.verdict.score + "%");
+  const legend = el("div", "", "shop-home-scale-legend");
+  legend.setAttribute("aria-hidden", "true");
+  legend.append(el("span", "Lower prices"), el("span", "50 · Similar prices"), el("span", "Higher prices"));
   const mascot = el("img", "", "shop-home-mascot");
   mascot.src = "assets/mascot/onion-boy-side-eye.webp";
   mascot.alt = "";
   mascot.width = 140;
   mascot.height = 140;
-  panel.append(label, handle, score, mascot, track);
+  panel.append(label, handle, score, mascot, track, legend);
 
   const evidence = el("div", "", "shop-home-evidence");
   const product = row.observations[item.productIndex].product;
@@ -174,7 +177,8 @@ export function homeRanking(lookup: HTMLElement, savedOnly = false) {
     edition.title = "Ranking edition · " + utcDay + " UTC";
     scope.append(edition);
   }
-  intro.append(scope, el("h1", "Rotten Onion Index"));
+  intro.append(scope, el("h1", "Rotten Onion Index"),
+    el("p", "Look up a creator to see what other TikTok shops charge for the same or similar items.", "shop-home-purpose"));
   const actions = el("div", "", "shop-home-links");
   const board = link("Full ranking →", shoppingRankingHref(), "shop-home-board");
   const check = el("button", savedOnly ? "Search" : "Check a link", "shop-home-jump");
