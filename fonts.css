@@ -1,0 +1,12 @@
+/*
+ * Display type for Onion Head.
+ * Bundled locally so the extension never fetches a font from a CDN.
+ */
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("assets/fonts/fraunces.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}

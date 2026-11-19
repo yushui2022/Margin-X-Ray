@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 104" fill="none">
+  <title>Bruised purple onion</title>
+  <path d="M48 26C40 16 43 7 48 5c6 8 7 14 2 21Z" fill="#92945c" stroke="#49364c" stroke-width="2.4"/>
+  <path d="M50 24C56 10 73 13 74 26c-8-7-13 0-24-2Z" fill="#a6a565" stroke="#49364c" stroke-width="2.4"/>
+  <path d="M40 22c2 13-24 22-28 42C7 86 26 98 48 99c24-1 42-13 37-35-4-20-30-29-29-42l-8 5-8-5Z" fill="#886477" stroke="#49364c" stroke-width="2.8" stroke-linejoin="round"/>
+  <path d="M40 31C23 50 19 75 31 89M56 31c16 19 19 45 8 58" stroke="#ac849a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M69 43c13 4 15 14 8 20-9 5-19-3-18-9s3-13 10-11Z" fill="#665151"/>
+  <path d="m21 70 7 4-4 8 7 7" stroke="#594347" stroke-width="2.3" stroke-linecap="round"/>
+  <ellipse cx="35" cy="66" rx="4" ry="5" fill="#302333"/><ellipse cx="61" cy="66" rx="4" ry="5" fill="#302333"/>
+  <path d="m29 55 10 3m17 0 10-3M39 81q9-4 18 0" stroke="#302333" stroke-width="2.7" stroke-linecap="round"/>
+  <circle cx="71" cy="82" r="4" fill="#a28a64"/>
+  <path d="m43 99-3 3m8-3v3m5-3 3 3" stroke="#8c7458" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

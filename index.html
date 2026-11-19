@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="onion-hosting" content="archive" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Check products from a TikTok video or creator. Compare the same item at consumer retailers, including delivery when verified." />
+    <meta name="theme-color" content="#faf6ee" />
+    <title>Shopping check · Onion Head</title>
+    <link rel="icon" href="assets/mascot/onion-head.webp" />
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="shopping.css" />
+    <link rel="stylesheet" href="creator-shopping.css" />
+  </head>
+  <body class="mx-theme">
+    <header class="topbar">
+      <a class="brand" href="#shop" aria-label="Onion Head home">
+        <img class="brand-mark" src="assets/mascot/onion-head.webp" alt="" />
+        <span class="brand-text">
+          <strong>Onion Head</strong>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="Research tools">
+        <a class="topnav-btn active" data-view="shop" href="#shop">Shopping check</a>
+        <a class="topnav-btn" data-view="creators" href="#creators">Creators</a>
+        <a class="topnav-btn" data-view="prices" href="#prices">Price archive</a>
+      </nav>
+      <details class="app-tools" id="appTools"><summary>Tools</summary><div class="tools-menu">
+        <a href="#markup">Compare supplier prices</a>
+        <a href="#scan">Scan a video or image</a>
+        <a href="#pro">Pricing workspace · sample</a>
+        <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
+        <button class="btn ghost" id="backendBtn" type="button">Backend</button>
+      </div></details>
+    </header>
+
+    <main class="page">
+      <section id="shopView" aria-label="Shopping check"></section>
+      <section id="creatorsView" aria-label="Creator directory" hidden></section>
+      <div id="markupView" hidden></div>
+      <section class="hero" id="hero" hidden>
+        <div class="hero-grid">
+          <div class="hero-copy">
+        <h1>Scan a <em>product.</em></h1>
+        <p class="lede">
+          Compare a listing with supplier offers and explore the estimated cost breakdown.
+        </p>
+
+        <div class="backend-offline" id="offlineNote" hidden>
+          Connect a scan backend to look up a new listing. You can also compare pack prices below.
+        </div>
+
+        <form class="scan-form" id="scanForm">
+          <label class="scan-field">
+            <span class="scan-field-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg>
+            </span>
+            <input
+               id="urlInput"
+               aria-label="Video or product URL"
+              type="url"
+              placeholder="Paste a TikTok, Amazon or Shopify link"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </label>
+          <button class="btn primary scan-btn" id="scanBtn" type="submit">
+            Scan product
+          </button>
+        </form>
+
+        <div class="scan-secondary">
+          <button class="btn secondary" id="uploadBtn" type="button">Upload image</button>
+          <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
+          <a class="btn secondary" href="#markup">Check product markup</a>
+          <a class="chip-link" href="#markup/winco-msp-4p">Compare three supplier quotes →</a>
+        </div>
+        <div class="image-ready" id="imageReady" hidden>
+          <img id="imageThumb" alt="" />
+          <span id="imageName"></span>
+          <button class="link-btn" id="clearImage" type="button">Remove</button>
+        </div>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <img src="assets/mascot/onion-kid.webp" alt="" />
+          </div>
+        </div>
+
+        <ol class="pipeline" aria-label="Agent pipeline">
+          <li><span>01</span><strong>Source</strong><em>Link, image or page</em></li>
+          <li><span>02</span><strong>Identify</strong><em>Product + retail price</em></li>
+          <li><span>03</span><strong>Match</strong><em>1688 image search</em></li>
+          <li><span>04</span><strong>Compare</strong><em>Retail vs supplier price</em></li>
+        </ol>
+      </section>
+
+      <section class="workspace" id="workspace" hidden>
+        <aside class="agent-card" aria-label="Agent trace">
+          <header class="agent-head">
+            <div>
+              <p class="eyebrow">Agent trace</p>
+              <strong id="traceTitle">Working…</strong>
+            </div>
+            <button class="link-btn" id="stopBtn" type="button" hidden>Stop</button>
+          </header>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
+            <i id="progressBar"></i>
+          </div>
+          <ol class="steps" id="steps"></ol>
+          <footer class="agent-foot">
+            <button class="btn ghost" id="newScanBtn" type="button">New scan</button>
+            <span id="agentMeta" class="agent-meta"></span>
+          </footer>
+        </aside>
+        <section class="report" id="report" aria-live="polite"></section>
+      </section>
+
+      <section class="pro" id="proView" hidden>
+        <header class="pro-head">
+          <div>
+            <h1>Pricing workspace</h1>
+            <p class="lede">
+              Choose a product to model profit, compare suppliers and prepare a quote request.
+            </p>
+          </div>
+          <span class="mock-badge">Sample workspace data</span>
+        </header>
+        <div class="pro-grid">
+          <aside class="radar">
+            <header class="radar-head">
+              <h2>Opportunity radar</h2>
+              <span>24h · mock</span>
+            </header>
+            <div class="radar-list" id="radarList"></div>
+          </aside>
+          <div class="pro-main" id="proMain"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="backend-dialog" id="backendDialog">
+      <form method="dialog" id="backendForm">
+        <h2>Agent backend</h2>
+        <p class="dialog-note">
+          The web app calls the same streaming endpoint as the extension:
+          <code>POST /api/v1/xray/stream</code>.
+        </p>
+        <label class="field">
+          <span>API base URL</span>
+          <input id="apiBaseInput" type="url" placeholder="http://localhost:8787" autocomplete="off" spellcheck="false" />
+        </label>
+        <div class="dialog-status" id="dialogStatus"></div>
+        <div class="dialog-actions">
+          <button class="btn secondary" id="testBackend" type="button">Test connection</button>
+          <button class="btn primary" value="save" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

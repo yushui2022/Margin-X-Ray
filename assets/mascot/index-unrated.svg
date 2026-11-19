@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 104" fill="none">
+  <title>Neutral gray onion pending source review</title>
+  <path d="M48 25C38 17 39 8 43 4c9 4 12 13 7 21Z" fill="#b0afa3" stroke="#69616d" stroke-width="2.4"/>
+  <path d="M50 24C52 12 62 10 67 15c-4 8-10 10-17 9Z" fill="#c6c4b4" stroke="#69616d" stroke-width="2.4"/>
+  <path d="M40 22c2 13-24 22-28 42C7 86 26 98 48 99c24-1 42-13 37-35-4-20-30-29-29-42l-8 5-8-5Z" fill="#b0a5b4" stroke="#69616d" stroke-width="2.8" stroke-linejoin="round"/>
+  <path d="M40 31C23 50 19 75 31 89M56 31c16 19 19 45 8 58" stroke="#d3c9d3" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="35" cy="66" rx="4" ry="5" fill="#534b58"/><ellipse cx="61" cy="66" rx="4" ry="5" fill="#534b58"/>
+  <path d="M41 81h14" stroke="#534b58" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="m43 99-3 3m8-3v3m5-3 3 3" stroke="#8c847c" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

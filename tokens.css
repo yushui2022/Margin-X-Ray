@@ -1,0 +1,101 @@
+/*
+ * Onion Head / Don't Be the Onion Head design tokens.
+ *
+ * Clean modern Americana: warm paper, near-white cards, espresso ink,
+ * rust-red actions, teal and ochre accents. Fraunces for display,
+ * system sans for UI text.
+ */
+
+.mx-theme {
+  color-scheme: light;
+
+  /* Surfaces */
+  --mx-paper: #faf6ee;
+  --mx-panel: #fffdf8;
+  --mx-panel-2: #f5eee2;
+  --mx-panel-3: #ece2d1;
+  --mx-soft: #f7f1e6;
+
+  /* Ink */
+  --mx-ink: #1e1a17;
+  --mx-muted: #6b6259;
+  --mx-dim: #9a9086;
+
+  /* Lines */
+  --mx-line: #e8dfd1;
+  --mx-line-strong: #d6c9b7;
+  --mx-edge: #b9aa96;
+
+  /* Semantic */
+  --mx-accent: #c0492f;
+  --mx-accent-strong: #a63c25;
+  --mx-accent-solid: #c0492f;
+  --mx-accent-hover: #a63c25;
+  --mx-on-accent: #fffdf8;
+  --mx-blue: #2f6f68;
+  --mx-wine: #a63c25;
+  --mx-gold: #c8963e;
+
+  /* Radii */
+  --mx-radius-sm: 6px;
+  --mx-radius: 8px;
+  --mx-radius-lg: 12px;
+
+  /* Elevation */
+  --mx-shadow-card:
+    0 1px 2px rgba(30, 26, 23, 0.05),
+    0 6px 18px rgba(30, 26, 23, 0.05);
+  --mx-shadow-panel: -8px 0 32px rgba(30, 26, 23, 0.1);
+  --mx-shadow-letterpress: none;
+
+  /* Type */
+  --mx-font-sans:
+    "Inter", "Helvetica Neue", "PingFang SC", "Microsoft YaHei",
+    ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mx-font-serif: "Fraunces", "Songti SC", Georgia, serif;
+  --mx-font-display: "Fraunces", "Songti SC", Georgia, serif;
+  --mx-font-brand:
+    "Fraunces", "PingFang SC", "Microsoft YaHei", ui-sans-serif, sans-serif;
+  --mx-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --mx-font-script: "Fraunces", Georgia, serif;
+
+  /* Spacing */
+  --mx-space-1: 4px;
+  --mx-space-2: 8px;
+  --mx-space-3: 12px;
+  --mx-space-4: 16px;
+  --mx-space-5: 24px;
+  --mx-space-6: 32px;
+
+  font-family: var(--mx-font-sans);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mx-theme *,
+.mx-theme *::before,
+.mx-theme *::after {
+  box-sizing: border-box;
+}
+
+.mx-theme :focus-visible {
+  outline: 2px solid var(--mx-accent);
+  outline-offset: 2px;
+}
+
+body.mx-theme {
+  position: relative;
+  background-color: var(--mx-paper);
+  color: var(--mx-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mx-theme *,
+  .mx-theme *::before,
+  .mx-theme *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

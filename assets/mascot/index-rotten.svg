@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 104" fill="none">
+  <title>Rotten onion with wilted leaf and mold patches</title>
+  <path d="M48 26C45 8 72 9 74 28c-11-12-11 4-26-2Z" fill="#7a8053" stroke="#403b3e" stroke-width="2.4"/>
+  <path d="M48 24 34 10l4 16" fill="#9b8e64" stroke="#403b3e" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M40 22c2 13-24 22-28 42C7 86 26 98 48 99c24-1 42-13 37-35-4-20-30-29-29-42l-8 5-8-5Z" fill="#62616a" stroke="#403b3e" stroke-width="2.8" stroke-linejoin="round"/>
+  <path d="M41 32C23 50 19 75 31 89M56 32c16 19 19 45 8 58" stroke="#867d89" stroke-width="3" stroke-linecap="round"/>
+  <path d="M63 40c18-3 23 25 8 28-14 3-20-4-17-16 1-6 3-11 9-12Z" fill="#465647"/>
+  <path d="M16 73c9-12 25-1 23 12-3 14-21 8-24-2-1-4-1-8 1-10Z" fill="#4b5442"/>
+  <circle cx="66" cy="46" r="4" fill="#a5ac75"/><circle cx="74" cy="54" r="3" fill="#889b65"/><circle cx="62" cy="57" r="2.5" fill="#b5b582"/>
+  <circle cx="23" cy="77" r="4" fill="#9aaa72"/><circle cx="31" cy="85" r="3" fill="#aeb782"/>
+  <path d="m29 63 11 2m16 0 11-2M40 85q8-10 16 0" stroke="#29292b" stroke-width="2.8" stroke-linecap="round"/>
+  <ellipse cx="35" cy="69" rx="3.5" ry="4" fill="#29292b"/><ellipse cx="61" cy="69" rx="3.5" ry="4" fill="#29292b"/>
+  <path d="m48 30-3 13 5 7-3 8m26 21-7 6 5 8" stroke="#403b3e" stroke-width="2" stroke-linecap="round"/>
+  <path d="m43 99-3 3m8-3v3m5-3 3 3" stroke="#8c7458" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

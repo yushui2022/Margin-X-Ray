@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 104" fill="none">
+  <title>Spotted purple onion</title>
+  <path d="M48 25C39 18 39 8 43 4c8 3 12 11 7 21Z" fill="#91a064" stroke="#49364c" stroke-width="2.4"/>
+  <path d="M49 24C51 9 65 10 68 17c-8-3-11 9-19 7Z" fill="#a9b674" stroke="#49364c" stroke-width="2.4"/>
+  <path d="M40 22c2 13-24 22-28 42C7 86 26 98 48 99c24-1 42-13 37-35-4-20-30-29-29-42l-8 5-8-5Z" fill="#915d88" stroke="#49364c" stroke-width="2.8" stroke-linejoin="round"/>
+  <path d="M40 31C23 50 19 75 31 89M56 31c16 19 19 45 8 58" stroke="#bc8aaf" stroke-width="3" stroke-linecap="round"/>
+  <path d="M22 56c3-7 6-10 10-13" stroke="#d5a1c0" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="35" cy="65" rx="4" ry="6" fill="#302333"/><ellipse cx="61" cy="65" rx="4" ry="6" fill="#302333"/>
+  <path d="m29 54 10-3m17 3h9m-27 25q10 7 19 0" stroke="#302333" stroke-width="2.6" stroke-linecap="round"/>
+  <ellipse cx="72" cy="49" rx="5" ry="4" fill="#a68b63"/><circle cx="76" cy="57" r="2.6" fill="#b69a71"/>
+  <ellipse cx="23" cy="80" rx="4" ry="3" fill="#a68b63"/>
+  <path d="m43 99-3 3m8-3v3m5-3 3 3" stroke="#8c7458" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
