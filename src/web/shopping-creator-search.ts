@@ -9,6 +9,7 @@ export interface CreatorSearchEntry {
   avatar?: string;
   href: string;
   score: number | null;
+  rank?: number | null;
   hasCheck: boolean;
 }
 
@@ -35,7 +36,7 @@ const index = Array.from(handles, handle => {
   const entry: CreatorSearchEntry = {
     handle, name, avatar: post?.avatar || profile?.image,
     href: checked ? shoppingRankingHref(handle) : creatorHref(handle),
-    score: checked?.verdict.score ?? null,
+    score: checked?.verdict.score ?? null, rank: checked?.rank,
     hasCheck: Boolean(checked),
   };
   const names = [name, profile?.name ?? name].map(value => value.normalize("NFKC").trim().toLowerCase());
@@ -69,7 +70,10 @@ export function creatorSearchDestination(raw: string, pages: boolean): string | 
     const handle = username(text);
     return handle ? creatorPriceReportHref(handle, pages) : null;
   }
-  if (isCreatorQuery(text)) return creatorResultsHref(text);
+  if (isCreatorQuery(text)) {
+    const handle = username(text);
+    return handle && checks.has(handle) ? shoppingRankingHref(handle) : creatorResultsHref(text);
+  }
 
   const url = publicUrl(/^https?:\/\//i.test(text) ? text : "https://" + text);
   const handle = url && tiktokProfileHandle(url);

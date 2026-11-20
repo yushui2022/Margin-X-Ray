@@ -35,7 +35,8 @@ function creatorList(matches: CreatorSearchEntry[], select: SelectResult, dropdo
     const handle = "@" + creator.handle;
     if (!dropdown && creator.name.toLowerCase() === creator.handle.toLowerCase()) identity.append(el("strong", handle));
     else identity.append(el("strong", creator.name), el("small", handle));
-    const label = creator.score !== null ? creator.score + "/100" : creator.hasCheck ? "Unrated" : "Check prices";
+    const label = creator.score !== null ? (creator.rank ? "#" + creator.rank + " · " : "") + creator.score + "/100"
+      : creator.hasCheck ? "Unrated" : "Check prices";
     row.append(identity);
     if (!dropdown || creator.hasCheck) row.append(el("span", label, "shop-creator-result-score"));
     item.append(row);
@@ -85,7 +86,7 @@ function mergeSuggestions(query: string, local: CreatorSearchEntry[], accounts: 
     const avatar = typeof account.avatar === "string" && account.avatar.startsWith("https://") ? account.avatar : undefined;
     rows.set(handle, {
       handle, name: typeof account.name === "string" && account.name.trim() ? account.name : handle,
-      avatar: known?.handle === handle && known.avatar ? known.avatar : avatar, hasCheck: Boolean(checked), score: checked?.score ?? null,
+      avatar: known?.handle === handle && known.avatar ? known.avatar : avatar, hasCheck: Boolean(checked), score: checked?.score ?? null, rank: checked?.rank,
       href: creatorPriceReportHref(handle, archiveHosting),
     });
   }
@@ -234,7 +235,7 @@ export function creatorResults(query: string, signal: AbortSignal, select: Selec
     retry.hidden = state !== "unavailable";
     if (state === "loading") status.textContent = (local.length ? local.length + (local.length === 1 ? " saved match" : " saved matches") : "Saved index checked") + " · Searching TikTok…";
     else if (state === "unavailable") status.textContent = matches.length ? "Showing saved matches. TikTok search is temporarily unavailable." : "TikTok search is temporarily unavailable.";
-    else if (matches.length) status.textContent = matches.length + (matches.length === 1 ? " match · Select this account to check prices." : " matches · Select an account to check prices.");
+    else if (matches.length) status.textContent = matches.length + (matches.length === 1 ? " matching creator" : " matching creators");
     else status.textContent = term ? "No matching accounts found. Try a different name or an exact @username." : "No saved matches. Enter 2–48 characters to search TikTok.";
   }
   async function load() {

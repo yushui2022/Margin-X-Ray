@@ -1,7 +1,9 @@
 import { SHOP_ONION_ALLOWANCES } from "../shared/shop-onion.mjs";
 import { RANKING_SCORE_VERSION, rankingScoreAnchors } from "../shared/shop-ranking-scale.mjs";
 import { shoppingRankingHref } from "../shared/shopping-links";
+import { onionScore, UNRATED_ONION } from "../shared/onion-index";
 import { details, el, link, money } from "./shop-dom";
+import { exactCreator } from "./shopping-creator-search";
 import { shopRankingRows as rows, type ShopRankingRow } from "./shopping-ranking-data";
 import { productReceipt, sourceName } from "./shopping-verdict";
 import { benchmarkCard, benchmarkDirectory, missingBenchmarkCard, otherListings } from "./shopping-benchmarks";
@@ -39,7 +41,7 @@ function matchLabel(row: ShopRankingRow) {
   return {exact:"Verified matches", similar:"Similar-item estimate", mixed:"Exact and similar matches", none:"No eligible comparison"}[row.verdict.basis];
 }
 
-function pricePair(row: ShopRankingRow, inline?: { productId?: string | null }) {
+function pricePair(row: ShopRankingRow, inline?: { productId?: string | null; showSources?: boolean }) {
   const {score} = row.verdict;
   const items = inline?.productId
     ? row.verdict.items.filter(item => row.observations[item.productIndex].product.productId === inline.productId)
@@ -47,11 +49,17 @@ function pricePair(row: ShopRankingRow, inline?: { productId?: string | null }) 
   if (score === null || !items.length) return null;
   const item = items.reduce((best, next) =>
     Math.abs(next.score - score) < Math.abs(best.score - score) ? next : best);
+  const observation = row.observations[item.productIndex];
   const pair = el("span", "", "price-ranking-pair");
-  if (items.length > 1) pair.append(el("small","Example from this sample","price-ranking-example"));
-  if (inline) pair.append(el("strong", sourceName(row.observations[item.productIndex].product), "shop-inline-item"));
+  if (items.length > 1 && !inline?.showSources) pair.append(el("small","Example from this sample","price-ranking-example"));
+  if (inline) {
+    const name = el("strong", sourceName(observation.product), "shop-inline-item");
+    name.title = observation.product.name;
+    pair.append(name);
+  }
   const max = Math.max(item.sourcePrice, item.peerPrice);
-  for (const [label, value] of [["Original",item.sourcePrice],["Benchmark",item.peerPrice]] as const) {
+  const peerLabel = inline?.showSources ? item.basis === "exact" ? "Same item elsewhere" : "Similar item elsewhere" : "Benchmark";
+  for (const [label, value] of [[inline?.showSources ? "Creator’s link" : "Original",item.sourcePrice],[peerLabel,item.peerPrice]] as const) {
     const quote = el("span", "", "price-ranking-quote");
     const track = el("i", "", "price-ranking-track");
     track.setAttribute("aria-hidden","true");
@@ -61,8 +69,21 @@ function pricePair(row: ShopRankingRow, inline?: { productId?: string | null }) 
   }
   const cents = Math.round(item.sourcePrice * 100) - Math.round(item.peerPrice * 100);
   const difference = cents === 0 ? "Same item price" : "Original " + money(Math.abs(cents) / 100,item.currency) + (cents > 0 ? " more" : " less");
-  pair.append(el("small",difference + " · " + item.peerCount + (item.peerCount === 1 ? " reference shop" : " reference shops"),"price-ranking-difference"));
+  const example = inline?.showSources && items.length > 1 ? "Example · " : "";
+  pair.append(el("small",example + difference + " · " + item.peerCount + (item.peerCount === 1 ? " reference shop" : " reference shops"),"price-ranking-difference"));
+  if (inline?.showSources) {
+    const sources = el("span", "", "shop-rank-sources");
+    sources.append(link("Original post ↗", observation.sourceUrl), link("Price sources →",
+      shoppingRankingHref(row.handle) + "?" + new URLSearchParams({product: observation.product.productId})));
+    pair.append(sources);
+  }
   return pair;
+}
+
+function rankingPosition(row: ShopRankingRow) {
+  const position = el("span", row.rank === null ? "—" : "#" + row.rank, "price-ranking-position");
+  if (row.rank !== null && tiedRanks.has(row.rank)) position.append(el("small","Tie"));
+  return position;
 }
 
 function rankingList(entries: ShopRankingRow[]) {
@@ -70,8 +91,7 @@ function rankingList(entries: ShopRankingRow[]) {
   for (const row of entries) {
     const li = el("li");
     const entry = link("", shoppingRankingHref(row.handle), "price-ranking-row");
-    const position = el("span", row.rank === null ? "—" : "#" + row.rank, "price-ranking-position");
-    if (row.rank !== null && tiedRanks.has(row.rank)) position.append(el("small","Tie"));
+    const position = rankingPosition(row);
     const identity = el("span", "", "price-ranking-identity");
     identity.append(el("strong","@" + row.handle), el("small", coverage(row) + " · " + matchLabel(row)));
     const result = el("span", "", "price-ranking-value");
@@ -85,6 +105,83 @@ function rankingList(entries: ShopRankingRow[]) {
     li.append(entry); list.append(li);
   }
   return list;
+}
+
+function contextRow(row: ShopRankingRow, selected: boolean) {
+  const li = el("li");
+  li.dataset.handle = row.handle;
+  if (selected) li.setAttribute("aria-current", "true");
+  const disclosure = el("details");
+  const summary = el("summary", "", "shop-rank-summary");
+  const entry = exactCreator(row.handle);
+  const name = entry?.name || row.handle;
+  const initial = el("span", Array.from(name)[0]?.toUpperCase(), "shop-rank-initial");
+  initial.setAttribute("aria-hidden", "true");
+  let portrait: HTMLElement = initial;
+  if (entry?.avatar) {
+    const image = el("img");
+    image.width = image.height = 32; image.alt = ""; image.referrerPolicy = "no-referrer";
+    image.addEventListener("error", () => image.replaceWith(initial), {once:true});
+    image.src = entry.avatar;
+    portrait = image;
+  }
+  const identity = el("span", "", "shop-rank-identity");
+  const handle = "@" + row.handle;
+  if (name.toLowerCase() !== row.handle) identity.append(el("strong", name), el("small", handle));
+  else identity.append(el("strong", handle));
+  const value = row.verdict.score;
+  const score = el("span", "", "shop-rank-score");
+  const mascot = el("img");
+  mascot.src = (onionScore(value)?.band ?? UNRATED_ONION).image;
+  mascot.width = 22; mascot.height = 25; mascot.alt = "";
+  score.append(mascot, value === null ? el("small","Unrated") : el("b",String(value)));
+  if (value !== null) score.append(el("small", "/100"));
+  summary.append(rankingPosition(row), portrait, identity, score);
+  const receipt = el("div", "", "shop-rank-evidence");
+  const prices = pricePair(row, {showSources:true});
+  if (prices) receipt.append(prices);
+  else receipt.append(el("p", row.verdict.decision?.reason || "No eligible cross-shop comparison was recorded."),
+    link("View checked posts →", shoppingRankingHref(row.handle)));
+  disclosure.append(summary, receipt);
+  disclosure.open = selected;
+  li.append(disclosure);
+  return li;
+}
+
+export function rankingAroundCreator(handle: string): HTMLElement | null {
+  const match = rows.find(row => row.handle === handle.toLowerCase());
+  if (!match) return null;
+  const entries = match.rank === null ? unranked : ranked;
+  const pageSize = 5;
+  let offset = Math.max(0, Math.min(entries.indexOf(match) - 1, entries.length - pageSize));
+  const section = el("div", "", "shop-rank-context");
+  section.dataset.group = match.rank === null ? "unrated" : "ranked";
+  const label = match.rank === null ? "Checked but unrated" : "Ranked creators";
+  const bar = el("div", "", "shop-rank-bar");
+  const range = el("span");
+  range.setAttribute("role", "status");
+  const previous = el("button", "‹");
+  const next = el("button", "›");
+  previous.type = next.type = "button";
+  previous.setAttribute("aria-label", "Previous creators");
+  next.setAttribute("aria-label", "Next creators");
+  bar.append(range, previous, next);
+  const list = el("ol", "", "price-ranking-list");
+  list.setAttribute("aria-label", label);
+  section.append(list, bar);
+  function render() {
+    const start = Math.max(0, offset);
+    const end = Math.min(entries.length, offset + pageSize);
+    range.textContent = "Rows " + (start + 1) + "–" + end + " of " + entries.length;
+    previous.disabled = start === 0;
+    next.disabled = end === entries.length;
+    list.start = start + 1;
+    list.replaceChildren(...entries.slice(start,end).map(row => contextRow(row, row === match)));
+  }
+  previous.addEventListener("click", () => { offset -= pageSize; render(); });
+  next.addEventListener("click", () => { offset += pageSize; render(); });
+  render();
+  return section;
 }
 
 export function rankingPage() {

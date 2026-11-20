@@ -8,7 +8,7 @@ import { listingCheck } from "./shopping-listing";
 import { liveShoppingPage } from "./shopping-live";
 import { lastShoppingJob, tikTokCheckRoute } from "./shopping-job";
 import { screenshotPage, screenshotPicker } from "./shopping-screenshot";
-import { rankedCreatorPage, rankingPage } from "./shopping-ranking";
+import { rankedCreatorPage, rankingAroundCreator, rankingPage } from "./shopping-ranking";
 import { homeRanking, scoredArchiveList } from "./shopping-home-ranking";
 import { savedShoppingMatches } from "./shopping-saved";
 import { creatorSearchDestination, liveCreatorHref, username } from "./shopping-creator-search";
@@ -96,6 +96,23 @@ function productRow(id: string) {
   return a;
 }
 
+function revealRankingMatch(ranking: HTMLElement, signal: AbortSignal) {
+  const selected = ranking.querySelector<HTMLElement>('li[aria-current="true"] > details > summary');
+  if (!selected) return;
+  requestAnimationFrame(() => {
+    if (signal.aborted || !selected.isConnected) return;
+    const viewport = window.visualViewport;
+    const viewportTop = viewport?.offsetTop ?? 0;
+    const viewportBottom = viewportTop + (viewport?.height ?? innerHeight);
+    const nav = document.querySelector(".topnav")?.getBoundingClientRect();
+    const bottom = nav && nav.top > innerHeight / 2 ? Math.min(viewportBottom, nav.top) : viewportBottom;
+    const top = Math.max(viewportTop, document.querySelector(".topbar")?.getBoundingClientRect().bottom ?? 0);
+    const row = selected.getBoundingClientRect();
+    if (row.bottom > bottom) window.scrollBy({top: row.bottom - bottom + 36, behavior: "instant"});
+    else if (row.top < top) window.scrollBy({top: row.top - top - 8, behavior: "instant"});
+  });
+}
+
 function home(lifetime: AbortSignal, initialQuery = "") {
   const main = el("div", "", "shop-page shop-home");
   const lookup = el("section", "", "shop-home-lookup");
@@ -112,6 +129,10 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     lookup.append(actions);
   }
   const section = el("section", "", "shop-browse");
+  const archiveHeading = el("div", "", "shop-section-head");
+  archiveHeading.append(el("h2", "Creator product archive"), link("Browse all →", shoppingRankingHref()));
+  const archiveList = scoredArchiveList();
+  section.append(archiveHeading, archiveList);
   const panel = el("section", "", "shop-inline-search");
   panel.hidden = true;
   panel.setAttribute("aria-label", "Creator search results");
@@ -130,11 +151,18 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   let activeDestination = "";
   lifetime.addEventListener("abort", () => request?.abort(), { once: true });
 
+  function restoreArchive() {
+    if (toolbar.parentElement !== section) return;
+    panel.prepend(toolbar);
+    section.replaceChildren(archiveHeading, archiveList);
+  }
+
   function clear() {
     request?.abort();
     activeDestination = matchesFor = "";
     panel.hidden = true;
     body.replaceChildren();
+    restoreArchive();
   }
   close.addEventListener("click", () => {
     clear();
@@ -145,7 +173,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   back.addEventListener("click", () => open("#shop/creators?" + new URLSearchParams({ q: matchesFor })));
 
   function open(destination: string) {
-    if (destination === activeDestination) return;
+    if (destination === activeDestination && toolbar.parentElement !== section) return;
     const focused = document.activeElement;
     const restoreFocus = focused?.matches(":focus-visible") && (
       form.querySelector(".shop-creator-suggestions")?.contains(focused) || body.contains(focused) || focused === back
@@ -161,10 +189,13 @@ function home(lifetime: AbortSignal, initialQuery = "") {
       matchesFor = input.value.trim();
     }
     title.textContent = accountSearch ? "Matches for “" + matchesFor + "”" : "Price check";
+    let ranking: HTMLElement | null = null;
     let result: HTMLElement;
     if (accountSearch) result = creatorResults(matchesFor, signal, open);
     else if (path.startsWith("/rankings/")) {
-      result = rankedCreatorPage(path.slice("/rankings/".length), { productId: query.get("product") });
+      const handle = path.slice("/rankings/".length);
+      if (!query.has("product")) ranking = rankingAroundCreator(handle);
+      result = ranking ?? rankedCreatorPage(handle, { productId: query.get("product") });
     } else if (path === "/tiktok") {
       result = liveCreatorPage(query.get("user")!, creatorLookupOrigin, signal, true);
     } else if (!archiveHosting && (path === "/video" || path === "/site" || path === "/profile")) {
@@ -186,13 +217,19 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     }
     activeDestination = destination;
     back.hidden = !matchesFor || accountSearch;
-    body.replaceChildren(result);
-    panel.hidden = false;
-    if (restoreFocus && panel.isConnected) title.focus({ preventScroll: true });
+    if (ranking) {
+      title.textContent = ranking.dataset.group === "unrated" ? "Checked but unrated" : "Creator ranking";
+      body.replaceChildren();
+      section.replaceChildren(toolbar, ranking);
+      panel.hidden = true;
+      revealRankingMatch(ranking, signal);
+    } else {
+      restoreArchive();
+      body.replaceChildren(result);
+      panel.hidden = false;
+    }
+    if (restoreFocus && title.isConnected) title.focus({ preventScroll: true });
   }
-  const heading = el("div", "", "shop-section-head");
-  heading.append(el("h2", "Creator product archive"), link("Browse all →", shoppingRankingHref()));
-  section.append(heading, scoredArchiveList());
   const mast = homeRanking(lookup, archiveHosting);
   mast.append(panel);
   main.append(mast, section);

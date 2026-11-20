@@ -53,7 +53,7 @@ test("a single letter opens results while the full literal display name can sele
 
 test("submitting a name searches for candidates, including partial names and handle-shaped words", () => {
   for (const pages of [false, true]) {
-    for (const name of ["tim", "edward", "Bethanny", "Tim Cook", "Jazzy.liveseller", "all_the_jazzy_things", "周 杰伦"]) {
+    for (const name of ["tim", "edward", "Bethanny", "Tim Cook", "Jazzy.liveseller", "周 杰伦"]) {
       assert.equal(creatorSearchDestination("  " + name + "  ", pages), "#shop/creators?" + new URLSearchParams({ q: name }));
     }
     assert.equal(creatorSearchDestination(" Ｔｉｍ ", pages), "#shop/creators?q=Tim");
@@ -65,6 +65,7 @@ test("an explicit username or pasted profile opens the same exact price report o
     for (const handle of ["all_the_jazzy_things", "kallmekris", "all.the.jazzy.things", "mrbeast", "a_new_account"]) {
       const hasCheck = handle === "all_the_jazzy_things" || handle === "kallmekris";
       const expected = hasCheck ? shoppingRankingHref(handle) : pages ? liveCreatorHref(handle) : profileCheckHref(handle);
+      if (hasCheck) assert.equal(creatorSearchDestination(handle.toUpperCase(), pages), expected);
       for (const input of ["＠" + handle.toUpperCase(), "https://www.tiktok.com/@" + handle, "m.tiktok.com/@" + handle + "/?lang=en&region=US"]) {
         assert.equal(creatorSearchDestination(input, pages), expected);
       }
