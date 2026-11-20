@@ -1,6 +1,6 @@
 import archivePosts from "../../research/shop-archive-creators.json";
 import { PUBLIC_CREATORS } from "../shared/creator-directory";
-import { creatorHref, shoppingRankingHref } from "../shared/shopping-links";
+import { creatorHref, profileCheckHref, publicUrl, shoppingRankingHref, tiktokProfileHandle } from "../shared/shopping-links";
 import { shopRankingRows } from "./shopping-ranking-data";
 
 export interface CreatorSearchEntry {
@@ -42,6 +42,42 @@ const index = Array.from(handles, handle => {
   const keys = [...new Set([handle, ...names].map(fold))].filter(Boolean);
   return { entry, names, keys };
 });
+
+export const creatorResultsHref = (q: string) => "#shop/creators?" + new URLSearchParams({ q });
+export const liveCreatorHref = (handle: string) => "#shop/tiktok?" + new URLSearchParams({ user: handle });
+
+export function username(raw: string) {
+  const handle = raw.normalize("NFKC").trim().replace(/^@/, "").toLowerCase();
+  return /^[a-z0-9_][a-z0-9_.]{0,23}$/.test(handle) && !handle.endsWith(".") ? handle : null;
+}
+
+export function isCreatorQuery(raw: string) {
+  const query = raw.normalize("NFKC").trim();
+  if (query.startsWith("@")) return username(query) !== null;
+  return /[\p{L}\p{N}_]/u.test(query) && !/[:/\\?#@]|^www\.|^(?:(?:m|vm|vt|shop)\.)?tiktok\.com(?:\s|$)/i.test(query);
+}
+
+export function creatorPriceReportHref(handle: string, pages: boolean) {
+  const key = handle.toLowerCase();
+  if (checks.has(key)) return shoppingRankingHref(key);
+  return pages ? liveCreatorHref(key) : profileCheckHref(key);
+}
+
+export function creatorSearchDestination(raw: string, pages: boolean): string | null {
+  const text = raw.normalize("NFKC").trim();
+  if (text.startsWith("@")) {
+    const handle = username(text);
+    return handle ? creatorPriceReportHref(handle, pages) : null;
+  }
+  if (isCreatorQuery(text)) return creatorResultsHref(text);
+
+  const url = publicUrl(/^https?:\/\//i.test(text) ? text : "https://" + text);
+  const handle = url && tiktokProfileHandle(url);
+  if (!url || !handle) return null;
+  const market = [...url.searchParams.getAll("region"), ...url.searchParams.getAll("market")].find(value => value.toUpperCase() !== "US");
+  if (market !== undefined) return "#shop/profile?" + new URLSearchParams({ url: url.href, market: market.toUpperCase() });
+  return creatorPriceReportHref(handle, pages);
+}
 
 export function searchCreators(query: string): CreatorSearchEntry[] {
   const match = creatorQuery(query);

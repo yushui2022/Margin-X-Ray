@@ -11,8 +11,8 @@ import { screenshotPage, screenshotPicker } from "./shopping-screenshot";
 import { rankedCreatorPage, rankingPage } from "./shopping-ranking";
 import { homeRanking, scoredArchiveList } from "./shopping-home-ranking";
 import { savedShoppingMatches } from "./shopping-saved";
-import { exactCreator } from "./shopping-creator-search";
-import { creatorLookupOrigin, creatorResultsHref, creatorResultsPage, isCreatorQuery, liveCreatorHref, suggestCreators, username } from "./shopping-creator-lookup";
+import { creatorSearchDestination, liveCreatorHref, username } from "./shopping-creator-search";
+import { creatorLookupOrigin, creatorResultsPage, suggestCreators } from "./shopping-creator-lookup";
 import { liveCreatorPage } from "./shopping-creator-live";
 import { archiveHosting } from "./hosting-mode";
 
@@ -45,16 +45,8 @@ function searchForm(initial = "", context: "live" | "home" | "archive" | "creato
   form.addEventListener("submit", event => {
     event.preventDefault();
     const raw = input.value.trim();
-    if (creatorLookup && isCreatorQuery(raw)) {
-      const exact = exactCreator(raw);
-      const handle = username(raw);
-      const isKnown = exact && (!handle || exact.handle === handle || (!raw.startsWith("@") && exact.name.normalize("NFKC").toLowerCase() === raw.normalize("NFKC").toLowerCase()));
-      if (isKnown) submitShopping(exact.href);
-      else if (handle) submitShopping(archiveHosting ? liveCreatorHref(handle) : profileCheckHref(handle));
-      else submitShopping(creatorResultsHref(raw));
-      return;
-    }
-    let dest = tikTokCheckRoute(raw);
+    let dest = creatorLookup ? creatorSearchDestination(raw, archiveHosting) : null;
+    if (!dest) dest = tikTokCheckRoute(raw);
     if (!dest && context === "archive") {
       const archived = shoppingDestination(input.value);
       if (archived?.startsWith("#shop/search?") || archived?.startsWith("#shop/product/")) dest = archived;
@@ -295,7 +287,7 @@ export function renderShopping(container: HTMLElement) {
       page.append(el("p", "Search the saved US edition with a creator handle, full TikTok video URL or TikTok Shop product link. Live checks are unavailable here."), searchForm());
     }
     page.append(link("Browse the ranking →", shoppingRankingHref(), "shop-action-link"));
-  } else if (path === "/creators") page = creatorResultsPage(query.get("q") ?? "", searchForm(query.get("q") ?? "", "creators"));
+  } else if (path === "/creators") page = creatorResultsPage(query.get("q") ?? "", searchForm(query.get("q") ?? "", "creators"), lifetime.signal);
   else if (path === "/rankings") page = rankingPage();
   else if (path.startsWith("/rankings/")) page = rankedCreatorPage(path.slice("/rankings/".length));
   else if (path.startsWith("/product/")) {

@@ -83,6 +83,12 @@ export function tiktokListing(url: URL) {
   return { market: region === "UK" ? "GB" : region };
 }
 
+export function tiktokProfileHandle(url: URL) {
+  if (!/^(?:(?:www|m|vm|vt)\.)?tiktok\.com$/.test(url.hostname)) return null;
+  const handle = /^\/@([a-z0-9_][a-z0-9_.]{0,23})\/?$/i.exec(url.pathname)?.[1];
+  return handle && !handle.endsWith(".") ? handle.toLowerCase() : null;
+}
+
 export function shoppingDestination(value: string): string | null {
   const raw = value.trim();
   if (!raw) return null;
@@ -92,8 +98,8 @@ export function shoppingDestination(value: string): string | null {
     if (!url) return null;
     if (tiktokListing(url)) return websiteCheckHref(url.href);
     if (/^(?:(?:www|m|vm|vt)\.)?tiktok\.com$/.test(url.hostname)) {
-      const profile = url.pathname.match(/^\/@([a-z0-9_][a-z0-9_.]{0,23})\/?$/i);
-      if (profile && !profile[1]!.endsWith(".")) return profileCheckHref(profile[1]!.toLowerCase());
+      const profile = tiktokProfileHandle(url);
+      if (profile) return profileCheckHref(profile);
       if (/^(?:vm|vt)\./.test(url.hostname) || /^\/(?:t\/|@[\w.]+\/video\/\d+)/i.test(url.pathname)) return videoHref(url.href);
       if (!/^\/shop\//.test(url.pathname)) return null;
     }
