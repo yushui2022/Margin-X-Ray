@@ -11,17 +11,42 @@ const dailySuggestions = 360;
 const minute = 60_000;
 const problem = (code, message) => ({ code, message });
 
-function json(request, data, status = 200, retry = 0) {
+function responseHeaders(request, contentType, retry = 0) {
   const headers = {
-    "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff", Vary: "Origin",
+    "Content-Type": contentType + "; charset=utf-8", "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff", Vary: "Origin, Accept",
   };
   if (request.headers.get("Origin") === origin) headers["Access-Control-Allow-Origin"] = origin;
   if (retry) headers["Retry-After"] = String(retry);
-  return new Response(JSON.stringify(data), { status, headers });
+  return headers;
 }
 
-async function measure(handle, token, identity) {
+function json(request, data, status = 200, retry = 0) {
+  return new Response(JSON.stringify(data), { status, headers: responseHeaders(request, "application/json", retry) });
+}
+
+function streamLookup(request, run, context, unavailable) {
+  const encoder = new TextEncoder();
+  let listening = true;
+  const stream = new ReadableStream({
+    start(controller) {
+      function emit(event) {
+        if (listening) controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
+      }
+      const work = run((stage, counts) => emit({ type: "stage", stage, ...counts }))
+        .then(({ status, result }) => emit(status === 200
+          ? { type: "result", report: result } : { type: "error", ...result }))
+        .catch(() => emit({ type: "error", ...unavailable }))
+        .finally(() => { if (listening) controller.close(); });
+      // Complete the shared cache record even if this visitor leaves the page.
+      context?.waitUntil(work);
+    },
+    cancel() { listening = false; },
+  });
+  return new Response(stream, { headers: responseHeaders(request, "application/x-ndjson") });
+}
+
+async function measure(handle, token, identity, onStage) {
   const profileUrl = "https://www.tiktok.com/@" + handle;
   const signal = AbortSignal.timeout(identity ? 26_000 : 60_000);
   let remaining = 38;
@@ -39,11 +64,23 @@ async function measure(handle, token, identity) {
       signature: identity.bio, awemeCount: identity.postCount,
     } : liveProfileFallback.findUser(hub, who),
   } : liveProfileFallback;
-  const data = await lookupVideo(profileUrl, { market: "US", tikhubOnly: true, token, fetchImpl, signal, profileFallback });
+  const data = await lookupVideo(profileUrl, { market: "US", tikhubOnly: true, token, fetchImpl, signal, profileFallback, onStage });
+  let comparing = false;
+  const counts = { checkedPosts: data.sample.checked, products: data.commerce.length };
   const report = await completeShoppingCheck({ ...data, listedProducts:data.listedProducts ?? [], market: "US", scope: "tiktok-shop", steps: [{stage:"source", status:data.status, message:data.message}] },
     { kind: "profile", market: "US" }, {
       signal,
-      compare: (product, options) => compareTikTokShopOffers(product, { ...options, token, fetchImpl }),
+      onStage: stage => onStage(stage, counts),
+      compare: (product, options) => compareTikTokShopOffers(product, {
+        ...options, token,
+        fetchImpl(url, init) {
+          if (!comparing) {
+            comparing = true;
+            onStage("comparison", counts);
+          }
+          return fetchImpl(url, init);
+        },
+      }),
     });
   const products = report.commerce.map((p, i) => {
     const checked = report.checks.find(c => c.productIndex === i);
@@ -91,7 +128,7 @@ function writeIdentity(db, identity, now) {
 }
 
 export function createCreatorWorker(lookup = measure, suggest = searchLiveCreators) {
-  return { async fetch(request, env) {
+  return { async fetch(request, env, context) {
     const url = new URL(request.url);
     const caller = request.headers.get("Origin");
     if (caller && caller !== origin && caller !== url.origin)
@@ -134,28 +171,37 @@ export function createCreatorWorker(lookup = measure, suggest = searchLiveCreato
         return other || (identity ? json(request, profileOnly(identity)) : null) || json(request, problem("rate_limited", "Today's live lookup allowance has been used. Try again tomorrow."), 429,
           Math.ceil((Date.parse(day + "T00:00:00Z") + 86_400_000 - now) / 1000));
       }
-      let result, status = 200, ttl = 6 * 60 * minute;
-      const writes = [];
-      try {
-        if (isSuggestion) {
-          const found = await suggest(handle, env.TIKHUB_TOKEN, undefined, true);
-          for (const entry of found.identities ?? found.creators) writes.push(writeIdentity(db, entry, now));
-          result = {creators:found.creators}; ttl = 30 * minute;
-        } else result = await lookup(handle, env.TIKHUB_TOKEN, identity);
-        if (result.status === "partial") ttl = 5 * minute;
-      } catch (err) {
-        const detail = String(err?.message || "").replaceAll(env.TIKHUB_TOKEN, "[redacted]").replace(/https?:\/\/[^ ]+/gi,"[url]").slice(0,140);
-        console.warn("creator.lookup.failed", isSuggestion ? "suggest" : "profile", err?.name, err?.status, err?.upstreamStatus, detail);
-        if (err.privateProfile) { status = 403; result = problem("inaccessible", "This TikTok account is private."); }
-        else if (identity) { result = profileOnly(identity); }
-        else if (err.status === 404) { status = 404; result = problem("not_found", "TikTok could not find a public account with this username."); }
-        else { status = 503; result = unavailable; }
-        ttl = status === 503 ? minute : status === 200 ? 3 * minute : 15 * minute;
+      async function run(onStage) {
+        let result, status = 200, ttl = 6 * 60 * minute;
+        const writes = [];
+        try {
+          if (isSuggestion) {
+            const found = await suggest(handle, env.TIKHUB_TOKEN, undefined, true);
+            for (const entry of found.identities ?? found.creators) writes.push(writeIdentity(db, entry, now));
+            result = {creators:found.creators}; ttl = 30 * minute;
+          } else {
+            onStage("profile");
+            result = await lookup(handle, env.TIKHUB_TOKEN, identity, onStage);
+          }
+          if (result.status === "partial") ttl = 5 * minute;
+        } catch (err) {
+          const detail = String(err?.message || "").replaceAll(env.TIKHUB_TOKEN, "[redacted]").replace(/https?:\/\/[^ ]+/gi,"[url]").slice(0,140);
+          console.warn("creator.lookup.failed", isSuggestion ? "suggest" : "profile", err?.name, err?.status, err?.upstreamStatus, detail);
+          if (err.privateProfile) { status = 403; result = problem("inaccessible", "This TikTok account is private."); }
+          else if (identity) { result = profileOnly(identity); }
+          else if (err.status === 404) { status = 404; result = problem("not_found", "TikTok could not find a public account with this username."); }
+          else { status = 503; result = unavailable; }
+          ttl = status === 503 ? minute : status === 200 ? 3 * minute : 15 * minute;
+        }
+        writes.push(db.prepare(`UPDATE creator_live_cache SET http_status = ?, payload = ?, expires_at = ?, lease_until = 0,
+          lease_id = NULL WHERE handle = ? AND lease_id = ?`)
+          .bind(status, JSON.stringify(result), Date.now() + ttl, key, lease));
+        await db.batch(writes);
+        return { result, status };
       }
-      writes.push(db.prepare(`UPDATE creator_live_cache SET http_status = ?, payload = ?, expires_at = ?, lease_until = 0,
-        lease_id = NULL WHERE handle = ? AND lease_id = ?`)
-        .bind(status, JSON.stringify(result), Date.now() + ttl, key, lease));
-      await db.batch(writes);
+      if (!isSuggestion && request.headers.get("Accept")?.includes("application/x-ndjson"))
+        return streamLookup(request, run, context, unavailable);
+      const { result, status } = await run(() => {});
       return json(request, result, status);
     } catch (error) { console.warn("creator.lookup.storage", error?.name); return json(request, unavailable, 503, 30); }
   } };

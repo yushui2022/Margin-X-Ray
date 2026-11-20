@@ -151,3 +151,80 @@ test("real product pipeline completes with a verified public profile but no link
   const data=await response.json();assert.equal(response.status,200);
   assert.equal(data.status,"no_evidence");assert.equal(data.sample.checked,0);assert.deepEqual(data.products,[]);assert.equal(data.score,null);
 });
+
+const streamHeaders = { Accept: "application/x-ndjson", Origin: "https://yushui2022.github.io" };
+
+test("a cold stream exposes the real feed stage before TikHub replies and skips comparison without products", async t => {
+  const state = env();
+  const feed = Promise.withResolvers();
+  const fetching = Promise.withResolvers();
+  const worker = createCreatorWorker();
+  let requests = 0;
+  t.mock.method(globalThis, "fetch", async url => {
+    requests++;
+    if (url.pathname.endsWith("fetch_user_profile"))
+      return Response.json({ code: 200, data: { userInfo: { user: { uniqueId: "harry", secUid: "verified" } } } });
+    assert.ok(url.pathname.endsWith("fetch_user_post_videos"));
+    fetching.resolve();
+    await feed.promise;
+    return Response.json({ code: 200, data: { aweme_list: [] } });
+  });
+  const response = await worker.fetch(request("harry", { headers: streamHeaders }), state);
+  assert.match(response.headers.get("Content-Type"), /application\/x-ndjson/);
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"), streamHeaders.Origin);
+  const reader = response.body.getReader();
+  const read = async () => JSON.parse(new TextDecoder().decode((await reader.read()).value));
+  await fetching.promise;
+  assert.deepEqual(await read(), { type: "stage", stage: "profile" });
+  assert.deepEqual(await read(), { type: "stage", stage: "posts" });
+  assert.equal((await worker.fetch(request("harry"), state)).status, 429);
+  feed.resolve();
+  assert.deepEqual(await read(), { type: "stage", stage: "decision", checkedPosts: 0, products: 0 });
+  const event = await read();
+  assert.equal(event.type, "result");
+  assert.equal(event.report.status, "no_evidence");
+  assert.equal((await reader.read()).done, true);
+  const cached = await worker.fetch(request("harry", { headers: streamHeaders }), state);
+  assert.match(cached.headers.get("Content-Type"), /application\/json/);
+  assert.deepEqual(await cached.json(), event.report);
+  assert.equal(requests, 2);
+  assert.equal(state.CREATOR_CACHE.sql.prepare("SELECT used FROM creator_live_budget").get().used, 1);
+});
+
+test("a private profile ends the stream with a public error and caches the ordinary HTTP status", async () => {
+  const state = env();
+  const worker = createCreatorWorker(async () => { throw Object.assign(new Error("upstream-only"), { privateProfile: true }); });
+  const response = await worker.fetch(request("private", { headers: streamHeaders }), state);
+  const rows = (await response.text()).trim().split("\n").map(row => JSON.parse(row));
+  assert.deepEqual(rows, [
+    { type: "stage", stage: "profile" },
+    { type: "error", code: "inaccessible", message: "This TikTok account is private." },
+  ]);
+  assert.equal((await worker.fetch(request("private"), state)).status, 403);
+});
+
+test("priced shop posts emit comparison with the observed post and product counts", async t => {
+  const state = env();
+  const handle = "store", productId = "1729999999999999999", sku = "1729999999999999801";
+  const post = { aweme_id: "7729999999999999864", author: { unique_id: handle, sec_uid: "verified" },
+    desc: "Our mixer", anchors: [{ type: 33, id: productId, keyword: "Mixer" }] };
+  const listing = { product_id: productId, title: "Acme Hand Mixer", default_sku_id: sku, seller_id: "7361111253456789000",
+    skus: [{ sku_id: sku, price: { sale_price_decimal: "19.50", currency_name: "USD" }, stock: 3, status: 0 }] };
+  const calls = [];
+  t.mock.method(globalThis, "fetch", async url => {
+    const route = url.pathname.split("/").at(-1);
+    calls.push(route);
+    const data = {
+      fetch_user_profile: { userInfo: { user: { uniqueId: handle, secUid: "verified" } } },
+      fetch_user_post_videos: { aweme_list: [post] }, fetch_one_video_v3: { aweme_detail: post },
+      fetch_product_detail_v3: { product_data: { initialData: { productInfo: listing } } },
+    }[route] ?? {};
+    return Response.json({ code: 200, data });
+  });
+  const response = await createCreatorWorker().fetch(request(handle, { headers: streamHeaders }), state);
+  const rows = (await response.text()).trim().split("\n").map(row => JSON.parse(row));
+  assert.deepEqual(rows.filter(row => row.type === "stage").map(row => row.stage), ["profile", "posts", "comparison", "decision"]);
+  assert.deepEqual(rows[2], { type: "stage", stage: "comparison", checkedPosts: 1, products: 1 });
+  assert.equal(rows.at(-1).report.products[0].price, 19.5);
+  assert.ok(calls.some(route => route.includes("search")));
+});

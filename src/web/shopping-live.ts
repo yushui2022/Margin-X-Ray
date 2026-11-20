@@ -198,13 +198,14 @@ function savedPriceReview(id: string, route: string, market: string, signal: Abo
   return section;
 }
 
-export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal, searchForm: () => HTMLElement, screenshot: () => HTMLElement) {
+export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal, searchForm: () => HTMLElement, screenshot: () => HTMLElement, inlineParams?: URLSearchParams) {
   const main = el("div", "", "shop-page shop-narrow");
   const names: Record<Route,string> = { video: "Check a video", profile: "Check a creator", site: "Check a Shop listing", find: "Check a product" };
   const nav = el("div", "", "verdict-nav");
   const share = el("div", "", "shop-report-actions");
-  nav.append(link("← Shopping check", "#shop", "shop-back"),share);
-  const routeHeading = el("h1",names[route]);
+  if (!inlineParams) nav.append(link("← Shopping check", "#shop", "shop-back"));
+  nav.append(share);
+  const routeHeading = el(inlineParams ? "h2" : "h1",names[route]);
   main.append(nav,routeHeading);
   const url = route === "find" ? null : publicUrl(raw);
   const destination = tikTokCheckRoute(raw);
@@ -221,7 +222,7 @@ export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal,
   const marketLabel = el("label", fixedMarket ? "Market in this link" : "Retail market", "shop-market");
   const market = el("select");
   market.add(new Option("United States", "US")); market.add(new Option("United Kingdom", "GB"));
-  const params = new URLSearchParams(location.hash.split("?")[1] || "");
+  const params = inlineParams ?? new URLSearchParams(location.hash.split("?")[1] || "");
   market.value = fixedMarket || (params.get("market") === "GB" ? "GB" : "US");
   market.disabled = !!fixedMarket;
   const marketHelp = el("p", "Seller price comparison is available for US listings.", "shop-small");
@@ -238,9 +239,11 @@ export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal,
     const known = archive.products.find(p => p.postUrl && new URL(p.postUrl).pathname.toLowerCase() === url.pathname.replace(/\/$/, "").toLowerCase());
     if (known) main.append(link("View the archived product record →", productHref(known.id), "shop-action-link"));
   }
-  const continuation = el("section", "", "shop-continuation");
-  continuation.append(el("h2", "Check another TikTok source"), searchForm(), screenshot());
-  main.append(continuation);
+  if (!inlineParams) {
+    const continuation = el("section", "", "shop-continuation");
+    continuation.append(el("h2", "Check another TikTok source"), searchForm(), screenshot());
+    main.append(continuation);
+  }
   let running = false;
   let started = false;
   let jobId = params.get("job") || undefined;
@@ -368,7 +371,7 @@ export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal,
     status.classList.remove("verdict-sr");
     if (!restore) {
       jobId = undefined;
-      history.replaceState(history.state, "", withJob(destination!, market.value));
+      if (!inlineParams) history.replaceState(history.state, "", withJob(destination!, market.value));
     }
     running = true; started = true; reconnect = false; selected = selection;
     output.replaceChildren(); jobNote.hidden = true;
@@ -382,17 +385,18 @@ export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal,
         const correctMarket = current.input?.market || market.value;
         const routeWithJob = withJob(canonical || destination!, correctMarket, current.id);
         rememberJob(routeWithJob);
-        if ((canonical && canonical !== destination) || correctMarket !== market.value) {
+        if (!inlineParams && ((canonical && canonical !== destination) || correctMarket !== market.value)) {
           movedToCanonicalSource = true; location.replace(routeWithJob); return;
         }
         jobId = current.id;
-        if (location.hash !== routeWithJob) history.replaceState(history.state, "", routeWithJob);
+        if (!inlineParams && location.hash !== routeWithJob) history.replaceState(history.state, "", routeWithJob);
         selected = current.input?.selection ?? selection;
         if (current.status !== "queued" && current.status !== "running") return;
-        jobNote.textContent = "You can reopen this page to see the result."; jobNote.hidden = false;
+        jobNote.textContent = "You can reopen this page to see the result."; jobNote.hidden = Boolean(inlineParams);
         status.textContent = current.status === "queued" ? "Queued for a shopping check…" : current.stage === "decision"
-          ? "Reviewing the price evidence and preparing buying advice…" : current.stage === "comparison"
-          ? "Comparing the same variant across TikTok Shop sellers…" : route === "profile" ? "Reading recent posts and linked Shop products…" : "Reading the TikTok source and its linked products…";
+          ? "Step 3 of 3 · Preparing the report from the available evidence…" : current.stage === "comparison"
+          ? "Step 2 of 3 · Checking linked products for comparable prices…" : route === "profile"
+            ? "Step 1 of 3 · Reading the creator’s recent posts…" : "Step 1 of 3 · Reading the linked TikTok source…";
       }, () => { status.textContent = "Reconnecting to your saved check…"; });
       if (signal.aborted || movedToCanonicalSource) return;
       jobNote.hidden = true;
@@ -420,11 +424,11 @@ export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal,
   }
   market.addEventListener("change", () => {
     marketHelp.hidden = market.value === "US";
-    history.replaceState(history.state, "", withJob(destination, market.value));
+    if (!inlineParams) history.replaceState(history.state, "", withJob(destination, market.value));
     if (started) void lookup();
   });
   button.addEventListener("click", () => void lookup(selected, reconnect));
-  const submitted = consumeShoppingSubmission(location.hash);
+  const submitted = inlineParams || consumeShoppingSubmission(location.hash);
   if (jobId) void lookup(undefined, true);
   else if (submitted) void lookup();
   return main;

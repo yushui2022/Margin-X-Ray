@@ -339,7 +339,7 @@ async function readShopProducts(attachments, options) {
   return items;
 }
 
-export async function lookupVideo(raw, { fetchImpl = fetch, token = process.env.TIKHUB_TOKEN, signal, market = "US", tikhubOnly = false, profileFallback } = {}) {
+export async function lookupVideo(raw, { fetchImpl = fetch, token = process.env.TIKHUB_TOKEN, signal, market = "US", tikhubOnly = false, profileFallback, onStage } = {}) {
   if (!["US","GB"].includes(market)) throw new LookupError(400, "Choose a supported shopping market.");
   const listing = parseShopListing(raw), profile = parseProfileAddress(raw), start = parseVideoAddress(raw);
   if (!listing && !profile && !start) throw invalidLink();
@@ -356,7 +356,7 @@ export async function lookupVideo(raw, { fetchImpl = fetch, token = process.env.
       message: commerce[0].status === "priced" ? "Read the listed TikTok Shop variants and prices." : "Found the TikTok Shop product link. A price for this market could not be verified." };
   }
   if (profile) {
-    const result = await lookupProfile(profile, { fetchImpl, hub, market, signal: budget, tikhubOnly, profileFallback });
+    const result = await lookupProfile(profile, { fetchImpl, hub, market, signal: budget, tikhubOnly, profileFallback, onStage });
     signal?.throwIfAborted();
     return result;
   }
@@ -483,7 +483,7 @@ async function hydrateProfilePosts(posts, { fetchImpl, hub, market, signal, secU
   return posts.filter(post => !removed.has(post.id));
 }
 
-async function lookupProfile(address, { fetchImpl, hub, market, signal, tikhubOnly, profileFallback }) {
+async function lookupProfile(address, { fetchImpl, hub, market, signal, tikhubOnly, profileFallback, onStage }) {
   let bio = "", brandClue = null, provider = "TikHub", urls = [], posts = [], sampleComplete = false;
   let profileUser, secUid;
   const excluded = new Set(), unresolved = new Set();
@@ -502,6 +502,7 @@ async function lookupProfile(address, { fetchImpl, hub, market, signal, tikhubOn
       if (typeof profileUser.secUid === "string" && profileUser.secUid.length <= 256) secUid = profileUser.secUid;
     }
     try {
+      onStage?.("posts");
       // The app feed also accepts a handle when the separate web profile service is down.
       const params = { unique_id: address.handle, max_cursor: "0", count: String(PROFILE_LIMIT), region: market };
       if (secUid) params.sec_user_id = secUid;

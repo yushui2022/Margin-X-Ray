@@ -7,7 +7,7 @@ export const creatorLookupOrigin = "https://onion-head-creator-lookup.purebeak64
 function reportLink(label: string, destination: string, className: string) {
   const row = link(label, destination, className);
   row.addEventListener("click", event => {
-    if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) markShoppingSubmission(destination);
+    if (!event.defaultPrevented && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) markShoppingSubmission(destination);
   });
   return row;
 }
@@ -200,12 +200,11 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement) {
     else if (focused === 0) input.focus();
     else links[focused < 0 ? links.length - 1 : focused - 1].focus();
   });
+  return dismiss;
 }
 
-export function creatorResultsPage(query: string, form: HTMLElement, signal: AbortSignal) {
-  const page = el("div", "", "shop-page shop-narrow shop-creator-results");
-  page.append(link("← Search creators", "#shop", "shop-back"), el("h1", query.trim() ? "Results for “" + query + "”" : "Search creators"), form);
-  if (!query.trim()) return page;
+export function creatorResults(query: string, signal: AbortSignal) {
+  const page = el("div", "", "shop-creator-results");
   const local = searchCreators(query);
   const term = liveSearchTerm(query);
   const handle = username(query);
@@ -228,9 +227,9 @@ export function creatorResultsPage(query: string, form: HTMLElement, signal: Abo
     if (focused) results.querySelector<HTMLAnchorElement>('[data-handle="' + focused + '"]')?.focus({ preventScroll: true });
     if (direct) direct.hidden = state === "loading" || matches.some(row => row.handle === handle);
     retry.hidden = state !== "unavailable";
-    if (state === "loading") status.textContent = "Searching TikTok…";
+    if (state === "loading") status.textContent = (local.length ? local.length + (local.length === 1 ? " saved match" : " saved matches") : "Saved index checked") + " · Searching TikTok…";
     else if (state === "unavailable") status.textContent = matches.length ? "Showing saved matches. TikTok search is temporarily unavailable." : "TikTok search is temporarily unavailable.";
-    else if (matches.length) status.textContent = matches.length + (matches.length === 1 ? " matching creator" : " matching creators");
+    else if (matches.length) status.textContent = matches.length + (matches.length === 1 ? " match · Select this account to check prices." : " matches · Select an account to check prices.");
     else status.textContent = term ? "No matching accounts found. Try a different name or an exact @username." : "No saved matches. Enter 2–48 characters to search TikTok.";
   }
   async function load() {

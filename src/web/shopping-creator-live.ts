@@ -135,43 +135,126 @@ function creatorReport(data: LiveCreator) {
   return body;
 }
 
-export function liveCreatorPage(handle: string, endpoint: string, signal: AbortSignal): HTMLElement {
-  const main = el("section", "", "shop-page shop-narrow");
+const stageLabels = {
+  profile: "Profile",
+  posts: "Recent posts",
+  comparison: "Shop prices",
+  decision: "Verdict",
+} as const;
+
+type Stage = keyof typeof stageLabels;
+type StageEvent = { type: "stage"; stage: Stage; checkedPosts?: number; products?: number };
+type Outcome = { type: "result"; report: LiveCreator } | { type: "error"; code?: string };
+
+// Older workers and cache hits return a JSON report. A live run ends its stream
+// with an explicit result or error, including when the final line lacks a newline.
+export async function readCreatorLookup(response: Response, onStage: (event: StageEvent) => void): Promise<Outcome> {
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    return { type: "error", code: error?.code ?? (response.status === 429 ? "rate_limited" : undefined) };
+  }
+  if (!response.headers.get("content-type")?.toLowerCase().includes("application/x-ndjson"))
+    return { type: "result", report: await response.json() };
+  const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader();
+  if (!reader) return { type: "error", code: "interrupted" };
+
+  let pending = "";
+  try {
+    while (true) {
+      const { done, value = "" } = await reader.read();
+      const lines = (pending + value).split("\n");
+      pending = done ? "" : lines.pop()!;
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const event = JSON.parse(line);
+        if (event.type === "result" || event.type === "error") return event;
+        if (event.type === "stage" && Object.hasOwn(stageLabels, event.stage)) onStage(event);
+      }
+      if (done) return { type: "error", code: "interrupted" };
+    }
+  } finally {
+    void reader.cancel().catch(() => {});
+    reader.releaseLock();
+  }
+}
+
+function stageMessage(event: StageEvent, handle: string) {
+  switch (event.stage) {
+    case "profile": return "Looking up @" + handle + " on TikTok…";
+    case "posts": return "Checking recent posts for linked products…";
+    case "comparison": return "Checking other TikTok shops for comparable listings…";
+    case "decision": return "Reviewing the evidence for an Onion Score…";
+  }
+}
+
+export function liveCreatorPage(handle: string, endpoint: string, signal: AbortSignal, inline = false): HTMLElement {
+  const main = el("section", "", inline ? "shop-page shop-inline-live" : "shop-page shop-narrow");
   const status = el("p", "", "shop-progress");
   status.setAttribute("role", "status");
+  const steps = el("ol", "", "shop-live-steps");
+  steps.setAttribute("aria-label", "Price check progress");
+  const markers = new Map<Stage, HTMLElement>();
+  for (const key of Object.keys(stageLabels) as Stage[]) {
+    const marker = el("li", stageLabels[key]);
+    markers.set(key, marker);
+    steps.append(marker);
+  }
   const results = el("div");
   const retry = el("button", "Retry lookup", "btn ghost");
   retry.type = "button";
-  retry.hidden = true;
-  main.append(link("← Search creators", "#shop", "shop-back"), el("p", "TikTok creator lookup", "shop-kicker"),
-    el("h1", "@" + handle), status, results, retry);
+  if (!inline) main.append(link("← Search creators", "#shop", "shop-back"));
+  main.append(el("p", "TikTok creator lookup", "shop-kicker"), el(inline ? "h2" : "h1", "@" + handle), steps, status, results, retry);
+
+  function showStage(event: StageEvent) {
+    if (signal.aborted) return;
+    steps.hidden = false;
+    for (const marker of markers.values()) marker.removeAttribute("aria-current");
+    const current = markers.get(event.stage)!;
+    current.dataset.visited = "true";
+    current.setAttribute("aria-current", "step");
+    if (event.stage === "decision" && !markers.get("comparison")!.dataset.visited) {
+      const comparison = markers.get("comparison")!;
+      comparison.dataset.skipped = "true";
+      comparison.textContent = "Shop prices · skipped";
+    }
+    const counts: string[] = [];
+    if (Number.isInteger(event.checkedPosts)) counts.push(event.checkedPosts + (event.checkedPosts === 1 ? " post checked" : " posts checked"));
+    if (Number.isInteger(event.products)) counts.push(event.products + (event.products === 1 ? " linked product" : " linked products"));
+    status.textContent = (counts.length ? counts.join(", ") + ". " : "") + stageMessage(event, handle);
+  }
 
   async function lookup() {
     if (signal.aborted || retry.disabled) return;
     retry.disabled = true;
+    retry.hidden = steps.hidden = true;
+    for (const [key, marker] of markers) {
+      marker.textContent = stageLabels[key];
+      delete marker.dataset.visited;
+      delete marker.dataset.skipped;
+    }
     status.classList.add("is-working");
-    status.textContent = "Checking this TikTok profile and its recent posts…";
+    status.textContent = "Opening the price check for @" + handle + "…";
+    results.replaceChildren();
     results.setAttribute("aria-busy", "true");
     try {
       const response = await fetch(endpoint.replace(/\/$/, "") + "/api/creators/" + encodeURIComponent(handle), {
-        signal, credentials: "omit", headers: { Accept: "application/json" },
+        signal, credentials: "omit", headers: { Accept: "application/x-ndjson, application/json" },
       });
+      const outcome = await readCreatorLookup(response, showStage);
       if (signal.aborted) return;
-      if (!response.ok) {
-        const error = await response.json().catch(() => null);
-        if (signal.aborted) return;
-        const code = error?.code;
+      if (outcome.type === "error") {
+        const code = outcome.code;
         if (code === "not_found") status.textContent = "No public TikTok profile was found for @" + handle + ". Check the spelling and search again.";
         else if (code === "inaccessible") status.textContent = "TikTok could not return public posts from this account.";
         else if (code === "invalid_handle") status.textContent = "This username could not be checked. Enter the account’s exact TikTok username.";
         else if (code === "busy") status.textContent = "A check for this creator is already running. Try again shortly.";
-        else if (code === "rate_limited" || response.status === 429) status.textContent = "The live lookup limit has been reached. Please try again later.";
+        else if (code === "rate_limited") status.textContent = "The live lookup limit has been reached. Please try again later.";
+        else if (code === "interrupted") status.textContent = "The connection ended before the report was ready. Try again.";
         else status.textContent = "The lookup service could not finish this check. Please try again.";
         retry.hidden = code === "invalid_handle" || code === "not_found";
         return;
       }
-      const data: LiveCreator = await response.json();
-      if (signal.aborted) return;
+      const data = outcome.report;
       if (data?.handle?.toLowerCase() !== handle.toLowerCase() || !Array.isArray(data.products) || !Array.isArray(data.posts)
         || !Number.isInteger(data.sample?.checked)) throw new Error("Incomplete creator response");
       results.replaceChildren(creatorReport(data));
@@ -186,6 +269,7 @@ export function liveCreatorPage(handle: string, endpoint: string, signal: AbortS
     } finally {
       retry.disabled = false;
       status.classList.remove("is-working");
+      for (const marker of markers.values()) marker.removeAttribute("aria-current");
       results.setAttribute("aria-busy", "false");
     }
   }

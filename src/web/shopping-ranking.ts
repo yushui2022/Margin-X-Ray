@@ -163,18 +163,19 @@ function rankingMethod() {
   return rule;
 }
 
-export function rankedCreatorPage(handle: string) {
+export function rankedCreatorPage(handle: string, inline?: { productId?: string | null }) {
   const main = el("div","","shop-page shop-narrow price-ranking-detail");
-  main.append(link("← Rotten Onion Index",shoppingRankingHref(),"shop-back"));
+  const title = inline ? "h2" : "h1";
+  if (!inline) main.append(link("← Rotten Onion Index",shoppingRankingHref(),"shop-back"));
   const row = rows.find(entry => entry.handle === handle.toLowerCase());
   if (!row) {
-    main.append(el("h1","Creator outside this edition"),el("p","This handle has no saved price check in the index."));
+    main.append(el(title,"Creator outside this edition"),el("p","This handle has no saved price check in the index."));
     return main;
   }
   const head = el("header","","price-ranking-mast ranking-scale-mast");
   const copy = el("div");
   copy.append(el("p", row.rank === null ? "Rotten Onion Index · Unrated" : "Rotten Onion Index · #" + row.rank, "shop-kicker"),
-    el("h1","@" + row.handle),el("p",row.posts.length + (row.posts.length === 1 ? " post checked · " : " posts checked · ") + coverage(row) + " · " + matchLabel(row)));
+    el(title,"@" + row.handle),el("p",row.posts.length + (row.posts.length === 1 ? " post checked · " : " posts checked · ") + coverage(row) + " · " + matchLabel(row)));
   const score = el("div","","price-ranking-total");
   score.append(el("strong",row.verdict.score === null ? "—" : String(row.verdict.score)));
   if (row.verdict.score !== null) score.append(el("span","/100"));
@@ -187,7 +188,8 @@ export function rankedCreatorPage(handle: string) {
   const sorted = row.observations.map((observation,index) => ({
     observation, item:row.verdict.items.find(item => item.productIndex === index),
     original:row.rawReceipts[index], raw:row.rawReceipts[index].items[0],
-  })).sort((a,b) => (b.item?.score ?? -1) - (a.item?.score ?? -1) || Number(!b.item && !!b.raw) - Number(!a.item && !!a.raw));
+  })).filter(entry => !inline?.productId || entry.observation.product.productId === inline.productId)
+    .sort((a,b) => (b.item?.score ?? -1) - (a.item?.score ?? -1) || Number(!b.item && !!b.raw) - Number(!a.item && !!a.raw));
   if (sorted.length) {
     if (row.verdict.scoredCount > 0) {
       const heading = el("header","","verdict-section-head ranking-receipts-heading");

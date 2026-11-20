@@ -12,7 +12,7 @@ import { rankedCreatorPage, rankingPage } from "./shopping-ranking";
 import { homeRanking, scoredArchiveList } from "./shopping-home-ranking";
 import { savedShoppingMatches } from "./shopping-saved";
 import { creatorSearchDestination, liveCreatorHref, username } from "./shopping-creator-search";
-import { creatorLookupOrigin, creatorResultsPage, suggestCreators } from "./shopping-creator-lookup";
+import { creatorLookupOrigin, creatorResults, suggestCreators } from "./shopping-creator-lookup";
 import { liveCreatorPage } from "./shopping-creator-live";
 import { archiveHosting } from "./hosting-mode";
 
@@ -27,7 +27,7 @@ function submitShopping(destination: string) {
   else location.hash = destination;
 }
 
-function searchForm(initial = "", context: "live" | "home" | "archive" | "creators" = "live") {
+function searchForm(initial = "", context: "live" | "home" | "archive" = "live", submit = submitShopping) {
   const box = el("div", "", "shop-entry-form");
   const form = el("form", "", "shop-search");
   form.setAttribute("role", "search");
@@ -35,12 +35,21 @@ function searchForm(initial = "", context: "live" | "home" | "archive" | "creato
   input.type = "search"; input.value = initial; input.required = true; input.maxLength = 2048;
   const button = el("button", "", "btn primary");
   button.type = "submit";
-  const creatorLookup = context === "home" || context === "creators" || (context === "live" && archiveHosting);
+  const creatorLookup = context === "home" || (context === "live" && archiveHosting);
   input.placeholder = creatorLookup ? "Username, name or TikTok link" : context === "archive" ? "Product, creator or brand" : "TikTok link or @creator";
   input.setAttribute("aria-label", creatorLookup ? "Search by username, display name or TikTok link" : context === "archive" ? "Search archived product checks" : "TikTok video link, Shop product link or creator handle");
   button.textContent = creatorLookup || context === "archive" ? "Search" : "Check price";
   form.append(input, button); box.append(form);
-  if (creatorLookup) suggestCreators(box, input);
+  const dismiss = creatorLookup ? suggestCreators(box, input) : undefined;
+  if (creatorLookup && context === "home") {
+    box.addEventListener("click", event => {
+      const match = searchChoice(event);
+      if (!match) return;
+      event.preventDefault();
+      dismiss?.();
+      submit(match.hash);
+    }, { capture: true });
+  }
   input.addEventListener("input", () => input.setCustomValidity(""));
   form.addEventListener("submit", event => {
     event.preventDefault();
@@ -55,7 +64,8 @@ function searchForm(initial = "", context: "live" | "home" | "archive" | "creato
       input.setCustomValidity(creatorLookup ? "Enter a username, display name or TikTok link." : "Enter a TikTok video, creator handle or TikTok Shop product link.");
       input.reportValidity(); return;
     }
-    submitShopping(dest);
+    dismiss?.();
+    submit(dest);
   });
   return box;
 }
@@ -95,10 +105,17 @@ function productRow(id: string) {
   return a;
 }
 
-function home() {
+function searchChoice(event: MouseEvent) {
+  if (event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return null;
+  return event.target instanceof Element
+    ? event.target.closest<HTMLAnchorElement>("a.shop-creator-match,a.shop-creator-see-all,a.shop-search-direct,a.shop-saved-match") : null;
+}
+
+function home(lifetime: AbortSignal, initialQuery = "") {
   const main = el("div", "", "shop-page shop-home");
   const lookup = el("section", "", "shop-home-lookup");
-  const form = searchForm("", "home");
+  const form = searchForm(initialQuery, "home", open);
+  const input = form.querySelector("input")!;
   const lookupHeading = el("div", "", "shop-home-lookup-heading");
   lookupHeading.append(el("h2", "Search creators"), link("Full ranking →", shoppingRankingHref(), "shop-home-mobile-ranking"));
   lookup.append(lookupHeading, form);
@@ -110,10 +127,96 @@ function home() {
     lookup.append(actions);
   }
   const section = el("section", "", "shop-browse");
+  const panel = el("section", "", "shop-inline-search");
+  panel.hidden = true;
+  panel.setAttribute("aria-label", "Creator search results");
+  const toolbar = el("div", "", "shop-inline-toolbar");
+  const title = el("h2");
+  title.tabIndex = -1;
+  const back = el("button", "← Back to matches", "shop-inline-control");
+  const close = el("button", "Close", "shop-inline-control");
+  close.setAttribute("aria-label", "Close search results");
+  back.type = close.type = "button";
+  toolbar.append(title, back, close);
+  const body = el("div", "", "shop-inline-body");
+  panel.append(toolbar, body);
+  let request: AbortController | undefined;
+  let matchesFor = "";
+  let activeDestination = "";
+  lifetime.addEventListener("abort", () => request?.abort(), { once: true });
+
+  function clear() {
+    request?.abort();
+    activeDestination = matchesFor = "";
+    panel.hidden = true;
+    section.hidden = false;
+    body.replaceChildren();
+  }
+  close.addEventListener("click", () => {
+    clear();
+    input.value = "";
+    input.focus({ preventScroll: true });
+  });
+  input.addEventListener("input", clear);
+  back.addEventListener("click", () => open("#shop/creators?" + new URLSearchParams({ q: matchesFor })));
+  panel.addEventListener("click", event => {
+    const match = searchChoice(event);
+    if (match) { event.preventDefault(); open(match.hash); }
+  }, { capture: true });
+
+  function open(destination: string) {
+    if (destination === activeDestination) {
+      title.focus({ preventScroll: true });
+      return;
+    }
+    request?.abort();
+    request = new AbortController();
+    const signal = request.signal;
+    const [path, params] = destination.slice(5).split("?");
+    const query = new URLSearchParams(params);
+    const accountSearch = path === "/creators";
+    if (accountSearch) matchesFor = query.get("q") ?? "";
+    else if (!activeDestination && !matchesFor && creatorSearchDestination(input.value, archiveHosting)?.startsWith("#shop/creators?")) {
+      matchesFor = input.value.trim();
+    }
+    title.textContent = accountSearch ? "Matches for “" + matchesFor + "”" : "Price check";
+    let result: HTMLElement;
+    if (accountSearch) result = creatorResults(matchesFor, signal);
+    else if (path.startsWith("/rankings/")) {
+      result = rankedCreatorPage(path.slice("/rankings/".length), { productId: query.get("product") });
+    } else if (path === "/tiktok") {
+      result = liveCreatorPage(query.get("user")!, creatorLookupOrigin, signal, true);
+    } else if (!archiveHosting && (path === "/video" || path === "/site" || path === "/profile")) {
+      result = liveShoppingPage(path.slice(1) as "video" | "site" | "profile", query.get("url")!, signal, searchForm, () => screenshotPicker(submitShopping), query);
+    } else {
+      const saved = savedShoppingMatches(path, query);
+      if (saved.length === 1 && saved[0].href.startsWith("#shop/rankings/")) {
+        open(saved[0].href);
+        return;
+      }
+      result = el("div", "", "shop-inline-link-results");
+      if (saved.length) {
+        title.textContent = "Matching price checks";
+        for (const match of saved) result.append(link(match.label, match.href, "shop-saved-match shop-action-link"));
+      } else {
+        title.textContent = "No saved price check for this link";
+        result.append(el("p", "Try the creator’s @username to check their recent TikTok posts.", "shop-small"));
+      }
+    }
+    activeDestination = destination;
+    back.hidden = !matchesFor || accountSearch;
+    body.replaceChildren(result);
+    section.hidden = true;
+    panel.hidden = false;
+    if (panel.isConnected) title.focus({ preventScroll: true });
+  }
   const heading = el("div", "", "shop-section-head");
   heading.append(el("h2", "Creator product archive"), link("Browse all →", shoppingRankingHref()));
   section.append(heading, scoredArchiveList());
-  main.append(homeRanking(lookup, archiveHosting), section);
+  const mast = homeRanking(lookup, archiveHosting);
+  mast.append(panel);
+  main.append(mast, section);
+  if (initialQuery) open("#shop/creators?" + new URLSearchParams({ q: initialQuery }));
   return main;
 }
 
@@ -287,7 +390,7 @@ export function renderShopping(container: HTMLElement) {
       page.append(el("p", "Search the saved US edition with a creator handle, full TikTok video URL or TikTok Shop product link. Live checks are unavailable here."), searchForm());
     }
     page.append(link("Browse the ranking →", shoppingRankingHref(), "shop-action-link"));
-  } else if (path === "/creators") page = creatorResultsPage(query.get("q") ?? "", searchForm(query.get("q") ?? "", "creators"), lifetime.signal);
+  } else if (path === "/creators") page = home(lifetime.signal, query.get("q") ?? "");
   else if (path === "/rankings") page = rankingPage();
   else if (path.startsWith("/rankings/")) page = rankedCreatorPage(path.slice("/rankings/".length));
   else if (path.startsWith("/product/")) {
@@ -298,7 +401,7 @@ export function renderShopping(container: HTMLElement) {
   } else if (path === "/screenshot") page = screenshotPage(lifetime.signal, submitShopping);
   else if (path === "/listing") page = listingCheck(query.get("url") ?? "", lifetime.signal, query.get("other"));
   else if (path === "/search") page = searchPage(query.get("q") ?? "");
-  else page = home();
+  else page = home(lifetime.signal);
   const leave = () => { lifetime.abort(); };
   window.addEventListener("hashchange", leave, { once: true, signal: lifetime.signal });
   container.replaceChildren(page);
