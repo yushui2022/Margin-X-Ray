@@ -13,14 +13,14 @@ export interface CreatorSearchEntry {
   hasCheck: boolean;
 }
 
-function fold(value: string) {
+export function creatorNameKey(value: string) {
   return value.normalize("NFKD").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 }
 
 function creatorQuery(raw: string) {
   const text = raw.normalize("NFKC").trim().replace(/^@/, "").trim().toLowerCase();
   if (/[/\\?#@]/.test(text)) return;
-  const key = fold(text);
+  const key = creatorNameKey(text);
   if (key) return { text, key };
 }
 
@@ -40,9 +40,14 @@ const index = Array.from(handles, handle => {
     hasCheck: Boolean(checked),
   };
   const names = [name, profile?.name ?? name].map(value => value.normalize("NFKC").trim().toLowerCase());
-  const keys = [...new Set([handle, ...names].map(fold))].filter(Boolean);
+  const keys = [...new Set([handle, ...names].map(creatorNameKey))].filter(Boolean);
   return { entry, names, keys };
 });
+const entriesByHandle = new Map(index.map(({ entry }) => [entry.handle, entry]));
+
+export function creatorByHandle(handle: string) {
+  return entriesByHandle.get(handle);
+}
 
 export const creatorResultsHref = (q: string) => "#shop/creators?" + new URLSearchParams({ q });
 export const liveCreatorHref = (handle: string) => "#shop/tiktok?" + new URLSearchParams({ user: handle });
@@ -107,8 +112,8 @@ export function searchCreators(query: string): CreatorSearchEntry[] {
 export function exactCreator(query: string): CreatorSearchEntry | undefined {
   const match = creatorQuery(query);
   if (!match) return;
-  const handle = index.find(({ entry }) => entry.handle === match.text);
-  if (handle) return handle.entry;
+  const handle = creatorByHandle(match.text);
+  if (handle) return handle;
   const named = index.filter(({ names }) => names.includes(match.text));
   if (named.length) return named.length === 1 ? named[0].entry : undefined;
   if (Array.from(match.key).length < 2) return;

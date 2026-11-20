@@ -1,6 +1,6 @@
 import { el } from "./shop-dom";
 import { archiveHosting } from "./hosting-mode";
-import { creatorPriceReportHref, creatorResultsHref, exactCreator, isCreatorQuery, searchCreators, username, type CreatorSearchEntry } from "./shopping-creator-search";
+import { creatorByHandle, creatorNameKey, creatorPriceReportHref, creatorResultsHref, exactCreator, isCreatorQuery, searchCreators, username, type CreatorSearchEntry } from "./shopping-creator-search";
 
 export const creatorLookupOrigin = "https://onion-head-creator-lookup.purebeak64.chatgpt.site";
 type SelectResult = (destination: string) => void;
@@ -54,10 +54,36 @@ function liveSearchTerm(query: string) {
 }
 
 const pendingSearches = new Map<string, Promise<SuggestedAccount[]>>();
-let lastSearch: { term: string; accounts: SuggestedAccount[]; expires: number } | undefined;
+const recentSearches = new Map<string, { accounts: SuggestedAccount[]; expires: number }>();
+const suggestionUpdates = new EventTarget();
+type SuggestionState = "loading" | "complete" | "unavailable";
+
+function matchesTypedName(account: SuggestedAccount, key: string) {
+  return key.length > 0 && (creatorNameKey(account.handle).includes(key) || creatorNameKey(account.name).includes(key));
+}
+
+function cachedAccounts(term: string) {
+  const record = recentSearches.get(term);
+  if (!record || record.expires <= Date.now()) return;
+  recentSearches.delete(term);
+  recentSearches.set(term, record);
+  return record.accounts;
+}
+
+function provisionalAccounts(key: string) {
+  const matches = new Map<string, SuggestedAccount>();
+  for (const record of Array.from(recentSearches.values()).reverse()) {
+    if (record.expires <= Date.now()) continue;
+    for (const account of record.accounts) {
+      if (!matches.has(account.handle) && matchesTypedName(account, key)) matches.set(account.handle, account);
+    }
+  }
+  return Array.from(matches.values()).slice(0, 6);
+}
 
 function searchTikTok(term: string): Promise<SuggestedAccount[]> {
-  if (lastSearch?.term === term && lastSearch.expires > Date.now()) return Promise.resolve(lastSearch.accounts);
+  const cached = cachedAccounts(term);
+  if (cached) return Promise.resolve(cached);
   const pending = pendingSearches.get(term);
   if (pending) return pending;
   // Submitting while autocomplete is loading should reuse the same provider request.
@@ -67,12 +93,53 @@ function searchTikTok(term: string): Promise<SuggestedAccount[]> {
     if (!response.ok) throw new Error("TikTok search unavailable");
     const data = await response.json();
     if (!Array.isArray(data?.creators)) throw new Error("Incomplete TikTok search results");
-    const accounts: SuggestedAccount[] = data.creators.slice(0, 6);
-    lastSearch = { term, accounts, expires: Date.now() + 60_000 };
+    const accounts: SuggestedAccount[] = data.creators.slice(0, 6).flatMap((account: SuggestedAccount | null) => {
+      if (typeof account?.handle !== "string") return [];
+      const handle = username(account.handle);
+      return handle ? [{ handle, name: typeof account.name === "string" ? account.name : handle, avatar: account.avatar }] : [];
+    });
+    recentSearches.delete(term);
+    recentSearches.set(term, {accounts, expires: Date.now() + 5 * 60_000});
+    if (recentSearches.size > 32) recentSearches.delete(recentSearches.keys().next().value!);
+    suggestionUpdates.dispatchEvent(new CustomEvent("accounts", {detail: {term, accounts}}));
     return accounts;
   }).finally(() => pendingSearches.delete(term));
   pendingSearches.set(term, request);
   return request;
+}
+
+// Partial matches can populate the picker while the provider checks the actual
+// query. Only a response for the exact term can finish that search.
+export function loadCreatorSuggestions(term: string | null, signal: AbortSignal, delayMs: number,
+  show: (accounts: SuggestedAccount[], state: SuggestionState) => void) {
+  if (signal.aborted) return;
+  if (!term) { show([], "complete"); return; }
+  const cached = cachedAccounts(term);
+  if (cached) {
+    show(cached, "complete");
+    return;
+  }
+  const key = creatorNameKey(term);
+  show(provisionalAccounts(key), "loading");
+  function onUpdate(event: Event) {
+    const update = (event as CustomEvent<{term: string; accounts: SuggestedAccount[]}>).detail;
+    if (update.term !== term && update.accounts.some(account => matchesTypedName(account, key)))
+      show(provisionalAccounts(key), "loading");
+  }
+  suggestionUpdates.addEventListener("accounts", onUpdate, {signal});
+  async function load(exact: string) {
+    try {
+      const accounts = await searchTikTok(exact);
+      if (!signal.aborted) show(accounts, "complete");
+    } catch {
+      if (!signal.aborted) show(provisionalAccounts(key), "unavailable");
+    } finally { suggestionUpdates.removeEventListener("accounts", onUpdate); }
+  }
+  if (pendingSearches.has(term) || !delayMs) void load(term);
+  else {
+    const timer = setTimeout(() => void load(term), delayMs);
+    signal.addEventListener("abort", () => clearTimeout(timer), {once:true});
+  }
 }
 
 function mergeSuggestions(query: string, local: CreatorSearchEntry[], accounts: SuggestedAccount[]) {
@@ -81,12 +148,12 @@ function mergeSuggestions(query: string, local: CreatorSearchEntry[], accounts: 
     if (typeof account?.handle !== "string") continue;
     const handle = username(account.handle);
     if (!handle || rows.has(handle)) continue;
-    const known = exactCreator(handle);
-    const checked = known?.handle === handle && known.hasCheck ? known : undefined;
+    const known = creatorByHandle(handle);
+    const checked = known?.hasCheck ? known : undefined;
     const avatar = typeof account.avatar === "string" && account.avatar.startsWith("https://") ? account.avatar : undefined;
     rows.set(handle, {
       handle, name: typeof account.name === "string" && account.name.trim() ? account.name : handle,
-      avatar: known?.handle === handle && known.avatar ? known.avatar : avatar, hasCheck: Boolean(checked), score: checked?.score ?? null, rank: checked?.rank,
+      avatar: known?.avatar || avatar, hasCheck: Boolean(checked), score: checked?.score ?? null, rank: checked?.rank,
       href: creatorPriceReportHref(handle, archiveHosting),
     });
   }
@@ -110,10 +177,8 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
   box.append(status, panel);
   input.autocomplete = "off";
   let pending: AbortController | undefined;
-  let timer: number | undefined;
   let pointingAtPanel = false;
   function dismiss() {
-    window.clearTimeout(timer);
     pending?.abort();
     pending = undefined;
     pointingAtPanel = false;
@@ -124,7 +189,7 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
     select(destination);
     dismiss();
   }
-  function show() {
+  function show(pasted = false) {
     dismiss();
     const query = input.value.normalize("NFKC").trim();
     if (!isCreatorQuery(query)) return;
@@ -135,14 +200,14 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
     const handle = username(query);
     const term = liveSearchTerm(query);
     panel.hidden = false;
-    function render(accounts: SuggestedAccount[], waiting = false, unavailable = false) {
+    function render(accounts: SuggestedAccount[], state: SuggestionState) {
       const active = panel.contains(document.activeElement) ? document.activeElement as HTMLButtonElement : null;
       const matches = mergeSuggestions(query, local, accounts);
       const visible = matches.slice(0, accounts.length ? 8 : 5);
       const body = document.createDocumentFragment();
       if (visible.length) body.append(creatorList(visible, choose, true));
-      else if (waiting || !handle) {
-        const message = waiting ? "Searching TikTok…" : unavailable ? "TikTok suggestions are unavailable." : "No matching creators found.";
+      else if (state === "loading" || !handle) {
+        const message = state === "loading" ? "Searching TikTok…" : state === "unavailable" ? "TikTok suggestions are unavailable." : "No matching creators found.";
         body.append(el("p", message));
       }
       if (visible.length < matches.length) {
@@ -158,7 +223,8 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
         (next ?? input).focus({ preventScroll: true });
       }
     }
-    render([], Boolean(term));
+    const debounceMs = pasted ? 0 : (query.length < 3 || pendingSearches.size ? 250 : 150);
+    loadCreatorSuggestions(term, signal, debounceMs, render);
     document.addEventListener("pointerdown", e => {
       pointingAtPanel = panel.contains(e.target as Node);
       if (!box.contains(e.target as Node)) dismiss();
@@ -168,17 +234,12 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
     document.addEventListener("pointercancel", release, { signal });
     window.addEventListener("hashchange", dismiss, { once: true, signal });
     window.addEventListener("blur", dismiss, { once: true, signal });
-    if (!term) return;
-    timer = window.setTimeout(async () => {
-      let accounts: SuggestedAccount[] = [];
-      let unavailable = false;
-      try {
-        accounts = await searchTikTok(term);
-      } catch { unavailable = true; }
-      if (!signal.aborted && box.isConnected && input.value.normalize("NFKC").trim() === query) render(accounts, false, unavailable);
-    }, 250);
   }
-  input.addEventListener("input", e => { if ((e as InputEvent).isComposing) dismiss(); else show(); });
+  input.addEventListener("input", event => {
+    const inputEvent = event as InputEvent;
+    if (inputEvent.isComposing) dismiss();
+    else show(inputEvent.inputType === "insertFromPaste");
+  });
   input.addEventListener("focus", () => { if (panel.hidden) show(); });
   box.addEventListener("focusout", e => {
     if (e.relatedTarget instanceof Node && !box.contains(e.relatedTarget)) dismiss();
@@ -225,7 +286,7 @@ export function creatorResults(query: string, signal: AbortSignal, select: Selec
   if (direct) page.append(direct);
   page.append(retry);
 
-  function render(accounts: SuggestedAccount[], state: "loading" | "complete" | "unavailable") {
+  function render(accounts: SuggestedAccount[], state: SuggestionState) {
     const matches = mergeSuggestions(query, local, accounts);
     const active = document.activeElement;
     const focused = results.contains(active) && active instanceof HTMLButtonElement ? active.dataset.handle : null;
@@ -233,21 +294,12 @@ export function creatorResults(query: string, signal: AbortSignal, select: Selec
     if (focused) results.querySelector<HTMLButtonElement>('[data-handle="' + focused + '"]')?.focus({ preventScroll: true });
     if (direct) direct.hidden = state === "loading" || matches.some(row => row.handle === handle);
     retry.hidden = state !== "unavailable";
-    if (state === "loading") status.textContent = (local.length ? local.length + (local.length === 1 ? " saved match" : " saved matches") : "Saved index checked") + " · Searching TikTok…";
-    else if (state === "unavailable") status.textContent = matches.length ? "Showing saved matches. TikTok search is temporarily unavailable." : "TikTok search is temporarily unavailable.";
+    if (state === "loading") status.textContent = (matches.length ? matches.length + (matches.length === 1 ? " match" : " matches") : "Saved index checked") + " · Searching TikTok…";
+    else if (state === "unavailable") status.textContent = matches.length ? "Showing available matches. TikTok search is temporarily unavailable." : "TikTok search is temporarily unavailable.";
     else if (matches.length) status.textContent = matches.length + (matches.length === 1 ? " matching creator" : " matching creators");
     else status.textContent = term ? "No matching accounts found. Try a different name or an exact @username." : "No saved matches. Enter 2–48 characters to search TikTok.";
   }
-  async function load() {
-    render([], term ? "loading" : "complete");
-    if (!term) return;
-    try {
-      const accounts = await searchTikTok(term);
-      if (!signal.aborted) render(accounts, "complete");
-    } catch {
-      if (!signal.aborted) render([], "unavailable");
-    }
-  }
+  function load() { loadCreatorSuggestions(term, signal, 0, render); }
   retry.addEventListener("click", load, { signal });
   void load();
   return page;

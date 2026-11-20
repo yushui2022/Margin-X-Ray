@@ -4,13 +4,12 @@ import { shoppingRankingHref } from "../shared/shopping-links";
 import { onionScore, UNRATED_ONION } from "../shared/onion-index";
 import { details, el, link, money } from "./shop-dom";
 import { exactCreator } from "./shopping-creator-search";
-import { shopRankingRows as rows, type ShopRankingRow } from "./shopping-ranking-data";
+import { featuredRankingSample, shopRankingRows as rows, tiedShopRanks, type ShopRankingRow } from "./shopping-ranking-data";
 import { productReceipt, sourceName } from "./shopping-verdict";
 import { benchmarkCard, benchmarkDirectory, missingBenchmarkCard, otherListings } from "./shopping-benchmarks";
 
 const ranked = rows.filter(row => row.rank !== null);
 const unranked = rows.filter(row => row.rank === null);
-const tiedRanks = new Set(ranked.filter((row,i) => i > 0 && row.rank === ranked[i - 1].rank).map(row => row.rank));
 const scoredListings = new Set(ranked.flatMap(row => row.verdict.items.map(item => row.observations[item.productIndex].product.productId)));
 const dateFormat = new Intl.DateTimeFormat("en-US", {month:"short", day:"numeric", year:"numeric", timeZone:"UTC"});
 
@@ -47,7 +46,8 @@ function pricePair(row: ShopRankingRow, inline?: { productId?: string | null; sh
     ? row.verdict.items.filter(item => row.observations[item.productIndex].product.productId === inline.productId)
     : row.verdict.items;
   if (score === null || !items.length) return null;
-  const item = items.reduce((best, next) =>
+  const featured = inline?.showSources && !inline.productId ? featuredRankingSample(row)?.item : undefined;
+  const item = featured ?? items.reduce((best, next) =>
     Math.abs(next.score - score) < Math.abs(best.score - score) ? next : best);
   const observation = row.observations[item.productIndex];
   const pair = el("span", "", "price-ranking-pair");
@@ -56,6 +56,11 @@ function pricePair(row: ShopRankingRow, inline?: { productId?: string | null; sh
     const name = el("strong", sourceName(observation.product), "shop-inline-item");
     name.title = observation.product.name;
     pair.append(name);
+  }
+  if (inline?.showSources) {
+    const variant = observation.product.variants[item.variantIndex]?.variant;
+    if (variant && !/^(?:default|single variant)$/i.test(variant))
+      pair.append(el("small", variant, "shop-rank-variant"));
   }
   const max = Math.max(item.sourcePrice, item.peerPrice);
   const peerLabel = inline?.showSources ? item.basis === "exact" ? "Same item elsewhere" : "Similar item elsewhere" : "Benchmark";
@@ -75,6 +80,10 @@ function pricePair(row: ShopRankingRow, inline?: { productId?: string | null; sh
     const sources = el("span", "", "shop-rank-sources");
     sources.append(link("Original post ↗", observation.sourceUrl), link("Price sources →",
       shoppingRankingHref(row.handle) + "?" + new URLSearchParams({product: observation.product.productId})));
+    const mascot = el("img", "", "shop-rank-mascot");
+    mascot.src = "assets/mascot/onion-boy-side-eye.webp";
+    mascot.alt = ""; mascot.width = mascot.height = 40;
+    sources.append(mascot);
     pair.append(sources);
   }
   return pair;
@@ -82,7 +91,7 @@ function pricePair(row: ShopRankingRow, inline?: { productId?: string | null; sh
 
 function rankingPosition(row: ShopRankingRow) {
   const position = el("span", row.rank === null ? "—" : "#" + row.rank, "price-ranking-position");
-  if (row.rank !== null && tiedRanks.has(row.rank)) position.append(el("small","Tie"));
+  if (row.rank !== null && tiedShopRanks.has(row.rank)) position.append(el("small","Tie"));
   return position;
 }
 

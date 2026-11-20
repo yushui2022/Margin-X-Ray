@@ -1,3 +1,4 @@
+import archivePosts from "../../research/shop-archive-creators.json";
 import seed from "../../research/shop-price-ranking-seed.json";
 import editionChecks from "../../research/shop-price-benchmark-checks.json";
 import extraPosts from "../../research/shop-price-batches/2026-11-19-additional-posts.json";
@@ -87,3 +88,15 @@ export type ShopRankingRow = ReturnType<typeof rankShopSamples>[number];
 if (editionChecks.formatVersion !== 1 || editionChecks.method !== "shop-ranking-benchmark-v1")
   throw new Error("Unsupported ranking benchmark edition.");
 export const shopRankingRows = rankShopSamples([seed,extraPosts],editionChecks.observations,editionChecks.candidates);
+export const tiedShopRanks = new Set(shopRankingRows.flatMap((row, i) =>
+  row.rank !== null && i > 0 && row.rank === shopRankingRows[i - 1].rank ? [row.rank] : []));
+
+const featuredPosts = new Map(archivePosts.map(post => [post.sourceUrl + "/" + post.productId, post]));
+
+export function featuredRankingSample(row: ShopRankingRow) {
+  for (const item of row.verdict.items) {
+    const {product, sourceUrl} = row.observations[item.productIndex];
+    const post = featuredPosts.get(sourceUrl + "/" + product.productId);
+    if (post?.handle === row.handle) return {item, post};
+  }
+}

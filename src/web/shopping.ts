@@ -131,7 +131,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   const section = el("section", "", "shop-browse");
   const archiveHeading = el("div", "", "shop-section-head");
   archiveHeading.append(el("h2", "Creator product archive"), link("Browse all →", shoppingRankingHref()));
-  const archiveList = scoredArchiveList();
+  const archiveList = scoredArchiveList((handle, button) => open(shoppingRankingHref(handle), button));
   section.append(archiveHeading, archiveList);
   const panel = el("section", "", "shop-inline-search");
   panel.hidden = true;
@@ -149,6 +149,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   let request: AbortController | undefined;
   let matchesFor = "";
   let activeDestination = "";
+  let archiveReturn: {button: HTMLButtonElement; top: number} | undefined;
   lifetime.addEventListener("abort", () => request?.abort(), { once: true });
 
   function restoreArchive() {
@@ -159,21 +160,27 @@ function home(lifetime: AbortSignal, initialQuery = "") {
 
   function clear() {
     request?.abort();
+    archiveReturn = undefined;
     activeDestination = matchesFor = "";
     panel.hidden = true;
     body.replaceChildren();
     restoreArchive();
   }
   close.addEventListener("click", () => {
+    const origin = archiveReturn;
     clear();
     input.value = "";
-    input.focus({ preventScroll: true });
+    if (origin) {
+      origin.button.focus({ preventScroll: true });
+      window.scrollBy({top: origin.button.getBoundingClientRect().top - origin.top, behavior: "instant"});
+    } else input.focus({ preventScroll: true });
   });
   input.addEventListener("input", clear);
   back.addEventListener("click", () => open("#shop/creators?" + new URLSearchParams({ q: matchesFor })));
 
-  function open(destination: string) {
-    if (destination === activeDestination && toolbar.parentElement !== section) return;
+  function open(destination: string, source?: HTMLButtonElement) {
+    if (!source && destination === activeDestination && toolbar.parentElement !== section) return;
+    archiveReturn = source ? {button: source, top: source.getBoundingClientRect().top} : undefined;
     const focused = document.activeElement;
     const restoreFocus = focused?.matches(":focus-visible") && (
       form.querySelector(".shop-creator-suggestions")?.contains(focused) || body.contains(focused) || focused === back
@@ -184,7 +191,10 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     const [path, params] = destination.slice(5).split("?");
     const query = new URLSearchParams(params);
     const accountSearch = path === "/creators";
-    if (accountSearch) matchesFor = query.get("q") ?? "";
+    if (source) {
+      matchesFor = "";
+      input.value = "@" + source.dataset.handle;
+    } else if (accountSearch) matchesFor = query.get("q") ?? "";
     else if (!activeDestination && !matchesFor && creatorSearchDestination(input.value, archiveHosting)?.startsWith("#shop/creators?")) {
       matchesFor = input.value.trim();
     }
@@ -222,6 +232,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
       body.replaceChildren();
       section.replaceChildren(toolbar, ranking);
       panel.hidden = true;
+      if (source) ranking.querySelector<HTMLElement>('li[aria-current="true"] summary')?.focus({preventScroll:true});
       revealRankingMatch(ranking, signal);
     } else {
       restoreArchive();
