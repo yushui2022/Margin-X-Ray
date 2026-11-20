@@ -12,7 +12,7 @@ import { rankedCreatorPage, rankingPage } from "./shopping-ranking";
 import { homeRanking, scoredArchiveList } from "./shopping-home-ranking";
 import { savedShoppingMatches } from "./shopping-saved";
 import { creatorSearchDestination, liveCreatorHref, username } from "./shopping-creator-search";
-import { creatorLookupOrigin, creatorResults, suggestCreators } from "./shopping-creator-lookup";
+import { creatorLookupOrigin, creatorResults, searchResultButton, suggestCreators } from "./shopping-creator-lookup";
 import { liveCreatorPage } from "./shopping-creator-live";
 import { archiveHosting } from "./hosting-mode";
 
@@ -40,16 +40,7 @@ function searchForm(initial = "", context: "live" | "home" | "archive" = "live",
   input.setAttribute("aria-label", creatorLookup ? "Search by username, display name or TikTok link" : context === "archive" ? "Search archived product checks" : "TikTok video link, Shop product link or creator handle");
   button.textContent = creatorLookup || context === "archive" ? "Search" : "Check price";
   form.append(input, button); box.append(form);
-  const dismiss = creatorLookup ? suggestCreators(box, input) : undefined;
-  if (creatorLookup && context === "home") {
-    box.addEventListener("click", event => {
-      const match = searchChoice(event);
-      if (!match) return;
-      event.preventDefault();
-      dismiss?.();
-      submit(match.hash);
-    }, { capture: true });
-  }
+  const dismiss = creatorLookup ? suggestCreators(box, input, submit) : undefined;
   input.addEventListener("input", () => input.setCustomValidity(""));
   form.addEventListener("submit", event => {
     event.preventDefault();
@@ -105,12 +96,6 @@ function productRow(id: string) {
   return a;
 }
 
-function searchChoice(event: MouseEvent) {
-  if (event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return null;
-  return event.target instanceof Element
-    ? event.target.closest<HTMLAnchorElement>("a.shop-creator-match,a.shop-creator-see-all,a.shop-search-direct,a.shop-saved-match") : null;
-}
-
 function home(lifetime: AbortSignal, initialQuery = "") {
   const main = el("div", "", "shop-page shop-home");
   const lookup = el("section", "", "shop-home-lookup");
@@ -149,7 +134,6 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     request?.abort();
     activeDestination = matchesFor = "";
     panel.hidden = true;
-    section.hidden = false;
     body.replaceChildren();
   }
   close.addEventListener("click", () => {
@@ -159,16 +143,13 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   });
   input.addEventListener("input", clear);
   back.addEventListener("click", () => open("#shop/creators?" + new URLSearchParams({ q: matchesFor })));
-  panel.addEventListener("click", event => {
-    const match = searchChoice(event);
-    if (match) { event.preventDefault(); open(match.hash); }
-  }, { capture: true });
 
   function open(destination: string) {
-    if (destination === activeDestination) {
-      title.focus({ preventScroll: true });
-      return;
-    }
+    if (destination === activeDestination) return;
+    const focused = document.activeElement;
+    const restoreFocus = focused?.matches(":focus-visible") && (
+      form.querySelector(".shop-creator-suggestions")?.contains(focused) || body.contains(focused) || focused === back
+    );
     request?.abort();
     request = new AbortController();
     const signal = request.signal;
@@ -181,7 +162,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     }
     title.textContent = accountSearch ? "Matches for “" + matchesFor + "”" : "Price check";
     let result: HTMLElement;
-    if (accountSearch) result = creatorResults(matchesFor, signal);
+    if (accountSearch) result = creatorResults(matchesFor, signal, open);
     else if (path.startsWith("/rankings/")) {
       result = rankedCreatorPage(path.slice("/rankings/".length), { productId: query.get("product") });
     } else if (path === "/tiktok") {
@@ -197,7 +178,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
       result = el("div", "", "shop-inline-link-results");
       if (saved.length) {
         title.textContent = "Matching price checks";
-        for (const match of saved) result.append(link(match.label, match.href, "shop-saved-match shop-action-link"));
+        for (const match of saved) result.append(searchResultButton(match.label, match.href, "shop-saved-match shop-action-link", open));
       } else {
         title.textContent = "No saved price check for this link";
         result.append(el("p", "Try the creator’s @username to check their recent TikTok posts.", "shop-small"));
@@ -206,9 +187,8 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     activeDestination = destination;
     back.hidden = !matchesFor || accountSearch;
     body.replaceChildren(result);
-    section.hidden = true;
     panel.hidden = false;
-    if (panel.isConnected) title.focus({ preventScroll: true });
+    if (restoreFocus && panel.isConnected) title.focus({ preventScroll: true });
   }
   const heading = el("div", "", "shop-section-head");
   heading.append(el("h2", "Creator product archive"), link("Browse all →", shoppingRankingHref()));

@@ -190,7 +190,6 @@ function showView(view: "scan" | "pro" | "creators" | "markup" | "shop"): void {
   const title = location.hash === "#prices" ? "Price archive" : { shop: "Shopping check", creators: "Creator research", scan: "Product scan", pro: "Pricing workspace", markup: "Product markup check" }[view];
   document.title = `${title} · Onion Head`;
   if (view === "shop") {
-    if (!location.hash) history.replaceState(history.state, "", "#shop");
     const requested = location.hash;
     void import("./shopping").then(({ renderShopping }) => {
       if (location.hash === requested && document.body.dataset.view === "shop") renderShopping(els.shopView);

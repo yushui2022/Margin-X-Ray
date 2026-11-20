@@ -2,7 +2,7 @@
 
 **Check the price behind the post.**
 
-The [public Sites edition](https://onion-head-price-index.purebeak64.chatgpt.site) serves saved US TikTok Shop checks. Visitors can search an archived creator, video or product and share its receipt URL. Live TikHub lookups, screenshot recognition and voting run on the Node deployment.
+Open [Onion Head on GitHub Pages](https://yushui2022.github.io/Margin-X-Ray/) to search TikTok creators by name, @username or profile link. Select an account to see its saved price report or follow a live TikHub check. The public edition also supports saved US TikTok Shop video and product receipts. Screenshot recognition and voting run on the Node deployment.
 
 Start at `#shop` and paste a TikTok profile, @handle, video or TikTok Shop
 listing. The server uses `TIKHUB_TOKEN` to read the original post attachment,

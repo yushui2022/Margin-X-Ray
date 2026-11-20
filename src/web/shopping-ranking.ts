@@ -3,7 +3,7 @@ import { RANKING_SCORE_VERSION, rankingScoreAnchors } from "../shared/shop-ranki
 import { shoppingRankingHref } from "../shared/shopping-links";
 import { details, el, link, money } from "./shop-dom";
 import { shopRankingRows as rows, type ShopRankingRow } from "./shopping-ranking-data";
-import { productReceipt } from "./shopping-verdict";
+import { productReceipt, sourceName } from "./shopping-verdict";
 import { benchmarkCard, benchmarkDirectory, missingBenchmarkCard, otherListings } from "./shopping-benchmarks";
 
 const ranked = rows.filter(row => row.rank !== null);
@@ -39,13 +39,17 @@ function matchLabel(row: ShopRankingRow) {
   return {exact:"Verified matches", similar:"Similar-item estimate", mixed:"Exact and similar matches", none:"No eligible comparison"}[row.verdict.basis];
 }
 
-function pricePair(row: ShopRankingRow) {
-  const {items, score} = row.verdict;
+function pricePair(row: ShopRankingRow, inline?: { productId?: string | null }) {
+  const {score} = row.verdict;
+  const items = inline?.productId
+    ? row.verdict.items.filter(item => row.observations[item.productIndex].product.productId === inline.productId)
+    : row.verdict.items;
   if (score === null || !items.length) return null;
   const item = items.reduce((best, next) =>
     Math.abs(next.score - score) < Math.abs(best.score - score) ? next : best);
   const pair = el("span", "", "price-ranking-pair");
   if (items.length > 1) pair.append(el("small","Example from this sample","price-ranking-example"));
+  if (inline) pair.append(el("strong", sourceName(row.observations[item.productIndex].product), "shop-inline-item"));
   const max = Math.max(item.sourcePrice, item.peerPrice);
   for (const [label, value] of [["Original",item.sourcePrice],["Benchmark",item.peerPrice]] as const) {
     const quote = el("span", "", "price-ranking-quote");
@@ -184,7 +188,15 @@ export function rankedCreatorPage(handle: string, inline?: { productId?: string 
     head.append(indexScale(row.verdict.score));
     if (row.verdict.scoredCount > 1) head.append(el("p","Median of " + row.verdict.scoredCount + " product scores.","ranking-aggregate-note"));
   } else head.append(el("p","A score needs a comparable in-stock offer from another shop.","ranking-aggregate-note"));
-  main.append(head,rankingMethod());
+  main.append(head);
+  const reportBody = inline ? details("View full price report") : main;
+  if (inline) {
+    main.classList.add("shop-inline-receipt");
+    const prices = pricePair(row, inline);
+    if (prices) main.append(prices);
+    main.append(reportBody);
+  }
+  reportBody.append(rankingMethod());
   const sorted = row.observations.map((observation,index) => ({
     observation, item:row.verdict.items.find(item => item.productIndex === index),
     original:row.rawReceipts[index], raw:row.rawReceipts[index].items[0],
@@ -195,8 +207,8 @@ export function rankedCreatorPage(handle: string, inline?: { productId?: string 
       const heading = el("header","","verdict-section-head ranking-receipts-heading");
       heading.append(el("h2",sorted.length === 1 ? "Price comparison" : "Price comparisons"),
         el("span","Item prices only","verdict-label"));
-      main.append(heading);
-    } else main.append(el("h2","Sampled products"));
+      reportBody.append(heading);
+    } else reportBody.append(el("h2","Sampled products"));
   }
   for (const {observation,item,raw,original} of sorted) {
     const check = raw ? observation.checks.find(check => check.variantIndex === raw.variantIndex) : observation.checks[0];
@@ -222,10 +234,10 @@ export function rankedCreatorPage(handle: string, inline?: { productId?: string 
         : "This receipt uses the prices and scoring method recorded for the original post.";
       notes.append(details(label,el("p",explanation + " Method · " + original.version),receipt));
     }
-    main.append(primary);
+    reportBody.append(primary);
   }
-  if (!sorted.length) main.append(el("p","The sampled posts had no linked product with a price comparison."));
+  if (!sorted.length) reportBody.append(el("p","The sampled posts had no linked product with a price comparison."));
   const posts = row.posts.map(post => link("TikTok post " + post.split("/").filter(Boolean).at(-1) + " ↗",post,"shop-source-link"));
-  main.append(details("Sampled posts (" + posts.length + ")", ...posts));
+  reportBody.append(details("Sampled posts (" + posts.length + ")", ...posts));
   return main;
 }

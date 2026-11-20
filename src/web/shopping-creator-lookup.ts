@@ -1,22 +1,23 @@
-import { el, link } from "./shop-dom";
-import { markShoppingSubmission } from "../shared/shopping-links";
+import { el } from "./shop-dom";
 import { archiveHosting } from "./hosting-mode";
 import { creatorPriceReportHref, creatorResultsHref, exactCreator, isCreatorQuery, searchCreators, username, type CreatorSearchEntry } from "./shopping-creator-search";
 
 export const creatorLookupOrigin = "https://onion-head-creator-lookup.purebeak64.chatgpt.site";
-function reportLink(label: string, destination: string, className: string) {
-  const row = link(label, destination, className);
-  row.addEventListener("click", event => {
-    if (!event.defaultPrevented && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) markShoppingSubmission(destination);
-  });
-  return row;
+type SelectResult = (destination: string) => void;
+
+export function searchResultButton(label: string, destination: string, className: string, select: SelectResult) {
+  const button = el("button", label, className);
+  button.type = "button";
+  button.dataset.choice = destination;
+  button.addEventListener("click", () => select(destination));
+  return button;
 }
 
-function creatorList(matches: CreatorSearchEntry[], dropdown = false) {
+function creatorList(matches: CreatorSearchEntry[], select: SelectResult, dropdown = false) {
   const list = el("ul", "", "shop-creator-matches");
   for (const creator of matches) {
     const item = el("li");
-    const row = reportLink("", creator.href, "shop-creator-match");
+    const row = searchResultButton("", creator.href, "shop-creator-match", select);
     row.dataset.handle = creator.handle;
     const initial = el("span", Array.from(creator.handle)[0]?.toUpperCase(), "shop-creator-initial");
     initial.setAttribute("aria-hidden", "true");
@@ -34,7 +35,7 @@ function creatorList(matches: CreatorSearchEntry[], dropdown = false) {
     const handle = "@" + creator.handle;
     if (!dropdown && creator.name.toLowerCase() === creator.handle.toLowerCase()) identity.append(el("strong", handle));
     else identity.append(el("strong", creator.name), el("small", handle));
-    const label = creator.score !== null ? creator.score + "/100" : creator.hasCheck ? "Unrated" : "Check prices →";
+    const label = creator.score !== null ? creator.score + "/100" : creator.hasCheck ? "Unrated" : "Check prices";
     row.append(identity);
     if (!dropdown || creator.hasCheck) row.append(el("span", label, "shop-creator-result-score"));
     item.append(row);
@@ -99,7 +100,7 @@ function mergeSuggestions(query: string, local: CreatorSearchEntry[], accounts: 
   return [...rows.values()].sort((a, b) => priority(a) - priority(b));
 }
 
-export function suggestCreators(box: HTMLElement, input: HTMLInputElement) {
+export function suggestCreators(box: HTMLElement, input: HTMLInputElement, select: SelectResult) {
   const panel = el("div", "", "shop-creator-suggestions");
   const status = el("span", "", "shop-creator-announcement");
   status.setAttribute("role", "status");
@@ -118,6 +119,10 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement) {
     panel.hidden = true;
     status.textContent = "";
   }
+  function choose(destination: string) {
+    select(destination);
+    dismiss();
+  }
   function show() {
     dismiss();
     const query = input.value.normalize("NFKC").trim();
@@ -130,25 +135,25 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement) {
     const term = liveSearchTerm(query);
     panel.hidden = false;
     function render(accounts: SuggestedAccount[], waiting = false, unavailable = false) {
-      const active = panel.contains(document.activeElement) ? document.activeElement as HTMLAnchorElement : null;
+      const active = panel.contains(document.activeElement) ? document.activeElement as HTMLButtonElement : null;
       const matches = mergeSuggestions(query, local, accounts);
       const visible = matches.slice(0, accounts.length ? 8 : 5);
       const body = document.createDocumentFragment();
-      if (visible.length) body.append(creatorList(visible, true));
+      if (visible.length) body.append(creatorList(visible, choose, true));
       else if (waiting || !handle) {
         const message = waiting ? "Searching TikTok…" : unavailable ? "TikTok suggestions are unavailable." : "No matching creators found.";
         body.append(el("p", message));
       }
       if (visible.length < matches.length) {
-        body.append(link("See all " + matches.length + " matches →", creatorResultsHref(query), "shop-creator-see-all"));
+        body.append(searchResultButton("See all " + matches.length + " matches", creatorResultsHref(query), "shop-creator-see-all", choose));
       }
       if (handle && !visible.some(row => row.handle === handle)) {
-        body.append(reportLink("Check @" + handle + " directly →", creatorPriceReportHref(handle, archiveHosting), "shop-creator-see-all"));
+        body.append(searchResultButton("Check @" + handle + " directly", creatorPriceReportHref(handle, archiveHosting), "shop-creator-see-all", choose));
       }
       panel.replaceChildren(body);
       status.textContent = visible.length ? visible.length + (visible.length === 1 ? " matching creator." : " matching creators.") : panel.textContent;
       if (active) {
-        const next = Array.from(panel.querySelectorAll("a")).find(a => a.href === active.href || (active.dataset.handle && a.dataset.handle === active.dataset.handle));
+        const next = Array.from(panel.querySelectorAll("button")).find(button => button.dataset.choice === active.dataset.choice);
         (next ?? input).focus({ preventScroll: true });
       }
     }
@@ -191,19 +196,19 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement) {
       return;
     }
     if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
-    const links = Array.from(panel.querySelectorAll("a"));
-    if (!links.length) return;
-    const focused = links.findIndex(a => a === document.activeElement);
+    const choices = Array.from(panel.querySelectorAll("button"));
+    if (!choices.length) return;
+    const focused = choices.indexOf(document.activeElement as HTMLButtonElement);
     if (event.target !== input && focused < 0) return;
     event.preventDefault();
-    if (event.key === "ArrowDown") links[(focused + 1) % links.length].focus();
+    if (event.key === "ArrowDown") choices[(focused + 1) % choices.length].focus();
     else if (focused === 0) input.focus();
-    else links[focused < 0 ? links.length - 1 : focused - 1].focus();
+    else choices[focused < 0 ? choices.length - 1 : focused - 1].focus();
   });
   return dismiss;
 }
 
-export function creatorResults(query: string, signal: AbortSignal) {
+export function creatorResults(query: string, signal: AbortSignal, select: SelectResult) {
   const page = el("div", "", "shop-creator-results");
   const local = searchCreators(query);
   const term = liveSearchTerm(query);
@@ -211,7 +216,7 @@ export function creatorResults(query: string, signal: AbortSignal) {
   const status = el("p", "", "shop-search-status");
   status.setAttribute("role", "status");
   const results = el("div", "", "shop-search-results-list");
-  const direct = handle && reportLink("Check @" + handle + " directly →", creatorPriceReportHref(handle, archiveHosting), "shop-search-direct");
+  const direct = handle && searchResultButton("Check @" + handle + " directly", creatorPriceReportHref(handle, archiveHosting), "shop-search-direct", select);
   const retry = el("button", "Retry TikTok search", "btn ghost");
   retry.type = "button";
   retry.hidden = true;
@@ -222,9 +227,9 @@ export function creatorResults(query: string, signal: AbortSignal) {
   function render(accounts: SuggestedAccount[], state: "loading" | "complete" | "unavailable") {
     const matches = mergeSuggestions(query, local, accounts);
     const active = document.activeElement;
-    const focused = results.contains(active) && active instanceof HTMLAnchorElement ? active.dataset.handle : null;
-    results.replaceChildren(...(matches.length ? [creatorList(matches)] : []));
-    if (focused) results.querySelector<HTMLAnchorElement>('[data-handle="' + focused + '"]')?.focus({ preventScroll: true });
+    const focused = results.contains(active) && active instanceof HTMLButtonElement ? active.dataset.handle : null;
+    results.replaceChildren(...(matches.length ? [creatorList(matches, select)] : []));
+    if (focused) results.querySelector<HTMLButtonElement>('[data-handle="' + focused + '"]')?.focus({ preventScroll: true });
     if (direct) direct.hidden = state === "loading" || matches.some(row => row.handle === handle);
     retry.hidden = state !== "unavailable";
     if (state === "loading") status.textContent = (local.length ? local.length + (local.length === 1 ? " saved match" : " saved matches") : "Saved index checked") + " · Searching TikTok…";

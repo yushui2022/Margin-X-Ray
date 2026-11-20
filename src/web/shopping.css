@@ -748,15 +748,26 @@ body[data-view="shop"] .page { padding-top:clamp(22px,3vw,44px); }
 .shop-inline-control:hover { text-decoration:underline; text-underline-offset:3px; }
 .shop-inline-control:focus-visible { outline:2px solid #83526b; outline-offset:2px; }
 .shop-inline-body > .shop-narrow { max-width:none; margin:0; }
+.shop-inline-receipt .price-ranking-mast { padding:12px 16px; gap:8px 12px; border-radius:10px; }
+.shop-inline-receipt .price-ranking-mast h2 { font:650 clamp(17px,2vw,23px)/1.25 var(--mx-font-sans); margin:3px 0; }
+.shop-inline-receipt .price-ranking-mast p:not(.shop-kicker) { font-size:13px; }
+.shop-inline-receipt .price-ranking-total strong { font-size:clamp(28px,3.5vw,40px); }
+.shop-inline-receipt:not(:has(> details[open])) .ranking-score-scale { display:none; }
+.shop-inline-receipt > .price-ranking-pair { max-width:620px; gap:5px 12px; margin:10px 0; }
+.shop-inline-item { grid-column:1/-1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:15px; }
 .shop-inline-body .shop-creator-results .shop-search-status,.shop-inline-link-results > p { margin:0 0 9px; }
-.shop-inline-link-results a { display:flex; align-items:center; min-height:44px; }
+.shop-inline-link-results .shop-saved-match { display:flex; align-items:center; min-height:44px; }
 .shop-creator-suggestions:not([hidden]),.shop-search-results-list > .shop-creator-matches {
   margin:8px 0 0; background:var(--mx-panel); border:1px solid #d7c7bc; border-radius:12px;
 }
 .shop-creator-suggestions > p { margin:0; padding:15px 16px; color:var(--mx-muted); }
 .shop-creator-matches { padding:0; margin:0; list-style:none; }
-.shop-creator-matches li + li,.shop-creator-see-all { border-top:1px solid var(--mx-line); }
-.shop-page a.shop-creator-match {
+:where(.shop-page) button[data-choice] {
+  appearance:none; width:100%; text-align:start; font:inherit; color:#714158;
+  background:transparent; border:0; cursor:pointer;
+}
+.shop-creator-matches li + li,button.shop-creator-see-all { border-top:1px solid var(--mx-line); }
+.shop-page button.shop-creator-match {
   display:grid; grid-template-columns:36px minmax(0,1fr) auto; align-items:center; gap:12px;
   padding:9px clamp(12px,2vw,20px); min-height:54px; color:var(--mx-ink); text-decoration:none;
 }

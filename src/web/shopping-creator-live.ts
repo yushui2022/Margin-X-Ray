@@ -1,5 +1,5 @@
 import { publicUrl, tiktokListing } from "../shared/shopping-links";
-import { el, link, money } from "./shop-dom";
+import { details, el, link, money } from "./shop-dom";
 
 interface LiveProduct {
   productId: string;
@@ -83,7 +83,7 @@ function productCard(product: LiveProduct, handle: string) {
   return card;
 }
 
-function creatorReport(data: LiveCreator) {
+function creatorReport(data: LiveCreator, inline: boolean) {
   const body = document.createDocumentFragment();
   const handle = data.handle.toLowerCase();
   const meta = el("div", "", "shop-byline");
@@ -130,7 +130,10 @@ function creatorReport(data: LiveCreator) {
       row.append(link(post.caption || "Open TikTok post ↗", url, "shop-source-link"));
       list.append(row);
     }
-    if (list.childElementCount) body.append(el("h2", "Posts checked"), list);
+    if (list.childElementCount) {
+      if (inline) body.append(details("View checked posts (" + list.childElementCount + ")", list));
+      else body.append(el("h2", "Posts checked"), list);
+    }
   }
   return body;
 }
@@ -257,7 +260,7 @@ export function liveCreatorPage(handle: string, endpoint: string, signal: AbortS
       const data = outcome.report;
       if (data?.handle?.toLowerCase() !== handle.toLowerCase() || !Array.isArray(data.products) || !Array.isArray(data.posts)
         || !Number.isInteger(data.sample?.checked)) throw new Error("Incomplete creator response");
-      results.replaceChildren(creatorReport(data));
+      results.replaceChildren(creatorReport(data, inline));
       const partial = data.status === "partial";
       status.textContent = partial ? "Partial check. Some posts or shop details could not be retrieved." : "Creator lookup complete.";
       retry.hidden = !partial;
