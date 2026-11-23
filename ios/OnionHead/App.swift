@@ -51,7 +51,7 @@ final class ShoppingViewController: UIViewController, WKNavigationDelegate, WKUI
             browser.trailingAnchor.constraint(equalTo: safe.trailingAnchor),
             browser.bottomAnchor.constraint(equalTo: safe.bottomAnchor)
         ])
-        browser.load(URLRequest(url: home))
+        browser.load(URLRequest(url: home, cachePolicy: .reloadRevalidatingCacheData))
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
@@ -88,7 +88,7 @@ final class ShoppingViewController: UIViewController, WKNavigationDelegate, WKUI
         alert.addAction(UIAlertAction(title: NSLocalizedString("connection.retry", comment: "Try loading again"), style: .default) { [weak self] _ in
             guard let self else { return }
             self.showingError = false
-            self.browser.load(URLRequest(url: self.browser.url ?? self.home))
+            self.browser.load(URLRequest(url: self.browser.url ?? self.home, cachePolicy: .reloadRevalidatingCacheData))
         })
         present(alert, animated: true)
     }
