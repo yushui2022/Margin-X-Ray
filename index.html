@@ -11,9 +11,9 @@
     <link rel="icon" href="assets/mascot/onion-head.webp" />
     <link rel="stylesheet" href="fonts.css?v=2fe77b3fbcc3" />
     <link rel="stylesheet" href="tokens.css?v=48d80a5ce906" />
-    <link rel="stylesheet" href="app.css?v=34f0f73caa7e" />
-    <link rel="stylesheet" href="shopping.css?v=43110114139d" />
-    <link rel="stylesheet" href="creator-shopping.css?v=e69b9fed1cdf" />
+    <link rel="stylesheet" href="app.css?v=1b690138cb6f" />
+    <link rel="stylesheet" href="shopping.css?v=9fed0ccb46ff" />
+    <link rel="stylesheet" href="creator-shopping.css?v=9c218fa62403" />
   </head>
   <body class="mx-theme">
     <header class="topbar">
@@ -23,10 +23,19 @@
           <strong>Onion Head</strong>
         </span>
       </a>
-      <nav class="topnav" aria-label="Research tools">
-        <a class="topnav-btn active" data-view="shop" href="#shop">Shopping check</a>
-        <a class="topnav-btn" data-view="creators" href="#creators">Creators</a>
-        <a class="topnav-btn" data-view="prices" href="#prices">Price archive</a>
+      <nav class="topnav" aria-label="Main navigation">
+        <a class="topnav-btn active" data-view="shop" href="#shop">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>Shopping check
+        </a>
+        <a class="topnav-btn" data-view="rankings" href="#shop/rankings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20v-8h6v8m0 0V5h6v15m0-10h6v10H3"/></svg>Rankings
+        </a>
+        <a class="topnav-btn" data-view="creators" href="#creators">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1m0-15a3 3 0 0 1 0 6m3 3a5 5 0 0 1 3 5v1"/></svg>Creators
+        </a>
+        <a class="topnav-btn" data-view="prices" href="#prices">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Zm4 5h6m-6 4h6"/></svg>Price archive
+        </a>
       </nav>
       <details class="app-tools" id="appTools"><summary>Tools</summary><div class="tools-menu">
         <a href="#markup">Compare supplier prices</a>
@@ -44,13 +53,9 @@
       <section class="hero" id="hero" hidden>
         <div class="hero-grid">
           <div class="hero-copy">
-        <h1>Scan a <em>product.</em></h1>
-        <p class="lede">
-          Compare a listing with supplier offers and explore the estimated cost breakdown.
-        </p>
-
-        <div class="backend-offline" id="offlineNote" hidden>
-          Connect a scan backend to look up a new listing. You can also compare pack prices below.
+        <div class="scan-intro">
+          <h1>Scan a <em>product</em></h1>
+          <p class="lede">Start with a product link, a TikTok video or a photo to look for supplier offers.</p>
         </div>
 
         <form class="scan-form" id="scanForm">
@@ -62,7 +67,7 @@
                id="urlInput"
                aria-label="Video or product URL"
               type="url"
-              placeholder="Paste a TikTok, Amazon or Shopify link"
+              placeholder="Paste a link"
               autocomplete="off"
               spellcheck="false"
             />
@@ -75,13 +80,15 @@
         <div class="scan-secondary">
           <button class="btn secondary" id="uploadBtn" type="button">Upload image</button>
           <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
-          <a class="btn secondary" href="#markup">Check product markup</a>
-          <a class="chip-link" href="#markup/winco-msp-4p">Compare three supplier quotes →</a>
+          <a class="chip-link" href="#markup">Compare pack prices →</a>
         </div>
         <div class="image-ready" id="imageReady" hidden>
           <img id="imageThumb" alt="" />
           <span id="imageName"></span>
           <button class="link-btn" id="clearImage" type="button">Remove</button>
+        </div>
+        <div class="backend-offline" id="offlineNote" hidden>
+          Connect a backend in Tools to scan a new listing.
         </div>
           </div>
           <div class="hero-visual" aria-hidden="true">
@@ -95,6 +102,7 @@
           <li><span>03</span><strong>Match</strong><em>1688 image search</em></li>
           <li><span>04</span><strong>Compare</strong><em>Retail vs supplier price</em></li>
         </ol>
+        <a class="chip-link scan-example" href="#markup/winco-msp-4p">View a saved supplier comparison →</a>
       </section>
 
       <section class="workspace" id="workspace" hidden>
@@ -131,9 +139,11 @@
         <div class="pro-grid">
           <aside class="radar">
             <header class="radar-head">
-              <h2>Opportunity radar</h2>
-              <span>24h · mock</span>
+              <h2>Sample products</h2>
             </header>
+            <label class="radar-select-field">Choose a sample product
+              <select id="proProductPicker"></select>
+            </label>
             <div class="radar-list" id="radarList"></div>
           </aside>
           <div class="pro-main" id="proMain"></div>
@@ -162,6 +172,6 @@
 
     <div class="toast" id="toast" hidden></div>
 
-    <script type="module" src="app.js?v=29d8d23bc0eb"></script>
+    <script type="module" src="app.js?v=72f06345e154"></script>
   </body>
 </html>
