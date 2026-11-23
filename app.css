@@ -2886,3 +2886,7 @@ body[data-view="creators"] .page { padding-top: 24px; }
   .price-archive .pa-product-image { position:static; width:36px; height:40px; align-self:center; grid-column:1; grid-row:2; }
   #creatorsView .price-archive .pa-record { grid-template-columns:minmax(0,1fr) minmax(84px,.43fr); gap:8px; padding:10px; }
 }
+
+@media(max-width:430px) {
+  .price-archive .pa-filter-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+}
