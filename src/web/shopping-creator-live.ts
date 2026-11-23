@@ -1,5 +1,5 @@
 import { publicUrl, tiktokListing } from "../shared/shopping-links";
-import { details, el, link, money } from "./shop-dom";
+import { backLink, details, el, link, money } from "./shop-dom";
 
 interface LiveProduct {
   productId: string;
@@ -191,7 +191,7 @@ function stageMessage(event: StageEvent, handle: string) {
 }
 
 export function liveCreatorPage(handle: string, endpoint: string, signal: AbortSignal, inline = false): HTMLElement {
-  const main = el("section", "", inline ? "shop-page shop-inline-live" : "shop-page shop-narrow");
+  const main = el("section", "", inline ? "shop-page shop-inline-live" : "shop-page shop-narrow shop-lookup-report");
   const status = el("p", "", "shop-progress");
   status.setAttribute("role", "status");
   const steps = el("ol", "", "shop-live-steps");
@@ -205,7 +205,7 @@ export function liveCreatorPage(handle: string, endpoint: string, signal: AbortS
   const results = el("div");
   const retry = el("button", "Retry lookup", "btn ghost");
   retry.type = "button";
-  if (!inline) main.append(link("← Search creators", "#shop", "shop-back"));
+  if (!inline) main.append(backLink("Search creators", "#shop"));
   main.append(el("p", "TikTok creator lookup", "shop-kicker"), el(inline ? "h2" : "h1", "@" + handle), steps, status, results, retry);
 
   function showStage(event: StageEvent) {

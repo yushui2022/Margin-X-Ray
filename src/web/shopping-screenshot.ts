@@ -1,5 +1,5 @@
 import { tikTokCheckRoute } from "./shopping-job";
-import { details, el, link } from "./shop-dom";
+import { backLink, details, el, link } from "./shop-dom";
 
 interface ScreenshotEvidence {
   text: string;
@@ -59,7 +59,7 @@ export function screenshotPicker(submit: Submit, caption = "Upload a screenshot"
 
 export function screenshotPage(signal: AbortSignal, submit: Submit) {
   const main = el("div", "", "shop-page shop-narrow");
-  main.append(link("← Shopping check", "#shop", "shop-back"), el("h1", "Check a screenshot"));
+  main.append(backLink("Shopping check", "#shop"), el("h1", "Check a screenshot"));
   const file = pending;
   pending = undefined;
   if (!file) {

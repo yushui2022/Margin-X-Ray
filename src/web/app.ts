@@ -181,8 +181,11 @@ function showView(view: "scan" | "pro" | "creators" | "markup" | "shop"): void {
   els.hero.hidden = view !== "scan" || scanStarted;
   els.workspace.hidden = view !== "scan" || !scanStarted;
   document.body.dataset.view = view;
+  let navView: string = view;
+  if (location.hash === "#prices" || /^#shop\/(?:product\/|search(?:\?|$))/.test(location.hash)) navView = "prices";
+  if (/^#shop\/rankings(?:[/?]|$)/.test(location.hash)) navView = "rankings";
   for (const link of document.querySelectorAll<HTMLAnchorElement>(".topnav [data-view]")) {
-    const active = link.dataset.view === (location.hash === "#prices" ? "prices" : view);
+    const active = link.dataset.view === navView;
     link.classList.toggle("active", active);
     if (active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");

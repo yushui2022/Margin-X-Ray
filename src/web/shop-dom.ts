@@ -15,6 +15,14 @@ export function link(text: string, url: string, className = "") {
   return a;
 }
 
+export function backLink(label: string, url: string) {
+  const back = link("", url, "shop-back");
+  const arrow = el("span", "", "creator-report-back-arrow");
+  arrow.setAttribute("aria-hidden", "true");
+  back.append(arrow, label);
+  return back;
+}
+
 export function money(amount: number, currency: string) {
   return new Intl.NumberFormat(currency === "GBP" ? "en-GB" : "en-US", { style: "currency", currency }).format(amount);
 }

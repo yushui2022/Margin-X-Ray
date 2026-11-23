@@ -67,10 +67,10 @@ function productLookup() {
   const input = el("input");
   input.type = "url";
   input.required = true;
-  input.placeholder = "Paste a product URL";
+  input.placeholder = "Paste a retail product link";
   input.setAttribute("aria-label", "Retail listing URL");
-  const submit = el("button", "Open listing check");
-  submit.className = "btn secondary";
+  const submit = el("button", "Check link");
+  submit.className = "btn primary";
   input.addEventListener("input", () => input.setCustomValidity(""));
   form.addEventListener("submit", event => {
     event.preventDefault();
@@ -131,25 +131,38 @@ export function renderMarkup(route: string, scan?: ScanResult) {
     return main;
   }
 
-  main.append(el("h1", listing?.name ?? live?.product.title ?? "Product markup check"));
+  const heading = el("header");
+  heading.className = "markup-heading";
+  heading.append(el("h1", listing?.name ?? live?.product.title ?? (enteredUrl ? "Check this listing" : "Compare supplier prices")));
   const intro = el("p");
   if (enteredUrl) intro.append(link(`Open listing on ${new URL(enteredUrl).hostname} ↗`, enteredUrl));
   else if (live) {
     const url = listingUrl(live.product.sourceUrl);
     if (url) intro.append(link("Open scanned listing ↗", url), " · ");
     intro.append(`Scanned ${live.generatedAt.slice(0, 10)}`);
-  } else intro.textContent = listing ? `Product markup check · ${listing.market}` : "Paste a product link or enter two pack prices to compare their cost per item.";
-  main.append(intro);
+  } else intro.textContent = listing ? `Supplier price check · ${listing.market}` : "Compare a retail listing with supplier quotes, one item at a time.";
+  heading.append(intro);
+  main.append(heading);
+  let samples: HTMLElement | undefined;
   if (!id) {
-    main.append(productLookup());
-    const samples = el("section"); samples.className = "example-checks";
-    samples.append(el("h2", "Explore a price check"));
+    main.classList.add("markup-start");
+    heading.append(productLookup());
+    samples = el("section"); samples.className = "example-checks";
+    samples.append(el("h2", "Saved price checks"));
     for (const [key, detail] of [["winco-msp-4p", "Multiple suppliers"], ["feastables-king", "Different pack sizes"], ["nikkie-biodance-mist", "Missing wholesale price"]]) {
       const example = markupRecord(key)!;
-      const item = link(example.listing.name, `#markup/${key}`);
-      item.append(el("small", detail + " →")); samples.append(item);
+      const item = link("", `#markup/${key}`);
+      const title = el("strong", example.listing.name);
+      const amount = new Intl.NumberFormat("en-US", {style:"currency", currency:example.listing.currency}).format(example.listing.amount);
+      const price = el("span", amount);
+      price.className = "example-price";
+      price.prepend(el("small", "Retail"));
+      const arrow = el("span", "→");
+      arrow.className = "example-open";
+      arrow.setAttribute("aria-hidden", "true");
+      item.append(title, el("small", detail), price, arrow);
+      samples.append(item);
     }
-    main.append(samples);
   }
   if (record) main.append(supplierRange(archivedAssessment(record), record.listing.currency, quote?.unit ?? "item", record.listing.observedAt, record.listing.url));
 
@@ -266,13 +279,14 @@ export function renderMarkup(route: string, scan?: ScanResult) {
   const output = el("div"); output.className = "markup-output";
   output.append(result, el("small", `Provisional high-gap threshold ≥ ${HIGH_PRICE_MULTIPLE}×`));
   grid.append(form, output);
+  const note = el("p", "Profit depends on actual purchase cost, shipping, tax, fees and returns.");
+  note.className = "fine-print";
   if (!id || (record && quote?.match === "same")) {
     const calculator = el("details"); calculator.className = "pack-calculator";
-    calculator.append(el("summary", id ? "Compare an individual quote or edit pack sizes" : "Calculate from your own pack prices"), grid);
+    calculator.append(el("summary", id ? "Edit pack prices and quantities" : "Enter pack prices manually"), grid, note);
     main.append(calculator);
-  } else main.append(grid);
-  const note = el("p", "Profit depends on actual purchase cost, shipping, tax, fees and returns.");
-  note.className = "fine-print"; main.append(note);
+  } else main.append(grid, note);
+  if (samples) main.append(samples);
   if (listing) {
     const evidence = el("section"); evidence.className = "card markup-evidence";
     evidence.append(el("h2", "Listing evidence"), link(listing.label, listing.url), el("p", `${listing.observedAt} · ${listing.conditions}`));

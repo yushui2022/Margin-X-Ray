@@ -1,6 +1,6 @@
 import archive from "../../research/creator-products.json";
 import { consumeShoppingSubmission, creatorHref, markShoppingSubmission, productHref, publicUrl, shoppingRankingHref, tiktokListing } from "../shared/shopping-links";
-import { details, el, link, money } from "./shop-dom";
+import { backLink, details, el, link, money } from "./shop-dom";
 import { followJob, JobRequestError, rememberJob, tikTokCheckRoute, validJobId, withJob } from "./shopping-job";
 import { SHOP_ONION_VERSION, shopOnionVerdict, shopOnionVersionForReport } from "../shared/shop-onion.mjs";
 import { buyingDecision, followUpRecord, productReceipt, verdictHero, verdictMethod } from "./shopping-verdict";
@@ -203,7 +203,7 @@ export function liveShoppingPage(route: Route, raw: string, signal: AbortSignal,
   const names: Record<Route,string> = { video: "Check a video", profile: "Check a creator", site: "Check a Shop listing", find: "Check a product" };
   const nav = el("div", "", "verdict-nav");
   const share = el("div", "", "shop-report-actions");
-  if (!inlineParams) nav.append(link("← Shopping check", "#shop", "shop-back"));
+  if (!inlineParams) nav.append(backLink("Shopping check", "#shop"));
   nav.append(share);
   const routeHeading = el(inlineParams ? "h2" : "h1",names[route]);
   main.append(nav,routeHeading);

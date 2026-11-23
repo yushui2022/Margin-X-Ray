@@ -1,6 +1,6 @@
 import { storefrontOffers } from "../shared/storefront-offer";
 import { listingKey, productForListing, productHref, publicUrl } from "../shared/shopping-links";
-import { el, link, money } from "./shop-dom";
+import { backLink, el, link, money } from "./shop-dom";
 import { retailerFinder } from "./retailer-finder";
 import { retailComparison } from "../shared/retail-premium";
 
@@ -19,9 +19,9 @@ function amountInput() {
 
 /** Shopper-entered totals remain in this view and never contribute to a public index. */
 export function listingCheck(raw: string, signal: AbortSignal, alternative: string | null) {
-  const main = el("div", "", "shop-page shop-narrow");
+  const main = el("div", "", "shop-page shop-narrow shop-listing-sheet");
   const first = publicUrl(raw);
-  main.append(link("← Shopping check", "#shop", "shop-back"), el("h1", "Compare two listings"));
+  main.append(backLink("Shopping check", "#shop"), el("h1", "Compare two listings"));
   if (!first) {
     main.append(el("p", "A public product URL is needed to start a comparison."), link("Enter a product link →", "#shop"));
     return main;

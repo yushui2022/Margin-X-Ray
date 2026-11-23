@@ -23,14 +23,13 @@ export function priceReceipt() {
   const link = el("a", "price-receipt");
   link.href = recordHref(product);
   const byline = el("div", "receipt-byline");
-  byline.append(el("span", "", "Price on record"), el("time", "", PRODUCT_OBSERVATION));
-  const profile = profiles.get(product.handle);
+  const stamp = el("img", "archive-stamp");
+  stamp.src = "assets/mascot/onion-date-stamp.webp"; stamp.alt = "";
+  stamp.width = 24; stamp.height = 25;
+  const date = el("time", "", new Intl.DateTimeFormat("en-US", {year:"numeric", month:"short", day:"numeric", timeZone:"UTC"}).format(new Date(PRODUCT_OBSERVATION)));
+  date.dateTime = PRODUCT_OBSERVATION;
+  byline.append(stamp, el("span", "", "Price on record"), date);
   const subject = el("div", "receipt-subject");
-  if (profile) {
-    const portrait = el("img", "");
-    portrait.src = profile.image; portrait.alt = ""; portrait.width = portrait.height = 54;
-    subject.append(portrait);
-  }
   subject.append(el("h2", "", product.name));
   const facts = el("div", "receipt-amount");
   facts.append(el("strong", "", money(product.price.amount, product.price.currency)), el("span", "", product.price.market));
@@ -54,8 +53,11 @@ export function priceArchive() {
   count.setAttribute("role", "status");
   tools.append(count, label);
   const grid = el("div", "archive-grid");
+  const columns = el("div", "archive-columns");
+  columns.setAttribute("aria-hidden", "true");
+  columns.append(...["Creator", "Product & variant", "Recorded price"].map(label => el("span", "", label)));
   const empty = el("p", "archive-empty", "No matching prices. Try another product, creator or currency.");
-  section.append(tools, grid, empty);
+  section.append(tools, columns, grid, empty);
   function update(query: string, currency: string) {
     select.value = currency;
     const term = query.trim().toLowerCase().replace(/^@/, "");
@@ -63,6 +65,7 @@ export function priceArchive() {
       [item.name, item.variant, item.handle, profiles.get(item.handle)?.name].some(field => field?.toLowerCase().includes(term)));
     count.textContent = `${records.length} of ${PRODUCT_ARCHIVE.length} price records`;
     empty.hidden = records.length > 0;
+    columns.hidden = records.length === 0;
     grid.replaceChildren(...records.map(product => {
       const link = el("a", "archive-record");
       link.href = recordHref(product);
@@ -75,8 +78,10 @@ export function priceArchive() {
       }
       owner.append(el("span", "", `@${product.handle}`));
       const foot = el("div", "archive-record-foot");
-      foot.append(el("strong", "", money(product.price.amount, product.price.currency)), el("span", "", `${product.sources.length} sources →`));
-      link.append(owner, el("h3", "", product.name), el("p", "", product.variant), foot);
+      foot.append(el("strong", "", money(product.price.amount, product.price.currency)), el("span", "", `${product.sources.length} ${product.sources.length === 1 ? "source" : "sources"} →`));
+      const subject = el("div", "archive-record-subject");
+      subject.append(el("h3", "", product.name), el("p", "", product.variant));
+      link.append(owner, subject, foot);
       return link;
     }));
   }

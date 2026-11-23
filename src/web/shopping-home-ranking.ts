@@ -1,6 +1,5 @@
 import { onionScore } from "../shared/onion-index";
-import { shoppingRankingHref } from "../shared/shopping-links";
-import { el, link, money } from "./shop-dom";
+import { el, money } from "./shop-dom";
 import { featuredRankingSample, shopRankingRows, tiedShopRanks, type ShopRankingRow } from "./shopping-ranking-data";
 import { sourceName } from "./shopping-verdict";
 
@@ -32,7 +31,7 @@ export function scoredArchiveList(select: (handle: string, source: HTMLButtonEle
   head.append(el("span", "Rank"), el("span", "Creator / post"), el("span", "Item price gap"), el("span", "Onion score"));
   const entries = el("ol", "", "shop-archive-entries");
   list.append(head, entries);
-  for (const { row, item, post } of picks) {
+  for (const [index, { row, item, post }] of picks.entries()) {
     const entry = el("li");
     const button = el("button", "", "shop-archive-row");
     button.type = "button";
@@ -41,6 +40,7 @@ export function scoredArchiveList(select: (handle: string, source: HTMLButtonEle
     const tied = row.rank !== null && tiedShopRanks.has(row.rank);
     if (tied) rank.append(el("small", "Tie"));
     const portrait = el("img", "", "shop-archive-portrait");
+    if (index >= 3) portrait.loading = "lazy";
     portrait.src = post.avatar; portrait.alt = ""; portrait.width = portrait.height = 48;
     const identity = el("span", "", "shop-archive-identity");
     const handle = "@" + row.handle;
@@ -77,18 +77,20 @@ export function scoredArchiveList(select: (handle: string, source: HTMLButtonEle
   return list;
 }
 
-export function homeRanking(lookup: HTMLElement, savedOnly = false) {
+export function homeRanking(lookup: HTMLElement) {
   const section = el("section", "", "shop-home-ranking");
-  const header = el("header", "", "shop-home-mast");
-  const intro = el("div");
-  intro.append(el("h1", "Is it cheaper at another TikTok shop?"),
-    el("p", "Look up a creator to compare their picks across US TikTok shops.", "shop-home-purpose"));
-  const actions = el("div", "", "shop-home-links");
-  const board = link("Full ranking →", shoppingRankingHref(), "shop-home-board");
-  const check = el("button", savedOnly ? "Search" : "Check a link", "shop-home-jump");
-  check.type = "button";
-  check.addEventListener("click", () => lookup.querySelector<HTMLInputElement>("input[type=search]")?.focus());
-  actions.append(board, check); header.append(intro, actions);
-  section.append(header, lookup);
+  const cover = el("header", "", "shop-home-mast");
+  const intro = el("div", "", "shop-home-intro");
+  const title = el("h1");
+  title.append("Is it cheaper at ", el("em", "another TikTok shop?"));
+  intro.append(title, el("p", "Look up a creator and compare their prices with other US TikTok shops.", "shop-home-purpose"));
+  const art = el("img", "", "shop-home-inspector");
+  art.fetchPriority = "high";
+  art.src = "assets/mascot/onion-price-inspector.webp";
+  art.alt = "";
+  art.width = 540;
+  art.height = 360;
+  cover.append(intro, art, lookup);
+  section.append(cover);
   return section;
 }

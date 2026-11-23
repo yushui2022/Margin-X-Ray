@@ -336,7 +336,15 @@ export function renderProWorkspace(): void {
   const main = document.getElementById("proMain");
   if (!radar || !main) return;
 
+  const picker = document.querySelector<HTMLSelectElement>("#proProductPicker");
+  if (picker) {
+    if (!picker.length) for (const product of PRODUCTS) picker.add(new Option(product.name, product.id));
+    picker.value = state.selected;
+    picker.onchange = () => selectProduct(picker.value);
+  }
+  const keepListFocus = radar.contains(document.activeElement);
   radar.replaceChildren(...PRODUCTS.map(renderRadarItem));
+  if (keepListFocus) radar.querySelector<HTMLButtonElement>("[aria-pressed=true]")?.focus({preventScroll:true});
   const product = selectedProduct();
   main.replaceChildren(
     renderProductHeader(product),
@@ -363,7 +371,7 @@ function renderRadarItem(product: ProProduct): HTMLElement {
   const active = product.id === state.selected;
   const node = el("button", {
     class: `radar-item ${active ? "active" : ""}`.trim(),
-    attrs: { type: "button" },
+    attrs: { type: "button", "aria-pressed": String(active) },
   });
   node.append(
     el("div", { class: "radar-item-top" }, [
@@ -373,7 +381,7 @@ function renderRadarItem(product: ProProduct): HTMLElement {
     el("p", { class: "radar-meta", text: `${product.category} · ${formatUsd(product.retail)}` }),
     el("p", {
       class: "radar-scans",
-      text: `${product.scans.toLocaleString("en-US")} scans in 24h (mock)`,
+      text: `${product.scans.toLocaleString("en-US")} scans in 24h`,
     }),
   );
   node.addEventListener("click", () => selectProduct(product.id));
@@ -386,21 +394,16 @@ function renderProductHeader(product: ProProduct): HTMLElement {
   return el("section", { class: "card pro-product" }, [
     el("header", { class: "card-head" }, [
       el("div", {}, [
-        el("p", { class: "eyebrow", text: "Selected opportunity" }),
+        el("p", { class: "eyebrow", text: product.category }),
         el("h2", { text: product.name }),
       ]),
-      el("span", { class: "mock-badge", text: "Sample data" }),
     ]),
     el("div", { class: "pro-stats" }, [
-      stat("Retail", formatUsd(product.retail)),
+      stat("Listed retail", formatUsd(product.retail)),
       stat("Factory at MOQ", factory > 0 ? formatUsd(factory) : "—"),
-      stat("Markup", markup === null ? "—" : `${markup.toFixed(1)}×`),
+      stat("Retail / factory", markup === null ? "—" : `${markup.toFixed(1)}×`),
       stat("24h scans", product.scans.toLocaleString("en-US")),
     ]),
-    el("p", {
-      class: "fine-print",
-      text: "Workspace figures are sample data. The model is live; the supplier signals are not verified.",
-    }),
   ]);
 }
 
@@ -416,7 +419,6 @@ function renderCalculator(product: ProProduct): HTMLElement {
   card.append(
     el("header", { class: "card-head" }, [
       el("h3", { text: "Net profit calculator" }),
-      el("span", { text: "Live model · editable" }),
     ]),
   );
 
@@ -428,8 +430,8 @@ function renderCalculator(product: ProProduct): HTMLElement {
     }, { min: 1, step: 0.01, prefix: "$" }),
     selectField("MOQ", state.moq, [100, 500, 2000], (v) => {
       state.moq = v;
-      updateCalculator();
       renderProWorkspace();
+      document.querySelector<HTMLSelectElement>("#proMain .calc-grid select")?.focus({preventScroll:true});
     }),
     numberField("Freight / unit", state.freight, (v) => {
       state.freight = v;
@@ -635,11 +637,12 @@ function renderSuppliers(product: ProProduct): HTMLElement {
       const chip = el("button", {
         class: `tier-chip ${tier.qty === state.moq ? "active" : ""}`.trim(),
         text: `MOQ ${tier.qty} · ${formatUsd(tier.price)}`,
-        attrs: { type: "button" },
+        attrs: { type: "button", "aria-pressed": String(tier.qty === state.moq), "data-supplier": supplier.id },
       });
       chip.addEventListener("click", () => {
         state.moq = tier.qty;
         renderProWorkspace();
+        document.querySelector<HTMLButtonElement>(`#proMain .tier-chip[data-supplier="${supplier.id}"][aria-pressed=true]`)?.focus({preventScroll:true});
       });
       tiers.append(chip);
     }

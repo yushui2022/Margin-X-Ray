@@ -3,7 +3,7 @@ import { PUBLIC_CREATORS } from "../shared/creator-directory";
 import { markupRecord } from "../shared/markup-records";
 import { creatorPremium, retailComparison, retailComparisons } from "../shared/retail-premium";
 import { creatorHref, markShoppingSubmission, profileCheckHref, productHref, publicUrl, shoppingDestination, shoppingRankingHref, videoHref } from "../shared/shopping-links";
-import { details, el, link, money } from "./shop-dom";
+import { backLink, details, el, link, money } from "./shop-dom";
 import { listingCheck } from "./shopping-listing";
 import { liveShoppingPage } from "./shopping-live";
 import { lastShoppingJob, tikTokCheckRoute } from "./shopping-job";
@@ -36,7 +36,7 @@ function searchForm(initial = "", context: "live" | "home" | "archive" = "live",
   const button = el("button", "", "btn primary");
   button.type = "submit";
   const creatorLookup = context === "home" || (context === "live" && archiveHosting);
-  input.placeholder = creatorLookup ? "Username, name or TikTok link" : context === "archive" ? "Product, creator or brand" : "TikTok link or @creator";
+  input.placeholder = creatorLookup ? "@username or link" : context === "archive" ? "Product, creator or brand" : "TikTok link or @creator";
   input.setAttribute("aria-label", creatorLookup ? "Search by username, display name or TikTok link" : context === "archive" ? "Search archived product checks" : "TikTok video link, Shop product link or creator handle");
   button.textContent = creatorLookup || context === "archive" ? "Search" : "Check price";
   form.append(input, button); box.append(form);
@@ -119,7 +119,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   const form = searchForm(initialQuery, "home", open);
   const input = form.querySelector("input")!;
   const lookupHeading = el("div", "", "shop-home-lookup-heading");
-  lookupHeading.append(el("h2", "Search creators"), link("Full ranking →", shoppingRankingHref(), "shop-home-mobile-ranking"));
+  lookupHeading.append(el("h2", "Search creators"));
   lookup.append(lookupHeading, form);
   if (!archiveHosting) {
     const actions = el("div", "", "shop-entry-actions");
@@ -130,7 +130,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   }
   const section = el("section", "", "shop-browse");
   const archiveHeading = el("div", "", "shop-section-head");
-  archiveHeading.append(el("h2", "Creator product archive"), link("Browse all →", shoppingRankingHref()));
+  archiveHeading.append(el("h2", "Featured price checks"), link("Full ranking →", shoppingRankingHref()));
   const archiveList = scoredArchiveList((handle, button) => open(shoppingRankingHref(handle), button));
   section.append(archiveHeading, archiveList);
   const panel = el("section", "", "shop-inline-search");
@@ -241,7 +241,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     }
     if (restoreFocus && title.isConnected) title.focus({ preventScroll: true });
   }
-  const mast = homeRanking(lookup, archiveHosting);
+  const mast = homeRanking(lookup);
   mast.append(panel);
   main.append(mast, section);
   if (initialQuery) open("#shop/creators?" + new URLSearchParams({ q: initialQuery }));
@@ -249,8 +249,10 @@ function home(lifetime: AbortSignal, initialQuery = "") {
 }
 
 function searchPage(query: string) {
-  const main = el("div", "", "shop-page shop-narrow");
-  main.append(link("← Shopping check", "#shop", "shop-back"), el("h1", query ? "Archive search results" : "Browse product checks"), searchForm(query, "archive"));
+  const main = el("div", "", "shop-page shop-narrow shop-archive-search");
+  const mast = el("header", "", "shop-archive-search-head");
+  mast.append(el("h1", "Search the price archive"), searchForm(query, "archive"));
+  main.append(backLink("Price archive", "#prices"), mast);
   const q = query.trim().toLowerCase().replace(/^@/, "");
   const ids = Array.from(new Set([...retailComparisons().map(row => row.productId), ...catalogue.map(row => row.id), "winco-msp-4p"]));
   const results = ids.filter(id => {
@@ -314,7 +316,12 @@ function checkoutReceipt(row: Comparison) {
   }
   if (row.reason) card.append(el("p", row.reason, "shop-small"));
   const offers = el("div", "", "shop-offers");
-  for (const offer of [row.reference, row.alternative]) if (offer) offers.append(offerCard(offer, row.currency, complete));
+  for (const offer of [row.reference, row.alternative]) {
+    if (!offer) continue;
+    const card = offerCard(offer, row.currency, complete);
+    if (row.delta && offer === (row.delta > 0 ? row.alternative : row.reference)) card.classList.add("shop-offer-lower");
+    offers.append(card);
+  }
   card.append(offers);
   const notes: HTMLElement[] = [el("p", row.matchNote)];
   if (publicUrl(row.sourceUrl)) notes.push(link("Creator or brand relationship ↗", row.sourceUrl, "shop-source-link"));
@@ -328,8 +335,8 @@ function checkoutReceipt(row: Comparison) {
 }
 
 function productPage(id: string, fromArchive: boolean) {
-  const main = el("div", "", "shop-page shop-narrow");
-  main.append(link("← Shopping check", "#shop", "shop-back"));
+  const main = el("div", "", "shop-page shop-narrow shop-retail-record");
+  main.append(backLink("Price archive", "#prices"));
   const p = catalogue.find(item => item.id === id);
   const check = retailComparison(id);
   const r = markupRecord(id);
@@ -337,13 +344,24 @@ function productPage(id: string, fromArchive: boolean) {
     main.append(el("h1", "Product record unavailable"), searchForm());
     return main;
   }
-  main.append(el("h1", p?.name ?? check?.name ?? r!.listing.name), el("p", check?.variant ?? p?.variant ?? r?.listing.conditions, "shop-lede"));
+  const header = el("header", "", "shop-retail-head");
+  const identity = el("div");
+  identity.append(el("h1", p?.name ?? check?.name ?? r!.listing.name), el("p", check?.variant ?? p?.variant ?? r?.listing.conditions, "shop-lede"));
+  header.append(identity);
+  if (id === "arun-sony") {
+    const photo = el("img");
+    photo.src = "assets/products/sony-wf1000xm6-silver.webp";
+    photo.alt = "Sony WF-1000XM6 earbuds and charging case in Platinum Silver";
+    photo.width = photo.height = 180;
+    header.append(photo);
+  }
+  main.append(header);
   const handle = p?.handle ?? check?.handle;
   if (handle) {
     const byline = el("div", "", "shop-byline");
     byline.append(creatorPortrait(handle), link("@" + handle, creatorHref(handle)));
     if (p?.postUrl) byline.append(link("Video evidence →", videoHref(p.postUrl)));
-    main.append(byline);
+    identity.append(byline);
   }
   if (check) {
     const context = check.relation === "retail-reference"
@@ -408,18 +426,18 @@ export function renderShopping(container: HTMLElement) {
       renderShopping(container);
       return;
     }
-    page = el("div", "", "shop-page shop-narrow");
+    page = el("div", "", "shop-page shop-narrow shop-saved-result");
     const title = path === "/screenshot" ? "Screenshot uploads are unavailable" : matches.length ? "Matching saved checks" : "No saved check";
-    page.append(link("← Shopping check", "#shop", "shop-back"), el("h1", title));
+    page.append(backLink("Shopping check", "#shop"), el("h1", title));
     if (matches.length) {
       page.append(el("p", "Open a saved receipt from this US edition."));
       for (const match of matches) page.append(link(match.label, match.href, "shop-action-link"));
     } else {
-      page.append(el("p", "Search the saved US edition with a creator handle, full TikTok video URL or TikTok Shop product link. Live checks are unavailable here."), searchForm());
+      page.append(el("p", "Enter a TikTok username to check recent posts, or try a different video or product link from the US edition."), searchForm());
     }
     page.append(link("Browse the ranking →", shoppingRankingHref(), "shop-action-link"));
   } else if (path === "/creators") page = home(lifetime.signal, query.get("q") ?? "");
-  else if (path === "/rankings") page = rankingPage();
+  else if (path === "/rankings") page = rankingPage(query);
   else if (path.startsWith("/rankings/")) page = rankedCreatorPage(path.slice("/rankings/".length), query.get("product"));
   else if (path.startsWith("/product/")) {
     page = productPage(path.slice(9), query.get("from") === "archive");
