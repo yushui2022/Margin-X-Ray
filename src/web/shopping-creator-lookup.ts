@@ -142,20 +142,31 @@ export function loadCreatorSuggestions(term: string | null, signal: AbortSignal,
   }
 }
 
+function suggestionEntry(account: SuggestedAccount): CreatorSearchEntry {
+  const { handle } = account;
+  const known = creatorByHandle(handle);
+  const checked = known?.hasCheck ? known : undefined;
+  const avatar = typeof account.avatar === "string" && account.avatar.startsWith("https://") ? account.avatar : undefined;
+  return {
+    handle, name: account.name.trim() ? account.name : handle, avatar: known?.avatar || avatar,
+    hasCheck: Boolean(checked), score: checked?.score ?? null, rank: checked?.rank,
+    href: creatorPriceReportHref(handle, archiveHosting),
+  };
+}
+
+export function lookupCreatorIdentity(handle: string) {
+  for (const record of Array.from(recentSearches.values()).reverse()) {
+    if (record.expires <= Date.now()) continue;
+    const exact = record.accounts.find(account => account.handle === handle);
+    if (exact) return suggestionEntry(exact);
+  }
+  return creatorByHandle(handle);
+}
+
 function mergeSuggestions(query: string, local: CreatorSearchEntry[], accounts: SuggestedAccount[]) {
   const rows = new Map<string, CreatorSearchEntry>();
   for (const account of accounts) {
-    if (typeof account?.handle !== "string") continue;
-    const handle = username(account.handle);
-    if (!handle || rows.has(handle)) continue;
-    const known = creatorByHandle(handle);
-    const checked = known?.hasCheck ? known : undefined;
-    const avatar = typeof account.avatar === "string" && account.avatar.startsWith("https://") ? account.avatar : undefined;
-    rows.set(handle, {
-      handle, name: typeof account.name === "string" && account.name.trim() ? account.name : handle,
-      avatar: known?.avatar || avatar, hasCheck: Boolean(checked), score: checked?.score ?? null, rank: checked?.rank,
-      href: creatorPriceReportHref(handle, archiveHosting),
-    });
+    if (!rows.has(account.handle)) rows.set(account.handle, suggestionEntry(account));
   }
   for (const row of local) if (!rows.has(row.handle)) rows.set(row.handle, { ...row, href: creatorPriceReportHref(row.handle, archiveHosting) });
   const text = query.normalize("NFKC").replace(/^@/, "").toLowerCase();

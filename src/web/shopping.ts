@@ -12,7 +12,7 @@ import { rankedCreatorPage, rankingAroundCreator, rankingPage } from "./shopping
 import { homeRanking, scoredArchiveList } from "./shopping-home-ranking";
 import { savedShoppingMatches } from "./shopping-saved";
 import { creatorSearchDestination, liveCreatorHref, username } from "./shopping-creator-search";
-import { creatorLookupOrigin, creatorResults, searchResultButton, suggestCreators } from "./shopping-creator-lookup";
+import { creatorLookupOrigin, creatorResults, lookupCreatorIdentity, searchResultButton, suggestCreators } from "./shopping-creator-lookup";
 import { liveCreatorPage } from "./shopping-creator-live";
 import { archiveHosting } from "./hosting-mode";
 
@@ -207,7 +207,8 @@ function home(lifetime: AbortSignal, initialQuery = "") {
       if (!query.has("product")) ranking = rankingAroundCreator(handle);
       result = ranking ?? rankedCreatorPage(handle, query.get("product"), open);
     } else if (path === "/tiktok") {
-      result = liveCreatorPage(query.get("user")!, creatorLookupOrigin, signal, true);
+      const handle = query.get("user")!;
+      result = liveCreatorPage(handle, creatorLookupOrigin, signal, true, lookupCreatorIdentity(handle));
     } else if (!archiveHosting && (path === "/video" || path === "/site" || path === "/profile")) {
       result = liveShoppingPage(path.slice(1) as "video" | "site" | "profile", query.get("url")!, signal, searchForm, () => screenshotPicker(submitShopping), query);
     } else {
@@ -407,7 +408,7 @@ export function renderShopping(container: HTMLElement) {
   let page: HTMLElement;
   const liveUser = path === "/tiktok" ? username(query.get("user") ?? "") : null;
   if (liveUser) {
-    page = liveCreatorPage(liveUser, creatorLookupOrigin, lifetime.signal);
+    page = liveCreatorPage(liveUser, creatorLookupOrigin, lifetime.signal, false, lookupCreatorIdentity(liveUser));
   } else if (archiveHosting && ["/video","/profile","/site","/find","/screenshot"].includes(path)) {
     const matches = savedShoppingMatches(path, query);
     if (matches.length === 1) {

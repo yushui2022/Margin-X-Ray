@@ -87,15 +87,6 @@ function creatorReport(data: LiveCreator, inline: boolean) {
   const body = document.createDocumentFragment();
   const handle = data.handle.toLowerCase();
   const meta = el("div", "", "shop-byline");
-  if (data.avatar?.startsWith("https://")) {
-    const avatar = el("img", "", "shop-avatar");
-    avatar.alt = "";
-    avatar.width = avatar.height = 40;
-    avatar.referrerPolicy = "no-referrer";
-    avatar.src = data.avatar;
-    meta.append(avatar);
-  }
-  if (data.name && data.name.toLowerCase() !== handle) meta.append(el("strong", data.name));
   meta.append(link("@" + handle + " on TikTok ↗", "https://www.tiktok.com/@" + encodeURIComponent(handle)));
   const checked = new Date(data.observedAt);
   if (Number.isFinite(checked.getTime())) {
@@ -116,10 +107,6 @@ function creatorReport(data: LiveCreator, inline: boolean) {
   body.append(stats);
   if (data.products.length) {
     body.append(el("h2", "Linked products"), ...data.products.map(product => productCard(product, handle)));
-  } else {
-    const finding = data.sample.checked > 0 ? "No TikTok Shop product link was found in the posts checked."
-      : data.status === "partial" ? "Account found. Recent posts could not be verified in this check." : "No public posts were returned for this account.";
-    body.append(el("p", finding));
   }
   if (data.posts.length) {
     const list = el("ol", "", "shop-sampled-posts");
@@ -140,9 +127,9 @@ function creatorReport(data: LiveCreator, inline: boolean) {
 
 const stageLabels = {
   profile: "Profile",
-  posts: "Recent posts",
+  posts: "Posts",
   comparison: "Shop prices",
-  decision: "Verdict",
+  decision: "Report",
 } as const;
 
 type Stage = keyof typeof stageLabels;
@@ -181,62 +168,116 @@ export async function readCreatorLookup(response: Response, onStage: (event: Sta
   }
 }
 
-function stageMessage(event: StageEvent, handle: string) {
-  switch (event.stage) {
-    case "profile": return "Looking up @" + handle + " on TikTok…";
-    case "posts": return "Checking recent posts for linked products…";
-    case "comparison": return "Checking other TikTok shops for comparable listings…";
-    case "decision": return "Reviewing the evidence for an Onion Score…";
-  }
+const stageCopy: Record<Stage, [string, string]> = {
+  profile: ["Finding the account", "Looking up this TikTok profile."],
+  posts: ["Checking recent posts", "Looking for TikTok Shop links in up to 5 recent posts."],
+  comparison: ["Comparing shop prices", "Checking other TikTok shops for the same item or a comparable version."],
+  decision: ["Putting the report together", "Checking whether the available prices support an Onion Score."],
+};
+
+function reportFinding(data: LiveCreator): [string, string] {
+  if (data.status === "partial") return data.sample.checked === 0 && !data.products.length
+    ? ["Recent posts unavailable", "We found the account, but couldn’t verify its recent posts."]
+    : ["Partial price check", "Some posts or shop details were unavailable. The findings below cover what we could verify."];
+  if (!data.products.length) return data.sample.checked > 0
+    ? ["No shop links found", "The sampled posts contained no TikTok Shop product links."]
+    : ["No public posts returned", "There were no posts to check for shop links."];
+  if (data.products.some(product => comparable(product))) return ["Price comparison ready", "Compare the creator’s linked price with offers from other TikTok shops below."];
+  return ["Shop links found", "The linked products are listed below. A price score needs a comparable offer from another shop."];
 }
 
-export function liveCreatorPage(handle: string, endpoint: string, signal: AbortSignal, inline = false): HTMLElement {
+type LookupIdentity = { handle: string; name?: string; avatar?: string | null };
+const stages = Object.keys(stageLabels) as Stage[];
+
+export function liveCreatorPage(handle: string, endpoint: string, signal: AbortSignal, inline = false, candidate?: LookupIdentity): HTMLElement {
   const main = el("section", "", inline ? "shop-page shop-inline-live" : "shop-page shop-narrow shop-lookup-report");
-  const status = el("p", "", "shop-progress");
+  const panel = el("div", "", "lookup-panel");
+  const account = el("div", "", "lookup-account");
+  const name = el(inline ? "h3" : "h1");
+  const username = el("span", "@" + handle);
+  const identity = el("div");
+  identity.append(name, username);
+  account.append(identity);
+  const selected = candidate?.handle.toLowerCase() === handle.toLowerCase() ? candidate : undefined;
+  function updateAccount(person?: LookupIdentity) {
+    const display = person?.name?.trim();
+    const hasName = display && display.toLowerCase() !== handle.toLowerCase();
+    name.textContent = hasName ? display : "@" + handle;
+    username.hidden = !hasName;
+    const url = person?.avatar;
+    if (!url || !(url.startsWith("https://") || url.startsWith("assets/creators/"))) return;
+    const prior = account.querySelector("img");
+    if (prior?.getAttribute("src") === url) return;
+    const photo = el("img");
+    photo.alt = "";
+    photo.width = photo.height = 40;
+    photo.referrerPolicy = "no-referrer";
+    photo.addEventListener("error", () => photo.remove(), { once:true });
+    photo.src = url;
+    if (prior) prior.replaceWith(photo);
+    else account.prepend(photo);
+  }
+  updateAccount(selected);
+
+  const status = el("div", "", "lookup-status");
   status.setAttribute("role", "status");
+  status.setAttribute("aria-atomic", "true");
+  const phase = el("span", "", "lookup-phase");
+  const headline = el(inline ? "h3" : "h2", "", "lookup-stage-title");
+  const description = el("p");
+  status.append(phase, headline, description);
+  function showStatus(label: string, title: string, detail: string) {
+    phase.textContent = label;
+    headline.textContent = title;
+    description.textContent = detail;
+  }
+
   const steps = el("ol", "", "shop-live-steps");
   steps.setAttribute("aria-label", "Price check progress");
-  const markers = new Map<Stage, HTMLElement>();
-  for (const key of Object.keys(stageLabels) as Stage[]) {
-    const marker = el("li", stageLabels[key]);
-    markers.set(key, marker);
+  const markers = stages.map((key, index) => {
+    const marker = el("li");
+    const icon = el("span", String(index + 1), "lookup-marker");
+    icon.setAttribute("aria-hidden", "true");
+    marker.append(icon, el("span", stageLabels[key], "lookup-step-label"));
     steps.append(marker);
-  }
-  const results = el("div");
-  const retry = el("button", "Retry lookup", "btn ghost");
+    return { key, marker, icon };
+  });
+  const visited = new Set<Stage>();
+  const results = el("div", "", "lookup-results");
+  const retry = el("button", "Retry lookup", "btn ghost lookup-retry");
   retry.type = "button";
   if (!inline) main.append(backLink("Search creators", "#shop"));
-  main.append(el("p", "TikTok creator lookup", "shop-kicker"), el(inline ? "h2" : "h1", "@" + handle), steps, status, results, retry);
+  panel.append(account, status, steps, retry);
+  main.append(panel, results);
 
   function showStage(event: StageEvent) {
     if (signal.aborted) return;
+    visited.add(event.stage);
     steps.hidden = false;
-    for (const marker of markers.values()) marker.removeAttribute("aria-current");
-    const current = markers.get(event.stage)!;
-    current.dataset.visited = "true";
-    current.setAttribute("aria-current", "step");
-    if (event.stage === "decision" && !markers.get("comparison")!.dataset.visited) {
-      const comparison = markers.get("comparison")!;
-      comparison.dataset.skipped = "true";
-      comparison.textContent = "Shop prices · skipped";
+    for (const [index, {key, marker, icon}] of markers.entries()) {
+      const active = event.stage === key;
+      const skipped = key === "comparison" && event.stage === "decision" && !visited.has(key);
+      const done = !active && visited.has(key);
+      marker.dataset.state = active ? "active" : skipped ? "skipped" : done ? "done" : "pending";
+      if (active) marker.setAttribute("aria-current", "step");
+      else marker.removeAttribute("aria-current");
+      icon.textContent = done ? "✓" : skipped ? "–" : String(index + 1);
+      marker.setAttribute("aria-label", stageLabels[key] + ", " + (active ? "in progress" : skipped ? "skipped" : done ? "finished" : "pending"));
     }
     const counts: string[] = [];
     if (Number.isInteger(event.checkedPosts)) counts.push(event.checkedPosts + (event.checkedPosts === 1 ? " post checked" : " posts checked"));
     if (Number.isInteger(event.products)) counts.push(event.products + (event.products === 1 ? " linked product" : " linked products"));
-    status.textContent = (counts.length ? counts.join(", ") + ". " : "") + stageMessage(event, handle);
+    const [title, detail] = stageCopy[event.stage];
+    showStatus("Step " + (stages.indexOf(event.stage) + 1) + " of " + stages.length, title, counts.length ? counts.join(" · ") : detail);
   }
 
   async function lookup() {
     if (signal.aborted || retry.disabled) return;
     retry.disabled = true;
     retry.hidden = steps.hidden = true;
-    for (const [key, marker] of markers) {
-      marker.textContent = stageLabels[key];
-      delete marker.dataset.visited;
-      delete marker.dataset.skipped;
-    }
-    status.classList.add("is-working");
-    status.textContent = "Opening the price check for @" + handle + "…";
+    visited.clear();
+    panel.dataset.state = "working";
+    showStatus("Connecting", "Opening the price check", "Requesting the latest available report for this account.");
     results.replaceChildren();
     results.setAttribute("aria-busy", "true");
     try {
@@ -247,32 +288,39 @@ export function liveCreatorPage(handle: string, endpoint: string, signal: AbortS
       if (signal.aborted) return;
       if (outcome.type === "error") {
         const code = outcome.code;
-        if (code === "not_found") status.textContent = "No public TikTok profile was found for @" + handle + ". Check the spelling and search again.";
-        else if (code === "inaccessible") status.textContent = "TikTok could not return public posts from this account.";
-        else if (code === "invalid_handle") status.textContent = "This username could not be checked. Enter the account’s exact TikTok username.";
-        else if (code === "busy") status.textContent = "A check for this creator is already running. Try again shortly.";
-        else if (code === "rate_limited") status.textContent = "The live lookup limit has been reached. Please try again later.";
-        else if (code === "interrupted") status.textContent = "The connection ended before the report was ready. Try again.";
-        else status.textContent = "The lookup service could not finish this check. Please try again.";
+        const messages: Record<string, [string, string]> = {
+          not_found: ["Account not found", "No public TikTok profile was found for @" + handle + ". Check the username and search again."],
+          inaccessible: ["Posts unavailable", "TikTok could not return public posts from this account."],
+          invalid_handle: ["Check the username", "Enter the account’s exact TikTok username and search again."],
+          busy: ["Another check is running", "This account is already being checked. Try again shortly."],
+          rate_limited: ["Lookup limit reached", "Please try again later."],
+          interrupted: ["Connection interrupted", "The connection ended before the report was ready."],
+        };
+        const [title, detail] = messages[code ?? ""] ?? ["Lookup unavailable", "The service could not finish this check. Please try again."];
+        panel.dataset.state = "error";
+        showStatus("Lookup stopped", title, detail);
         retry.hidden = code === "invalid_handle" || code === "not_found";
         return;
       }
       const data = outcome.report;
       if (data?.handle?.toLowerCase() !== handle.toLowerCase() || !Array.isArray(data.products) || !Array.isArray(data.posts)
         || !Number.isInteger(data.sample?.checked)) throw new Error("Incomplete creator response");
+      updateAccount({handle, name: selected?.name || data.name, avatar: selected?.avatar || data.avatar});
       results.replaceChildren(creatorReport(data, inline));
       const partial = data.status === "partial";
-      status.textContent = partial ? "Partial check. Some posts or shop details could not be retrieved." : "Creator lookup complete.";
+      panel.dataset.state = partial ? "partial" : "ready";
+      showStatus(partial ? "Limited evidence" : "Check complete", ...reportFinding(data));
       retry.hidden = !partial;
     } catch {
       if (!signal.aborted) {
-        status.textContent = "Couldn’t load the live creator check. Check your connection and try again.";
+        panel.dataset.state = "error";
+        showStatus("Lookup stopped", "Connection unavailable", "Check your connection and try again.");
         retry.hidden = false;
       }
     } finally {
       retry.disabled = false;
-      status.classList.remove("is-working");
-      for (const marker of markers.values()) marker.removeAttribute("aria-current");
+      steps.hidden = true;
+      for (const {marker} of markers) marker.removeAttribute("aria-current");
       results.setAttribute("aria-busy", "false");
     }
   }
