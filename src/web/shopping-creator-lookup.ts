@@ -177,11 +177,9 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
   box.append(status, panel);
   input.autocomplete = "off";
   let pending: AbortController | undefined;
-  let pointingAtPanel = false;
   function dismiss() {
     pending?.abort();
     pending = undefined;
-    pointingAtPanel = false;
     panel.hidden = true;
     status.textContent = "";
   }
@@ -206,8 +204,14 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
       const visible = matches.slice(0, accounts.length ? 8 : 5);
       const body = document.createDocumentFragment();
       if (visible.length) body.append(creatorList(visible, choose, true));
-      else if (state === "loading" || !handle) {
-        const message = state === "loading" ? "Searching TikTok…" : state === "unavailable" ? "TikTok suggestions are unavailable." : "No matching creators found.";
+      if (state === "unavailable") {
+        body.append(el("p", "TikTok suggestions are temporarily unavailable."));
+        const retry = el("button", "Retry search", "shop-creator-retry");
+        retry.type = "button";
+        retry.addEventListener("click", () => { input.focus(); show(true); });
+        body.append(retry);
+      } else if (!visible.length) {
+        const message = state === "loading" ? "Searching TikTok…" : term ? "No matching creators found." : "Enter 2–48 characters to search TikTok.";
         body.append(el("p", message));
       }
       if (visible.length < matches.length) {
@@ -225,28 +229,20 @@ export function suggestCreators(box: HTMLElement, input: HTMLInputElement, selec
     }
     const debounceMs = pasted ? 0 : (query.length < 3 || pendingSearches.size ? 250 : 150);
     loadCreatorSuggestions(term, signal, debounceMs, render);
-    document.addEventListener("pointerdown", e => {
-      pointingAtPanel = panel.contains(e.target as Node);
+    // Dismiss on an actual move outside the picker. Window switches and native
+    // input-method panels can temporarily take focus without selecting anything.
+    function outside(e: Event) {
       if (!box.contains(e.target as Node)) dismiss();
-    }, { capture: true, signal });
-    const release = () => { pointingAtPanel = false; };
-    document.addEventListener("pointerup", release, { signal });
-    document.addEventListener("pointercancel", release, { signal });
+    }
+    document.addEventListener("pointerdown", outside, { capture: true, signal });
+    document.addEventListener("focusin", outside, { signal });
     window.addEventListener("hashchange", dismiss, { once: true, signal });
-    window.addEventListener("blur", dismiss, { once: true, signal });
   }
-  input.addEventListener("input", event => {
-    const inputEvent = event as InputEvent;
-    if (inputEvent.isComposing) dismiss();
-    else show(inputEvent.inputType === "insertFromPaste");
-  });
-  input.addEventListener("focus", () => { if (panel.hidden) show(); });
-  box.addEventListener("focusout", e => {
-    if (e.relatedTarget instanceof Node && !box.contains(e.relatedTarget)) dismiss();
-    else if (!e.relatedTarget && !pointingAtPanel) queueMicrotask(() => {
-      if (!box.contains(document.activeElement)) dismiss();
-    });
-  });
+  input.addEventListener("input", event => show((event as InputEvent).inputType === "insertFromPaste"));
+  input.addEventListener("compositionend", () => show());
+  function reopen() { if (panel.hidden) show(); }
+  input.addEventListener("focus", reopen);
+  input.addEventListener("click", reopen);
   box.addEventListener("keydown", event => {
     if (event.isComposing) return;
     if (panel.hidden && event.target === input && event.key === "ArrowDown") show();
