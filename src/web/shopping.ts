@@ -205,7 +205,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     else if (path.startsWith("/rankings/")) {
       const handle = path.slice("/rankings/".length);
       if (!query.has("product")) ranking = rankingAroundCreator(handle);
-      result = ranking ?? rankedCreatorPage(handle, { productId: query.get("product") });
+      result = ranking ?? rankedCreatorPage(handle, query.get("product"), open);
     } else if (path === "/tiktok") {
       result = liveCreatorPage(query.get("user")!, creatorLookupOrigin, signal, true);
     } else if (!archiveHosting && (path === "/video" || path === "/site" || path === "/profile")) {
@@ -420,7 +420,7 @@ export function renderShopping(container: HTMLElement) {
     page.append(link("Browse the ranking →", shoppingRankingHref(), "shop-action-link"));
   } else if (path === "/creators") page = home(lifetime.signal, query.get("q") ?? "");
   else if (path === "/rankings") page = rankingPage();
-  else if (path.startsWith("/rankings/")) page = rankedCreatorPage(path.slice("/rankings/".length));
+  else if (path.startsWith("/rankings/")) page = rankedCreatorPage(path.slice("/rankings/".length), query.get("product"));
   else if (path.startsWith("/product/")) {
     page = productPage(path.slice(9), query.get("from") === "archive");
   } else if (path === "/video" || path === "/profile" || path === "/site" || path === "/find") {
@@ -439,13 +439,5 @@ export function renderShopping(container: HTMLElement) {
     heading.tabIndex = -1;
     heading.focus({ preventScroll: true });
   }
-  const receiptId = path.startsWith("/rankings/") ? query.get("product") : null;
-  const receipt = receiptId ? document.getElementById("ranking-product-" + receiptId) : null;
-  if (receipt) {
-    const comparisonHeading = receipt.previousElementSibling;
-    const start = comparisonHeading?.classList.contains("ranking-receipts-heading") ? comparisonHeading : receipt;
-    start.scrollIntoView({ block: "start" });
-    receipt.tabIndex = -1;
-    receipt.focus({ preventScroll: true });
-  } else window.scrollTo({ top: 0, behavior: "instant" });
+  window.scrollTo({ top: 0, behavior: "instant" });
 }

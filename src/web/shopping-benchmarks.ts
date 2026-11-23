@@ -46,6 +46,11 @@ function shopItemDescription(title: string, variant?: string | null) {
   return namedVariant && !display.toLowerCase().includes(variant.toLowerCase()) ? display + " · " + variant : display;
 }
 
+function matchingShade(product: Observation["product"], variant: Observation["product"]["variants"][number] | undefined, baseline: Benchmark) {
+  return variant && /\b\d{1,2}[cnw]\d?\b/i.test(variant.variant) && /\b(?:cushion|foundation|concealer)\b/i.test(product.name)
+    && baseline.shops.every(shop => shop.variant?.trim().toLowerCase() === variant.variant.trim().toLowerCase());
+}
+
 function quoteDifference(min: number, max: number, baseline: Benchmark) {
   const low = min - baseline.peerPrice;
   const high = max - baseline.peerPrice;
@@ -86,100 +91,7 @@ function rankingIndexScale(item: Item) {
   return scale;
 }
 
-function rankingBuyingAdvice(baseline: Benchmark, item: Item, quotes: HTMLDetailsElement, originalUrl?: string) {
-  const advice = el("section","","decision-close ranking-receipt-advice");
-  const byline = el("div","","decision-byline");
-  const seal = el("img","","decision-seal");
-  seal.src = "assets/mascot/onion-head.webp";
-  seal.width = 44; seal.height = 44; seal.alt = "";
-  byline.append(seal,el("span","Buying advice","verdict-label"));
-  const same = baseline.basis === "exact", count = baseline.shops.length;
-  const scope = count === 1 ? "one other shop" : count + " other shops";
-  const decision = item.decision;
-  const title = decision ? buyingAdviceTitle(decision) : "Check the shop quotes";
-  const reason = same ? "The same variant was verified at " + scope + "." :
-    count === 1 ? "Only one other shop matched the selected options." : "The reference is the median price across " + scope + " with similar listings.";
-  advice.append(byline,el("h2",title),el("p",reason,"decision-reason"));
-  const nextStep = decision?.steps.find(step => step.label === "Action");
-  if (nextStep) advice.append(el("p",nextStep.detail,"decision-next"));
-  const cheaper = baseline.peerPrice < baseline.sourcePrice;
-  const cheapestShop = baseline.shops.find(shop => shop.price === baseline.peerPrice);
-  const offerUrl = same && (cheaper ? cheapestShop && productLink(cheapestShop.url)?.url : originalUrl);
-  if (offerUrl) {
-    advice.append(link(cheaper ? "View the lower-priced offer ↗" : "View the original offer ↗",offerUrl,"decision-inspect"));
-  } else {
-    const inspect = el("button","Inspect listing details","decision-inspect");
-    inspect.type = "button";
-    inspect.setAttribute("aria-controls",quotes.id);
-    inspect.addEventListener("click",() => {
-      quotes.open = true;
-      const summary = quotes.querySelector("summary");
-      summary?.focus({preventScroll:true});
-      summary?.scrollIntoView({block:"center"});
-    });
-    advice.append(inspect);
-  }
-  if (decision) {
-    const proof = details("Why this scored " + item.score + "/100",decisionSteps(decision));
-    const anchor = rankingScoreAnchors(decision.context?.allowancePct).find(([,points]) => points === 65);
-    if (anchor) proof.append(el("p","For this item, a " + percentage.format(anchor[0]) + "% premium scores 65.","decision-context-note"));
-    advice.append(proof);
-  }
-  return advice;
-}
-
-export function benchmarkCard(baseline: Benchmark, observation: Observation, item?: Item, originalPrices?: number[]) {
-  const product = observation.product;
-  const article = el("article","",item ? "ranking-product-spread ranking-receipt" : "price-benchmark");
-  const main = item ? el("section","","ranking-receipt-main price-benchmark verdict-receipt") : article;
-  const heading = el("div","","price-benchmark-heading");
-  const listingTitle = compactTitle(sourceName(product));
-  const title = el("h3",item ? rankedItemTitle(listingTitle,product) : listingTitle);
-  title.title = product.name;
-  heading.append(title);
-  const variant = product.variants.find(v => v.skuId === baseline.skuId);
-  const fromPost = product.captionSkuId === baseline.skuId;
-  const linked = product.requestedSkuId === baseline.skuId || product.selectedSkuId === baseline.skuId;
-  const fromShop = product.defaultSkuId === baseline.skuId && product.variants.length > 1;
-  const variantLabel = !item ? "Variant" : fromPost ? "Shade named in the post" : linked ? "Linked variant" : fromShop ? "Shop default" : "Variant";
-  const matchedShade = variant && /\b\d{1,2}[cnw]\d?\b/i.test(variant.variant) && /\b(?:cushion|foundation|concealer)\b/i.test(product.name)
-    && baseline.shops.every(shop => shop.variant?.trim().toLowerCase() === variant.variant.trim().toLowerCase());
-  const basis = baseline.basis === "exact" ? "Verified match" : matchedShade ? "Matching shade · Formula unverified" : "Similar-item estimate";
-  main.append(heading);
-  const meta = el("div","","ranking-benchmark-meta");
-  if (variant?.variant) meta.append(el("p",variantLabel + " · " + variant.variant,"price-benchmark-variant"));
-  if (meta.childElementCount) main.append(meta);
-  const quotes = el("div","","price-benchmark-quotes");
-  const source = el("div","","price-benchmark-source"), ref = el("div","","price-benchmark-ref");
-  const observed = originalPrices ?? [baseline.sourcePrice];
-  const min = Math.min(...observed), max = Math.max(...observed);
-  const original = min === max ? money(min,baseline.currency) : money(min,baseline.currency) + " – " + money(max,baseline.currency);
-  const labelClass = item ? "verdict-label receipt-price-label" : "";
-  source.append(el("small",min === max ? "Original shop" : "Original shop range",labelClass),el("strong",original,min === max ? "" : "price-benchmark-range"));
-  const sourceUrl = productLink(sourceSkuUrl(product,baseline.skuId) ?? "")?.url;
-  if (sourceUrl) source.append(link((product.seller || "Original listing") + "\u00a0↗",sourceUrl,item ? "verdict-shop-link" : ""));
-  else if (item && product.seller) source.append(el("span",product.seller,"verdict-shop-name"));
-  const singleShop = baseline.shops.length === 1;
-  const refLabel = !item ? "Ranking benchmark" : baseline.basis === "exact" ? "Verified same item" : singleShop ? "Similar listing" : "Similar listings";
-  ref.append(el("small",refLabel,labelClass),el("strong",money(baseline.peerPrice,baseline.currency)));
-  const single = singleShop && baseline.shops[0];
-  const singleUrl = single && productLink(single.url)?.url;
-  if (item && single && singleUrl) ref.append(link((single.seller || "TikTok Shop listing") + "\u00a0↗",singleUrl,"verdict-shop-link"));
-  else ref.append(el("span",shopCountLabel(baseline),item ? "verdict-shop-name" : ""));
-  quotes.append(source,ref);
-  const difference = quoteDifference(min,max,baseline);
-  if (item) {
-    quotes.classList.add("verdict-prices");
-    source.classList.add("verdict-price-tile","receipt-source");
-    ref.classList.add("verdict-price-tile","receipt-peer");
-    difference.classList.add("receipt-gap");
-    const match = baseline.basis === "exact" ? "Same variant confirmed. Item prices only." :
-      matchedShade ? "The shade matches. The formula still needs confirmation." : "The exact variant still needs confirmation.";
-    main.append(quotes,difference,el("p",match,"price-benchmark-match"),rankingIndexScale(item));
-  } else {
-    quotes.append(difference);
-    main.append(quotes,el("p",basis,"price-benchmark-match"));
-  }
+function benchmarkShops(baseline: Benchmark) {
   const shops = el("ul","","price-benchmark-shops");
   for (const other of baseline.shops) {
     const dest = productLink(other.url);
@@ -200,17 +112,148 @@ export function benchmarkCard(baseline: Benchmark, observation: Observation, ite
     shop.append(time);
     li.append(shop); shops.append(li);
   }
-  if (item) {
-    const listing = el("p","","ranking-original-listing");
-    listing.append(el("strong","Original listing")," · ",sourceUrl ? link(product.name + " ↗",sourceUrl) : product.name);
-    const evidence = details("Shop quotes and variants",listing,shops);
-    evidence.classList.add("ranking-receipt-quotes");
-    evidence.id = "ranking-quotes-" + baseline.productId + "-" + baseline.skuId;
-    main.append(evidence);
-    const aside = el("aside","","ranking-receipt-aside");
-    aside.append(rankingBuyingAdvice(baseline,item,evidence,sourceUrl),el("div","","ranking-receipt-notes verdict-notes"));
-    article.append(main,aside);
-  } else article.append(el("h4",baseline.calibrated ? "Sources from the edition check" : "Sources from post checks"),shops);
+  return shops;
+}
+
+function rankingBuyingAdvice(baseline: Benchmark, item: Item, quotes: HTMLDetailsElement, originalUrl?: string) {
+  const advice = el("aside","","scored-receipt-advice");
+  const seal = el("img","","scored-receipt-mascot");
+  seal.src = "assets/mascot/onion-boy-side-eye.webp";
+  seal.width = 68; seal.height = 84; seal.alt = "";
+  const decision = item.decision;
+  const title = decision?.action === "Wait for a closer match" ? "Check the exact version" :
+    decision ? buyingAdviceTitle(decision) : "Check the shop quotes";
+  advice.append(seal,el("p","Buying advice","scored-receipt-label"),el("h3",title));
+  const nextStep = decision?.steps.find(step => step.label === "Action");
+  if (nextStep) advice.append(el("p",nextStep.detail,"scored-receipt-action"));
+
+  const cheaper = baseline.peerPrice < baseline.sourcePrice;
+  const cheapest = baseline.shops.find(shop => shop.price === baseline.peerPrice);
+  const offerUrl = baseline.basis === "exact" && (cheaper ? cheapest && productLink(cheapest.url)?.url : originalUrl);
+  if (offerUrl) {
+    advice.append(link(cheaper ? "See the lower price ↗" : "View the creator’s offer ↗",offerUrl,"scored-receipt-cta"));
+  } else {
+    const inspect = el("button","Compare listing details →","scored-receipt-cta");
+    inspect.type = "button";
+    inspect.setAttribute("aria-controls",quotes.id);
+    inspect.addEventListener("click",() => {
+      quotes.open = true;
+      const summary = quotes.querySelector("summary");
+      summary?.focus({preventScroll:true});
+      summary?.scrollIntoView({block:"center"});
+    });
+    advice.append(inspect);
+  }
+  return advice;
+}
+
+function priceChartRow(label: string, store: string, url: string | undefined,
+  price: number, currency: string, largest: number) {
+  const row = el("div","","scored-receipt-quote");
+  const shop = el("div","","scored-receipt-shop");
+  shop.append(el("strong",label));
+  if (url) shop.append(link(store + " ↗",url));
+  else shop.append(el("span",store));
+  const value = el("div","","scored-receipt-value");
+  const bar = el("span","","scored-receipt-bar");
+  bar.setAttribute("aria-hidden","true");
+  bar.style.setProperty("--quote-width",price / largest * 100 + "%");
+  value.append(el("strong",money(price,currency)),bar);
+  row.append(shop,value);
+  return row;
+}
+
+function scoredReceipt(baseline: Benchmark, observation: Observation, item: Item) {
+  const {product} = observation;
+  const {sourcePrice,peerPrice,currency} = baseline;
+  const exact = baseline.basis === "exact";
+  const count = baseline.shops.length;
+  const difference = (Math.round(sourcePrice * 100) - Math.round(peerPrice * 100)) / 100;
+  const delta = money(Math.abs(difference),currency);
+  const variant = product.variants.find(v => v.skuId === baseline.skuId);
+  const sourceUrl = productLink(sourceSkuUrl(product,baseline.skuId) ?? "")?.url;
+  const single = count === 1 ? baseline.shops[0] : undefined;
+  const peerUrl = single && productLink(single.url)?.url;
+
+  const article = el("article","","ranking-product-spread ranking-receipt scored-receipt");
+  article.dataset.priceDirection = difference > 0 ? "higher" : difference < 0 ? "lower" : "equal";
+  const main = el("section","","scored-receipt-main");
+  main.append(el("p","Shop price check","scored-receipt-label"));
+  const gap = el("h2","","scored-receipt-gap price-benchmark-heading");
+  if (!difference) gap.textContent = "Same price";
+  else if (exact && difference > 0) gap.append("Save ",el("strong",delta)," elsewhere");
+  else gap.append(el("strong",delta),difference > 0 ? " higher" : " lower");
+  const reference = count === 1 ? "one other shop’s price for " + (exact ? "the same item" : "a similar item") :
+    (exact ? "the lowest price for the same item" : "the median for similar listings") + " at " + count + " other shops";
+  const percent = percentage.format(Math.abs(item.premiumPct)) + "%";
+  const summary = difference === 0 ? "The creator’s price matches " + reference + "." :
+    "The creator’s price is " + percent + (difference > 0 ? " above " : " below ") + reference + ".";
+  main.append(gap,el("p",summary,"scored-receipt-deck"));
+
+  const productInfo = el("div","","scored-receipt-product");
+  const title = el("h3",rankedItemTitle(compactTitle(sourceName(product)),product));
+  title.title = product.name;
+  productInfo.append(title);
+  if (variant?.variant && !/^(?:default|single variant)$/i.test(variant.variant)) {
+    const label = product.captionSkuId === baseline.skuId ? "Named in the post" :
+      product.requestedSkuId === baseline.skuId || product.selectedSkuId === baseline.skuId ? "Linked variant" :
+      product.defaultSkuId === baseline.skuId && product.variants.length > 1 ? "Shop default" : "Variant";
+    productInfo.append(el("p",label + " · " + variant.variant));
+  }
+  const chart = el("div","","scored-receipt-chart");
+  const largest = Math.max(sourcePrice,peerPrice);
+  const peerLabel = count === 1 ? exact ? "Same item elsewhere" : "Similar item elsewhere" :
+    exact ? "Lowest verified price" : "Similar shops’ median";
+  chart.append(priceChartRow("Creator’s link",product.seller || "Original listing",sourceUrl,sourcePrice,currency,largest),
+    priceChartRow(peerLabel,single?.seller || (count === 1 ? "TikTok Shop listing" : count + " other shops"),peerUrl,peerPrice,currency,largest));
+  const matchedShade = matchingShade(product,variant,baseline);
+  const match = exact ? "Same variant verified" : matchedShade ? "Shade matches · formula unverified" : "Exact variant unconfirmed";
+  main.append(productInfo,chart,el("p",match + " · Item prices only","scored-receipt-scope"));
+
+  const original = el("p","","ranking-original-listing");
+  original.append(el("strong","Creator’s listing")," · ",sourceUrl ? link(product.name + " ↗",sourceUrl) : product.name);
+  const quotes = details("Shop quotes and variants",original,benchmarkShops(baseline));
+  quotes.id = "ranking-quotes-" + baseline.productId + "-" + baseline.skuId;
+  quotes.classList.add("ranking-receipt-quotes");
+  const proof = details("How this item scored " + item.score + "/100",rankingIndexScale(item));
+  const decision = item.decision;
+  if (decision) {
+    proof.append(decisionSteps(decision));
+    const anchor = rankingScoreAnchors(decision.context?.allowancePct).find(([,points]) => points === 65);
+    if (anchor) proof.append(el("p","For this item, a " + percentage.format(anchor[0]) + "% premium scores 65.","decision-context-note"));
+  }
+  const evidence = el("div","","scored-receipt-evidence");
+  evidence.append(quotes,proof,el("div","","ranking-receipt-notes verdict-notes"));
+  article.append(main,rankingBuyingAdvice(baseline,item,quotes,sourceUrl),evidence);
+  return article;
+}
+
+export function benchmarkCard(baseline: Benchmark, observation: Observation, item?: Item, originalPrices?: number[]) {
+  if (item) return scoredReceipt(baseline,observation,item);
+  const product = observation.product;
+  const article = el("article","","price-benchmark");
+  const heading = el("div","","price-benchmark-heading");
+  const title = el("h3",compactTitle(sourceName(product)));
+  title.title = product.name;
+  heading.append(title);
+  article.append(heading);
+  const variant = product.variants.find(v => v.skuId === baseline.skuId);
+  if (variant?.variant) article.append(el("p","Variant · " + variant.variant,"price-benchmark-variant"));
+
+  const observed = originalPrices ?? [baseline.sourcePrice];
+  const min = Math.min(...observed), max = Math.max(...observed);
+  const original = min === max ? money(min,baseline.currency) : money(min,baseline.currency) + " – " + money(max,baseline.currency);
+  const quotes = el("div","","price-benchmark-quotes");
+  const source = el("div","","price-benchmark-source"), ref = el("div","","price-benchmark-ref");
+  source.append(el("small",min === max ? "Original shop" : "Original shop range"),el("strong",original,min === max ? "" : "price-benchmark-range"));
+  const sourceUrl = productLink(sourceSkuUrl(product,baseline.skuId) ?? "")?.url;
+  if (sourceUrl) source.append(link((product.seller || "Original listing") + " ↗",sourceUrl));
+  ref.append(el("small","Ranking benchmark"),el("strong",money(baseline.peerPrice,baseline.currency)),el("span",shopCountLabel(baseline)));
+  quotes.append(source,ref,quoteDifference(min,max,baseline));
+  const matchedShade = matchingShade(product,variant,baseline);
+  const basis = baseline.basis === "exact" ? "Verified match" : matchedShade ? "Matching shade · Formula unverified" : "Similar-item estimate";
+  article.append(quotes,el("p",basis,"price-benchmark-match"),
+    el("h4",baseline.calibrated ? "Sources from the edition check" : "Sources from post checks"),benchmarkShops(baseline));
   return article;
 }
 
