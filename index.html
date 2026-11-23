@@ -11,7 +11,7 @@
     <link rel="icon" href="assets/mascot/onion-head.webp" />
     <link rel="stylesheet" href="fonts.css?v=2fe77b3fbcc3" />
     <link rel="stylesheet" href="tokens.css?v=48d80a5ce906" />
-    <link rel="stylesheet" href="app.css?v=1b690138cb6f" />
+    <link rel="stylesheet" href="app.css?v=5187b46122f3" />
     <link rel="stylesheet" href="shopping.css?v=ef886b028470" />
     <link rel="stylesheet" href="creator-shopping.css?v=9c218fa62403" />
   </head>
@@ -37,13 +37,18 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Zm4 5h6m-6 4h6"/></svg>Price archive
         </a>
       </nav>
+      <div class="topbar-actions">
+      <button class="language-switch" id="languageSwitch" type="button" lang="zh-Hans" translate="no" aria-label="切换到简体中文 · Switch to Simplified Chinese">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg><span>中文</span>
+      </button>
       <details class="app-tools" id="appTools"><summary>Tools</summary><div class="tools-menu">
         <a href="#markup">Compare supplier prices</a>
         <a href="#scan">Scan a video or image</a>
-        <a href="#pro">Pricing workspace · sample</a>
+        <a href="#pro">Seller profit simulator · sample</a>
         <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
         <button class="btn ghost" id="backendBtn" type="button">Backend</button>
       </div></details>
+      </div>
     </header>
 
     <main class="page">
@@ -129,12 +134,12 @@
       <section class="pro" id="proView" hidden>
         <header class="pro-head">
           <div>
-            <h1>Pricing workspace</h1>
+            <h1>Seller profit simulator</h1>
             <p class="lede">
-              Choose a product to model profit, compare suppliers and prepare a quote request.
+              Explore how costs affect a seller’s margin using fictional suppliers and sample prices. Creator price checks use observed TikTok Shop offers.
             </p>
           </div>
-          <span class="mock-badge">Sample workspace data</span>
+          <span class="mock-badge">Sample data</span>
         </header>
         <div class="pro-grid">
           <aside class="radar">
@@ -172,6 +177,6 @@
 
     <div class="toast" id="toast" hidden></div>
 
-    <script type="module" src="app.js?v=c808b3756f51"></script>
+    <script type="module" src="app.js?v=6e16985c581b"></script>
   </body>
 </html>

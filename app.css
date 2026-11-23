@@ -2643,6 +2643,16 @@ body[data-view="creators"] .page { padding-top: 24px; }
 .app-tools > summary::after { content:""; width:7px; height:7px; border:solid currentColor; border-width:0 1.5px 1.5px 0; transform:translateY(-2px) rotate(45deg); }
 .app-tools[open] > summary::after { transform:translateY(2px) rotate(225deg); }
 .app-tools[open] > summary,.app-tools > summary:hover { background:#f2e9ed; }
+.topbar-actions { display:flex; align-items:center; gap:4px; margin-inline-start:auto; flex:none; }
+.language-switch {
+  display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:44px;
+  padding:0 8px; background:transparent; border:0; border-radius:6px; color:#624857;
+  font:600 13px/1.2 var(--mx-font-sans); white-space:nowrap; cursor:pointer;
+}
+.language-switch svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.6; }
+.language-switch:hover,.language-switch:focus-visible { background:#f2e9ed; }
+.language-switch:focus-visible { outline:2px solid #79546b; outline-offset:1px; }
+:lang(zh-Hans) .shop-page :is(h1,h2,h3),:lang(zh-Hans) .pro :is(h1,h2,h3) { letter-spacing:0; }
 .app-tools .tools-menu { min-width:235px; padding:6px; border-color:var(--mx-line-strong); }
 .tools-menu a { border-radius:5px; font-size:14px; }
 .tools-menu a:hover,.tools-menu a:focus-visible { background:#f4ecee; }
@@ -2652,6 +2662,9 @@ body[data-view="creators"] .page { padding-top: 24px; }
   .topbar .topnav-btn { font-size:12px; gap:5px; padding-inline:8px; }
 }
 @media (max-width:720px) {
+  .topbar { column-gap:6px; }
+  .topbar-actions { gap:0; }
+  .language-switch { padding-inline:5px; }
   .topbar .brand-mark { width:31px; height:31px; }
   .topbar .topnav {
     grid-template-columns:repeat(4,minmax(0,1fr)); gap:2px;
