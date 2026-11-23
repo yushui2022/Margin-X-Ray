@@ -1,7 +1,28 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
+import rankingPortraits from "../research/shop-ranking-portraits.json";
 import { creatorHref, profileCheckHref, shoppingRankingHref } from "../src/shared/shopping-links";
 import { creatorSearchDestination, exactCreator, liveCreatorHref, searchCreators } from "../src/web/shopping-creator-search";
+
+test("ranking portraits resolve to local WebP files for the same account in reports and search", () => {
+  const handles = new Set<string>();
+  for (const {handle, avatar, sourceUrl} of rankingPortraits) {
+    assert.equal(handles.has(handle), false, handle);
+    handles.add(handle);
+    const source = new URL(sourceUrl);
+    assert.equal(source.hostname, "www.tiktok.com");
+    assert.equal(source.pathname.split("/")[1]?.toLowerCase(), "@" + handle);
+    assert.equal(avatar, "assets/creators/shop-archive/" + handle + ".webp");
+    const image = readFileSync(new URL("../" + avatar, import.meta.url));
+    assert.equal(image.toString("ascii", 8, 12), "WEBP", handle);
+    assert.equal(exactCreator("@" + handle)?.avatar, avatar, handle);
+  }
+  const report = exactCreator("@2412ya");
+  assert.ok(report?.avatar);
+  assert.equal(report.href, shoppingRankingHref("2412ya"));
+  assert.equal(searchCreators("2412ya")[0]?.avatar, report.avatar);
+});
 
 test("a verified display name and flexible handle spellings reach the same current shop report", () => {
   const handle = "all_the_jazzy_things";

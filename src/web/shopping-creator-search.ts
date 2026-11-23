@@ -1,4 +1,5 @@
 import archivePosts from "../../research/shop-archive-creators.json";
+import rankingPortraits from "../../research/shop-ranking-portraits.json";
 import { PUBLIC_CREATORS } from "../shared/creator-directory";
 import { creatorHref, profileCheckHref, publicUrl, shoppingRankingHref, tiktokProfileHandle } from "../shared/shopping-links";
 import { shopRankingRows } from "./shopping-ranking-data";
@@ -27,14 +28,16 @@ function creatorQuery(raw: string) {
 const directory = new Map(PUBLIC_CREATORS.map(profile => [profile.handle.toLowerCase(), profile]));
 const checks = new Map(shopRankingRows.map(row => [row.handle, row]));
 const posts = new Map(archivePosts.map(post => [post.handle.toLowerCase(), post]));
+const portraits = new Map(rankingPortraits.map(portrait => [portrait.handle.toLowerCase(), portrait]));
 const handles = new Set([...checks.keys(), ...directory.keys()]);
 const index = Array.from(handles, handle => {
   const profile = directory.get(handle);
   const checked = checks.get(handle);
   const post = posts.get(handle);
-  const name = post?.displayName || profile?.name || handle;
+  const portrait = portraits.get(handle);
+  const name = post?.displayName || profile?.name || portrait?.displayName || handle;
   const entry: CreatorSearchEntry = {
-    handle, name, avatar: post?.avatar || profile?.image,
+    handle, name, avatar: post?.avatar || profile?.image || portrait?.avatar,
     href: checked ? shoppingRankingHref(handle) : creatorHref(handle),
     score: checked?.verdict.score ?? null, rank: checked?.rank,
     hasCheck: Boolean(checked),
