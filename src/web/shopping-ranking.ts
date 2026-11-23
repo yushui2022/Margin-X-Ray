@@ -334,7 +334,13 @@ export function rankedCreatorPage(handle: string, productId: string | null, open
   const main = el("div", "", "shop-page shop-narrow price-ranking-detail");
   const row = rows.find(entry => entry.handle === handle.toLowerCase());
   const breadcrumb = el("div", "", "creator-report-nav");
-  if (!openInline) breadcrumb.append(link("← Creator ranking", shoppingRankingHref(), "shop-back"));
+  if (!openInline) {
+    const back = link("", shoppingRankingHref(), "shop-back");
+    const arrow = el("span", "", "creator-report-back-arrow");
+    arrow.setAttribute("aria-hidden", "true");
+    back.append(arrow, "Creator ranking");
+    breadcrumb.append(back);
+  }
   main.append(breadcrumb);
   if (!row) {
     main.append(el(openInline ? "h2" : "h1", "Creator outside this edition"), el("p", "This handle has no saved price check in the index."));
@@ -344,9 +350,16 @@ export function rankedCreatorPage(handle: string, productId: string | null, open
   const current = productId ? row.observations.findIndex(({product}) => product.productId === productId) : featured?.productIndex ?? 0;
   const selected = row.observations[current];
   if (selected) {
-    const time = el("time", "Price checked " + dateFormat.format(new Date(selected.observedAt)));
+    const dateline = el("div", "", "creator-report-dateline");
+    const stamp = el("img");
+    stamp.src = "assets/mascot/onion-date-stamp.webp";
+    stamp.alt = "";
+    stamp.width = 38;
+    stamp.height = 40;
+    const time = el("time", dateFormat.format(new Date(selected.observedAt)));
     time.dateTime = selected.observedAt;
-    breadcrumb.append(time);
+    dateline.append(stamp, el("span", "Price checked"), time);
+    breadcrumb.append(dateline);
   }
   main.append(creatorReportHeader(row, Boolean(openInline)));
   if (selected) main.append(creatorProductReport(row, current));
