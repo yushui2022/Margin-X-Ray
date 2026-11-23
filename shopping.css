@@ -679,7 +679,7 @@ body[data-view="shop"] .page { padding-top:clamp(22px,3vw,44px); }
 }
 .shop-creator-suggestions > p { margin:0; padding:15px 16px; color:var(--mx-muted); }
 .shop-creator-matches { padding:0; margin:0; list-style:none; }
-:where(.shop-page) button[data-choice] {
+:where(.shop-page) button[data-choice], .shop-creator-retry {
   appearance:none; width:100%; text-align:start; font:inherit; color:#714158;
   background:transparent; border:0; cursor:pointer;
 }
@@ -695,9 +695,9 @@ body[data-view="shop"] .page { padding-top:clamp(22px,3vw,44px); }
 .shop-creator-name strong { font-size:15px; }
 .shop-creator-name small { font-size:13px; color:var(--mx-muted); }
 .shop-creator-result-score { font-size:14px; font-weight:650; color:#67465c; white-space:nowrap; }
-.shop-creator-see-all { display:block; padding:12px 18px; min-height:44px; font-weight:600; }
+.shop-creator-see-all,.shop-creator-retry { display:block; padding:12px 18px; min-height:44px; font-weight:600; }
 .shop-creator-match:hover,.shop-creator-match:focus-visible { background:#f4edf0; border-radius:8px; }
-.shop-creator-match:focus-visible,.shop-creator-see-all:focus-visible { outline:2px solid #83526b; outline-offset:-3px; }
+.shop-creator-match:focus-visible,.shop-creator-see-all:focus-visible,.shop-creator-retry:focus-visible { outline:2px solid #83526b; outline-offset:-3px; }
 .shop-creator-results h1 { overflow-wrap:anywhere; }
 .shop-creator-results .shop-search-status { margin:20px 0 8px; color:var(--mx-muted); font-size:14px; }
 .shop-search-direct { display:inline-flex; align-items:center; min-height:44px; }
