@@ -1,5 +1,7 @@
 // UI copy only. Creator names, captions, variant names and seller listings stay in their original language.
 export const shoppingZh: Record<string, string> = {
+  "Compare products": "按商品比价", "View receipt →": "查看比价依据 →",
+  "Close price check": "关闭商品比价",
   "Is it cheaper at": "同一件商品，",
   "another TikTok shop?": "换家店买能省多少？",
   "Is it cheaper at another TikTok shop?": "同一件商品，换家店买能省多少？",

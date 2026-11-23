@@ -1,78 +1,105 @@
-import { onionScore } from "../shared/onion-index";
 import { el, money } from "./shop-dom";
-import { featuredRankingSample, shopRankingRows, tiedShopRanks, type ShopRankingRow } from "./shopping-ranking-data";
+import { creatorByHandle } from "./shopping-creator-search";
+import { shopRankingRows, type ShopRankingRow } from "./shopping-ranking-data";
 import { sourceName } from "./shopping-verdict";
 
-const ranked = shopRankingRows.filter(row => row.rank !== null && row.verdict.items.length > 0);
 type Item = ShopRankingRow["verdict"]["items"][number];
+type Sample = { row: ShopRankingRow; item: Item };
+// These listings open with a long list of licensed characters. Their quoted
+// product names and the selected variant are clearer together on a small card.
+const shortProductNames = new Map([
+  ["1731176397038522481", "Pit Stop Tool Bench Playset"],
+  ["1731603800884088945", "Wooden Electronic Air Hockey Table"],
+]);
 
 function itemName(row: ShopRankingRow, item: Item) {
   const product = row.observations[item.productIndex].product;
+  const shortName = shortProductNames.get(product.productId);
+  if (shortName && product.name.includes(shortName)) return shortName;
   const title = sourceName(product);
   const first = title.split(/:\s+|\s+(?:[–—]|l)\s+|[|;]/)[0].trim();
   return first.length >= 18 ? first : title;
 }
 
-function priceGap(item: Item) {
-  const cents = Math.round(item.sourcePrice * 100) - Math.round(item.peerPrice * 100);
-  const label = cents === 0 ? "Same item price" : money(Math.abs(cents) / 100, item.currency) + (cents > 0 ? " more" : " less");
-  return { cents, label };
+function featuredProducts() {
+  const samples = shopRankingRows.flatMap(row => row.verdict.items.map(item => ({row, item})));
+  // Pick one complete recorded comparison per listing. Never combine quotes
+  // from different variants, creators or observation dates.
+  samples.sort((a, b) =>
+    Number(b.item.basis === "exact") - Number(a.item.basis === "exact")
+    || b.item.peerCount - a.item.peerCount
+    || b.row.observations[b.item.productIndex].observedAt.localeCompare(a.row.observations[a.item.productIndex].observedAt)
+    || a.row.handle.localeCompare(b.row.handle)
+  );
+  const products = new Map<string, {sample: Sample; handles: Set<string>}>();
+  for (const sample of samples) {
+    const id = sample.row.observations[sample.item.productIndex].product.productId;
+    const group = products.get(id);
+    if (group) group.handles.add(sample.row.handle);
+    else products.set(id, {sample, handles: new Set([sample.row.handle])});
+  }
+  return Array.from(products.values())
+    .sort((a, b) => b.handles.size - a.handles.size)
+    .map(group => group.sample);
 }
 
-export function scoredArchiveList(select: (handle: string, source: HTMLButtonElement) => void) {
-  const picks = ranked.flatMap(row => {
-    const sample = featuredRankingSample(row);
-    return sample ? [{ row, ...sample }] : [];
-  });
-  if (!picks.length) return el("p", "No featured posts with a scored price check in this edition.");
-  const list = el("div", "", "shop-list shop-archive-list");
-  const head = el("div", "", "shop-archive-head");
-  head.setAttribute("aria-hidden", "true");
-  head.append(el("span", "Rank"), el("span", "Creator / post"), el("span", "Item price gap"), el("span", "Onion score"));
-  const entries = el("ol", "", "shop-archive-entries");
-  list.append(head, entries);
-  for (const [index, { row, item, post }] of picks.entries()) {
-    const entry = el("li");
-    const button = el("button", "", "shop-archive-row");
+function quote(label: string, amount: number, currency: string) {
+  const price = el("span");
+  price.append(el("small", label), el("b", money(amount, currency)));
+  return price;
+}
+
+export function featuredProductChecks(select: (row: ShopRankingRow, index: number, source: HTMLButtonElement) => void) {
+  const products = featuredProducts();
+  if (!products.length) return el("p", "No featured posts with a scored price check in this edition.");
+  const list = el("ul", "", "shop-product-checks");
+  for (const {row, item} of products) {
+    const {product} = row.observations[item.productIndex];
+    const button = el("button", "", "shop-product-check");
     button.type = "button";
+    button.dataset.product = product.productId;
     button.dataset.handle = row.handle;
-    const rank = el("span", "#" + row.rank, "shop-archive-rank");
-    const tied = row.rank !== null && tiedShopRanks.has(row.rank);
-    if (tied) rank.append(el("small", "Tie"));
-    const portrait = el("img", "", "shop-archive-portrait");
-    if (index >= 3) portrait.loading = "lazy";
-    portrait.src = post.avatar; portrait.alt = ""; portrait.width = portrait.height = 48;
-    const identity = el("span", "", "shop-archive-identity");
-    const handle = "@" + row.handle;
-    const sameName = post.displayName.toLowerCase() === row.handle.toLowerCase();
-    identity.append(el("strong", sameName ? handle : post.displayName));
-    if (!sameName) identity.append(el("small", handle));
-    const excerpt = post.caption.replace(/(?:\s+#[^\s#]+)+\s*$/u, "").trim() || post.caption;
-    const caption = el("span", excerpt, "shop-archive-post");
-    const title = el("small", itemName(row, item), "shop-archive-product");
-    title.title = row.observations[item.productIndex].product.name;
-    const comparison = el("span", "", "shop-archive-gap");
-    comparison.append(el("b", priceGap(item).label), el("small", item.basis === "exact" ? "Verified match" : "Similar-item estimate"));
-    const { value, band } = onionScore(row.verdict.score)!;
-    const badge = el("span", "", "shop-archive-score");
-    badge.setAttribute("role", "img");
-    const count = row.verdict.scoredCount;
-    badge.title = "Creator price score " + value + " out of 100 · " + count + (count === 1 ? " product" : " products") + " scored · " + band.label + " onion";
-    badge.setAttribute("aria-label", badge.title);
-    const skin = el("span", "", "shop-archive-onion");
-    skin.style.setProperty("--rot", String(value / 100));
-    const mascot = el("img");
-    mascot.src = band.image; mascot.alt = ""; mascot.width = 40; mascot.height = 44;
-    skin.append(mascot);
-    const amount = el("span", "", "shop-archive-points");
-    amount.append(el("b", String(value)), el("small", "/100"));
-    badge.append(skin, amount);
-    button.setAttribute("aria-label", handle + " · " + (tied ? "Tied rank " : "Rank ") + row.rank
-      + " · Onion score " + value + " out of 100 · " + title.textContent);
-    button.append(rank, portrait, identity, caption, title, comparison, badge);
-    button.addEventListener("click", () => select(row.handle, button));
+    const title = el("span", itemName(row, item), "product-check-title");
+    title.title = product.name;
+    title.translate = false;
+    button.append(title);
+    const variant = product.variants[item.variantIndex]?.variant;
+    if (variant && !/^(?:default|single variant)$/i.test(variant)) {
+      const label = el("small", variant, "product-check-variant");
+      label.translate = false;
+      button.append(label);
+    }
+
+    const cents = Math.round(item.sourcePrice * 100) - Math.round(item.peerPrice * 100);
+    button.dataset.direction = cents > 0 ? "higher" : cents < 0 ? "lower" : "equal";
+    const difference = cents === 0 ? "Same item price" : money(Math.abs(cents) / 100, item.currency) + (cents > 0 ? " higher" : " lower");
+    const exact = item.basis === "exact";
+    const basis = exact ? "Verified match" : "Similar-item estimate";
+    const peerLabel = item.peerCount === 1
+      ? (exact ? "Same item elsewhere" : "Similar item elsewhere")
+      : (exact ? "Lowest verified price" : "Similar shops’ median");
+    const prices = el("span", "", "product-check-prices");
+    prices.append(quote("Creator’s link", item.sourcePrice, item.currency), quote(peerLabel, item.peerPrice, item.currency));
+    button.append(el("strong", difference, "product-check-difference"), el("small", basis, "product-check-basis"), prices);
+
+    const footer = el("span", "", "product-check-footer");
+    const avatar = creatorByHandle(row.handle)?.avatar;
+    if (avatar) {
+      const portrait = el("img");
+      portrait.src = avatar;
+      portrait.alt = "";
+      portrait.width = portrait.height = 24;
+      portrait.loading = "lazy";
+      footer.append(portrait);
+    }
+    const handle = el("span", "@" + row.handle, "product-check-creator");
+    handle.translate = false;
+    footer.append(handle, el("b", "View receipt →", "product-check-action"));
+    button.append(footer);
+    button.addEventListener("click", () => select(row, item.productIndex, button));
+    const entry = el("li");
     entry.append(button);
-    entries.append(entry);
+    list.append(entry);
   }
   return list;
 }

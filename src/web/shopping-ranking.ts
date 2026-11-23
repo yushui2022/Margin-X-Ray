@@ -379,7 +379,7 @@ function creatorReportHeader(row: ShopRankingRow, inline: boolean) {
   return header;
 }
 
-function creatorProductReport(row: ShopRankingRow, index: number) {
+export function creatorProductReport(row: ShopRankingRow, index: number) {
   const observation = row.observations[index];
   const item = row.verdict.items.find(entry => entry.productIndex === index);
   const original = row.rawReceipts[index];

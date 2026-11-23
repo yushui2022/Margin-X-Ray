@@ -8,8 +8,8 @@ import { listingCheck } from "./shopping-listing";
 import { liveShoppingPage } from "./shopping-live";
 import { lastShoppingJob, tikTokCheckRoute } from "./shopping-job";
 import { screenshotPage, screenshotPicker } from "./shopping-screenshot";
-import { rankedCreatorPage, rankingAroundCreator, rankingPage } from "./shopping-ranking";
-import { homeRanking, scoredArchiveList } from "./shopping-home-ranking";
+import { creatorProductReport, rankedCreatorPage, rankingAroundCreator, rankingPage } from "./shopping-ranking";
+import { featuredProductChecks, homeRanking } from "./shopping-home-ranking";
 import { savedShoppingMatches } from "./shopping-saved";
 import { creatorSearchDestination, liveCreatorHref, username } from "./shopping-creator-search";
 import { creatorLookupOrigin, creatorResults, lookupCreatorIdentity, searchResultButton, suggestCreators } from "./shopping-creator-lookup";
@@ -131,8 +131,19 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   }
   const section = el("section", "", "shop-browse");
   const archiveHeading = el("div", "", "shop-section-head");
-  archiveHeading.append(el("h2", "Featured price checks"), link("Full ranking →", shoppingRankingHref()));
-  const archiveList = scoredArchiveList((handle, button) => open(shoppingRankingHref(handle), button));
+  archiveHeading.append(el("h2", "Compare products"), link("Creator ranking →", shoppingRankingHref()));
+  const archiveList = featuredProductChecks((row, index, button) => {
+    const top = button.getBoundingClientRect().top;
+    clear();
+    archiveReturn = {button, top};
+    title.textContent = "Price check";
+    back.hidden = true;
+    close.setAttribute("aria-label", "Close price check");
+    section.replaceChildren(toolbar, creatorProductReport(row, index));
+    title.focus({preventScroll: true});
+    const topbar = document.querySelector(".topbar")?.getBoundingClientRect().bottom ?? 0;
+    window.scrollBy({top: toolbar.getBoundingClientRect().top - Math.max(0, topbar) - 8, behavior: "instant"});
+  });
   section.append(archiveHeading, archiveList);
   const panel = el("section", "", "shop-inline-search");
   panel.hidden = true;
@@ -170,18 +181,21 @@ function home(lifetime: AbortSignal, initialQuery = "") {
   close.addEventListener("click", () => {
     const origin = archiveReturn;
     clear();
-    input.value = "";
     if (origin) {
       origin.button.focus({ preventScroll: true });
       window.scrollBy({top: origin.button.getBoundingClientRect().top - origin.top, behavior: "instant"});
-    } else input.focus({ preventScroll: true });
+    } else {
+      input.value = "";
+      input.focus({ preventScroll: true });
+    }
   });
   input.addEventListener("input", clear);
   back.addEventListener("click", () => open("#shop/creators?" + new URLSearchParams({ q: matchesFor })));
 
-  function open(destination: string, source?: HTMLButtonElement) {
-    if (!source && destination === activeDestination && toolbar.parentElement !== section) return;
-    archiveReturn = source ? {button: source, top: source.getBoundingClientRect().top} : undefined;
+  function open(destination: string) {
+    if (destination === activeDestination && toolbar.parentElement !== section) return;
+    archiveReturn = undefined;
+    close.setAttribute("aria-label", "Close search results");
     const focused = document.activeElement;
     const restoreFocus = focused?.matches(":focus-visible") && (
       form.querySelector(".shop-creator-suggestions")?.contains(focused) || body.contains(focused) || focused === back
@@ -192,10 +206,7 @@ function home(lifetime: AbortSignal, initialQuery = "") {
     const [path, params] = destination.slice(5).split("?");
     const query = new URLSearchParams(params);
     const accountSearch = path === "/creators";
-    if (source) {
-      matchesFor = "";
-      input.value = "@" + source.dataset.handle;
-    } else if (accountSearch) matchesFor = query.get("q") ?? "";
+    if (accountSearch) matchesFor = query.get("q") ?? "";
     else if (!activeDestination && !matchesFor && creatorSearchDestination(input.value, archiveHosting)?.startsWith("#shop/creators?")) {
       matchesFor = input.value.trim();
     }
@@ -234,7 +245,6 @@ function home(lifetime: AbortSignal, initialQuery = "") {
       body.replaceChildren();
       section.replaceChildren(toolbar, ranking);
       panel.hidden = true;
-      if (source) ranking.querySelector<HTMLElement>('li[aria-current="true"] summary')?.focus({preventScroll:true});
       revealRankingMatch(ranking, signal);
     } else {
       restoreArchive();

@@ -9,7 +9,7 @@ const attributes = ["aria-label", "aria-description", "aria-valuetext", "placeho
 // interface and its accessible action labels can still be localized.
 const sourceContent = [
   '[translate="no"]', "script", "style", "code", "textarea", "svg", "[contenteditable=true]",
-  ".shop-creator-name", ".shop-archive-identity", ".shop-archive-product", ".shop-archive-post",
+  ".shop-creator-name",
   ".shop-rank-identity", ".shop-inline-item", ".edition-name", ".edition-product > strong",
   ".lookup-account", ".creator-report-name", ".shop-sampled-posts a", ".creator-caption",
   ".creator-identity strong", ".shop-live-product > h3", ".shop-live-product > h3 + .shop-small",
