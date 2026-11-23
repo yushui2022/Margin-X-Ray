@@ -184,7 +184,8 @@ function showView(view: "scan" | "pro" | "creators" | "markup" | "shop"): void {
   els.workspace.hidden = view !== "scan" || !scanStarted;
   document.body.dataset.view = view;
   let navView: string = view;
-  if (location.hash === "#prices" || /^#shop\/(?:product\/|search(?:\?|$))/.test(location.hash)) navView = "prices";
+  if (location.hash === "#prices" || /^#shop\/(?:product\/|search(?:\?|$))/.test(location.hash)
+      || /^#creator\/[^/]+\/products\/[^/]+$/.test(location.hash)) navView = "prices";
   if (/^#shop\/rankings(?:[/?]|$)/.test(location.hash)) navView = "rankings";
   for (const link of document.querySelectorAll<HTMLAnchorElement>(".topnav [data-view]")) {
     const active = link.dataset.view === navView;

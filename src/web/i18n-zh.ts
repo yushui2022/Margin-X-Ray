@@ -1,8 +1,13 @@
+import { priceArchiveZh } from "./i18n-price-archive";
 import { shoppingZh, shoppingPhrase } from "./i18n-shopping";
 import { toolsZh, toolsPhrase } from "./i18n-tools";
 
 const common: Record<string, string> = {
   "Switch shops and save": "换家店可省",
+  "TikTok Shop rankings": "TikTok Shop 价格榜",
+  "Tied #1": "并列第 1 名",
+  "Retail premium & evidence": "零售溢价与证据",
+  "Coverage & sources →": "资料与来源 →",
   "Shopping check": "带货比价", "Rankings": "排行榜", "Creators": "博主", "Price archive": "价格档案",
   "Main navigation": "主导航", "Onion Head home": "Onion Head 首页", "Tools": "工具",
   "Search": "搜索", "Close": "关闭", "Retry": "重试", "Save": "保存", "Back": "返回",
@@ -15,7 +20,7 @@ const common: Record<string, string> = {
   "Enter a TikTok video, creator handle or TikTok Shop product link.": "请输入 TikTok 视频链接、博主账号或 TikTok Shop 商品链接。",
   "Enter a TikTok video, creator handle or TikTok Shop listing.": "请输入 TikTok 视频链接、博主账号或 TikTok Shop 商品链接。",
 };
-const labels = { ...toolsZh, ...shoppingZh, ...common };
+const labels = { ...toolsZh, ...priceArchiveZh, ...shoppingZh, ...common };
 const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function translateUnit(text: string): string {
