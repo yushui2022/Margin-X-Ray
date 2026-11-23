@@ -381,7 +381,7 @@ function renderRadarItem(product: ProProduct): HTMLElement {
     el("p", { class: "radar-meta", text: `${product.category} · ${formatUsd(product.retail)}` }),
     el("p", {
       class: "radar-scans",
-      text: `${product.scans.toLocaleString("en-US")} scans in 24h`,
+      text: `${product.scans.toLocaleString("en-US")} sample scans in 24h`,
     }),
   );
   node.addEventListener("click", () => selectProduct(product.id));
@@ -399,10 +399,10 @@ function renderProductHeader(product: ProProduct): HTMLElement {
       ]),
     ]),
     el("div", { class: "pro-stats" }, [
-      stat("Listed retail", formatUsd(product.retail)),
-      stat("Factory at MOQ", factory > 0 ? formatUsd(factory) : "—"),
+      stat("Sample retail", formatUsd(product.retail)),
+      stat("Sample factory price", factory > 0 ? formatUsd(factory) : "—"),
       stat("Retail / factory", markup === null ? "—" : `${markup.toFixed(1)}×`),
-      stat("24h scans", product.scans.toLocaleString("en-US")),
+      stat("Sample scans · 24h", product.scans.toLocaleString("en-US")),
     ]),
   ]);
 }
@@ -418,7 +418,7 @@ function renderCalculator(product: ProProduct): HTMLElement {
   const card = el("section", { class: "card" });
   card.append(
     el("header", { class: "card-head" }, [
-      el("h3", { text: "Net profit calculator" }),
+      el("h3", { text: "Seller margin calculator" }),
     ]),
   );
 
@@ -613,8 +613,8 @@ function renderSuppliers(product: ProProduct): HTMLElement {
   const card = el("section", { class: "card" });
   card.append(
     el("header", { class: "card-head" }, [
-      el("h3", { text: "Supplier shortlist" }),
-      el("span", { text: "Names locked · sample signals" }),
+      el("h3", { text: "Example suppliers" }),
+      el("span", { text: "Fictional supplier profiles" }),
     ]),
   );
   for (const supplier of product.suppliers) {
@@ -627,7 +627,7 @@ function renderSuppliers(product: ProProduct): HTMLElement {
         ]),
         el("button", {
           class: "btn secondary small",
-          text: "Unlock report",
+          text: "About this sample",
           attrs: { type: "button" },
         }),
       ]),
@@ -653,19 +653,19 @@ function renderSuppliers(product: ProProduct): HTMLElement {
     node.append(
       el("div", { class: "supplier-locked" }, [
         lockIcon(),
-        el("span", { text: "Factory legal name, phone and 1688 link are locked in this sample." }),
+        el("span", { text: "This example has no supplier contact or 1688 listing." }),
       ]),
     );
     const unlock = node.querySelector<HTMLButtonElement>(".btn");
     unlock?.addEventListener("click", () =>
-      toast("Paywall is not connected. This is the Pro unlock slot."),
+      toast("Supplier details and quotes are fictional inputs for the calculator."),
     );
     card.append(node);
   }
   card.append(
     el("p", {
       class: "fine-print",
-      text: "Supplier names, signals and prices are sample data for interface review.",
+      text: "Change the order quantity to explore how sample unit prices vary.",
     }),
   );
   return card;
@@ -675,8 +675,8 @@ function renderInquiry(product: ProProduct): HTMLElement {
   const card = el("section", { class: "card" });
   card.append(
     el("header", { class: "card-head" }, [
-      el("h3", { text: "Request factory evidence" }),
-      el("span", { text: "Mock form · stored locally" }),
+      el("h3", { text: "Draft a supplier inquiry" }),
+      el("span", { text: "Saved on this device" }),
     ]),
   );
   const form = el("form", { class: "inquiry" });
@@ -719,7 +719,7 @@ function renderInquiry(product: ProProduct): HTMLElement {
     message,
   );
 
-  const submit = el("button", { class: "btn primary", text: "Queue factory request", attrs: { type: "submit" } });
+  const submit = el("button", { class: "btn primary", text: "Save sample inquiry", attrs: { type: "submit" } });
   form.append(submit);
 
   const status = el("p", { class: "inquiry-status" });
@@ -745,12 +745,14 @@ function renderInquiry(product: ProProduct): HTMLElement {
       const existing = JSON.parse(localStorage.getItem(key) || "[]") as unknown[];
       localStorage.setItem(key, JSON.stringify([inquiry, ...existing].slice(0, 50)));
     } catch {
-      // Local storage may be unavailable.
+      status.textContent = "Couldn’t save the draft on this device.";
+      status.className = "inquiry-status error";
+      return;
     }
-    status.textContent = `Queued locally for ${product.name}. No request was sent — this is a mock workspace.`;
+    status.textContent = `Sample inquiry for ${product.name} saved on this device.`;
     status.className = "inquiry-status ok";
     submit.disabled = true;
-    toast("Inquiry stored locally (mock).");
+    toast("Sample inquiry saved.");
   });
 
   card.append(form, status);

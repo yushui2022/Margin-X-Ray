@@ -1,4 +1,5 @@
 import { tikTokCheckRoute } from "./shopping-job";
+import { uiText } from "./language";
 import { backLink, details, el, link } from "./shop-dom";
 
 interface ScreenshotEvidence {
@@ -116,7 +117,7 @@ export function screenshotPage(signal: AbortSignal, submit: Submit) {
         event.preventDefault();
         const route = tikTokCheckRoute(input.value);
         if (!route) {
-          input.setCustomValidity("Enter a TikTok video, creator handle or TikTok Shop listing."); input.reportValidity(); return;
+          input.setCustomValidity(uiText("Enter a TikTok video, creator handle or TikTok Shop listing.")); input.reportValidity(); return;
         }
         submit(route);
       });

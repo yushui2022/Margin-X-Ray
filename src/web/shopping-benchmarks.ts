@@ -181,7 +181,7 @@ function scoredReceipt(baseline: Benchmark, observation: Observation, item: Item
   main.append(el("p","Shop price check","scored-receipt-label"));
   const gap = el("h2","","scored-receipt-gap price-benchmark-heading");
   if (!difference) gap.textContent = "Same price";
-  else if (exact && difference > 0) gap.append("Save ",el("strong",delta)," elsewhere");
+  else if (exact && difference > 0) gap.append("Switch shops and save ",el("strong",delta));
   else gap.append(el("strong",delta),difference > 0 ? " higher" : " lower");
   const reference = count === 1 ? "one other shop’s price for " + (exact ? "the same item" : "a similar item") :
     (exact ? "the lowest price for the same item" : "the median for similar listings") + " at " + count + " other shops";

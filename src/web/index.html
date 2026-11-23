@@ -36,13 +36,18 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Zm4 5h6m-6 4h6"/></svg>Price archive
         </a>
       </nav>
+      <div class="topbar-actions">
+      <button class="language-switch" id="languageSwitch" type="button" lang="zh-Hans" translate="no" aria-label="切换到简体中文 · Switch to Simplified Chinese">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg><span>中文</span>
+      </button>
       <details class="app-tools" id="appTools"><summary>Tools</summary><div class="tools-menu">
         <a href="#markup">Compare supplier prices</a>
         <a href="#scan">Scan a video or image</a>
-        <a href="#pro">Pricing workspace · sample</a>
+        <a href="#pro">Seller profit simulator · sample</a>
         <span class="agent-status" id="agentStatus"><i></i><span>Checking agent</span></span>
         <button class="btn ghost" id="backendBtn" type="button">Backend</button>
       </div></details>
+      </div>
     </header>
 
     <main class="page">
@@ -128,12 +133,12 @@
       <section class="pro" id="proView" hidden>
         <header class="pro-head">
           <div>
-            <h1>Pricing workspace</h1>
+            <h1>Seller profit simulator</h1>
             <p class="lede">
-              Choose a product to model profit, compare suppliers and prepare a quote request.
+              Explore how costs affect a seller’s margin using fictional suppliers and sample prices. Creator price checks use observed TikTok Shop offers.
             </p>
           </div>
-          <span class="mock-badge">Sample workspace data</span>
+          <span class="mock-badge">Sample data</span>
         </header>
         <div class="pro-grid">
           <aside class="radar">

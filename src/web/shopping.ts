@@ -15,6 +15,7 @@ import { creatorSearchDestination, liveCreatorHref, username } from "./shopping-
 import { creatorLookupOrigin, creatorResults, lookupCreatorIdentity, searchResultButton, suggestCreators } from "./shopping-creator-lookup";
 import { liveCreatorPage } from "./shopping-creator-live";
 import { archiveHosting } from "./hosting-mode";
+import { uiText } from "./language";
 
 const catalogue = archive.products;
 const profiles = new Map(PUBLIC_CREATORS.map(profile => [profile.handle, profile]));
@@ -52,7 +53,7 @@ function searchForm(initial = "", context: "live" | "home" | "archive" = "live",
       if (archived?.startsWith("#shop/search?") || archived?.startsWith("#shop/product/")) dest = archived;
     }
     if (!dest) {
-      input.setCustomValidity(creatorLookup ? "Enter a username, display name or TikTok link." : "Enter a TikTok video, creator handle or TikTok Shop product link.");
+      input.setCustomValidity(uiText(creatorLookup ? "Enter a username, display name or TikTok link." : "Enter a TikTok video, creator handle or TikTok Shop product link."));
       input.reportValidity(); return;
     }
     dismiss?.();

@@ -19,6 +19,7 @@ import { downloadPoster, renderPosterBlob } from "../content/ui/poster";
 import { renderProWorkspace } from "./pro";
 import { renderMarkup } from "./markup";
 import { archiveHosting } from "./hosting-mode";
+import { initLanguage } from "./language";
 import { markupHref } from "../shared/markup-records";
 import type {
   Confidence,
@@ -98,6 +99,7 @@ let scanStarted = false;
 boot();
 
 function boot(): void {
+  initLanguage(byId<HTMLButtonElement>("languageSwitch"));
   renderSteps();
   els.apiBaseInput.value = apiBase;
   els.scanForm.addEventListener("submit", (event) => {
